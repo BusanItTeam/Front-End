@@ -4,37 +4,38 @@ const Login = () => {
   return (
     <div class="log-in">
       <div class="div">
-        <div class="line"></div>
         <div class="frame-7">
           <div class="side-image">
-            <img class="dl-beatsnoop" src="img/dl-beatsnoop-1.png" />
+            <img class="dl-beatsnoop" src="dl.beatsnoop.png" />
           </div>
-          <div class="frame-8">
+          <form class="frame-8">
             <div class="frame-9">
               <div class="frame-10">
-                <div class="text-wrapper-6">Log in to Exclusive</div>
-                <div class="text-wrapper-7">Enter your details below</div>
+                <div class="text-wrapper-6">로그인 페이지</div>
+                <div class="text-wrapper-7">이메일과 비밀번호를 입력해주세요</div>
               </div>
               <div class="frame-8">
                 <div class="frame-11">
-                  <div class="text-wrapper-8">Email or Phone Number</div>
+                  <input className="text-wrapper-8" placeholder="E-mail" />
                   <div class="under-line"></div>
                 </div>
                 <div class="frame-11">
-                  <div class="text-wrapper-8">Password</div>
+                  <input className="text-wrapper-8" placeholder="Password" />
                   <div class="under-line-2"></div>
                 </div>
               </div>
             </div>
             <div class="frame-12">
               <div class="frame-13">
-                <button class="button">
-                  <div class="view-all-products">Log In</div>
+                <button type="submit" class="button">
+                  <div class="view-all-products">로그인</div>
                 </button>
               </div>
-              <div class="text-wrapper-9">Forget Password?</div>
+              <a href="/" class="text-wrapper-9">
+                비밀번호 찾기
+              </a>
             </div>
-          </div>
+          </form>
         </div>
       </div>
     </div>
