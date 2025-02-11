@@ -331,6 +331,7 @@ html,
 body {
   margin: 0px;
   height: 100%;
+  padding-bottom: 345px; /* 푸터 높이만큼 본문 아래 여백 추가 */
 }
 /* a blue color as a generic focus style */
 button:focus-visible {
