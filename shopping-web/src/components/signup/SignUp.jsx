@@ -1,14 +1,31 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./SignUp.css";
 
 const SignUp = () => {
+  const [name, setName] = useState("");
+  const [emailOrPhone, setEmailOrPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // 백엔드로 전송
+    console.log("Signing up with:", { name, emailOrPhone, password });
+    // 가입성공후 로그인페이지로
+    navigate("/login");
+  };
+
+  const handleGoogleSignUp = () => {
+    // 구글회원가입 로직 여기
+    console.log("Signing up with Google");
+  };
+
   return (
     <div className="sign-up">
-      {/* 상단 헤더 */}
       <div className="div">
         <div className="line"></div>
         <div className="frame-7">
-          {/* 왼쪽 이미지 */}
           <div className="side-image">
             <img
               className="dl-beatsnoop"
@@ -17,51 +34,70 @@ const SignUp = () => {
             />
           </div>
 
-          {/* 오른쪽 회원가입 폼 */}
           <div className="frame-8">
             <div className="frame-9">
               <h2 className="text-wrapper-7">Create an account</h2>
               <p className="text-wrapper-8">Enter your details below</p>
             </div>
 
-            {/* 입력 필드 */}
-            <div className="frame-10">
+            <form onSubmit={handleSubmit} className="frame-10">
               <div className="frame-11">
                 <div className="frame-12">
                   <label className="text-wrapper-9">Name</label>
-                  <input type="text" placeholder="Enter your name" />
+                  <input
+                    type="text"
+                    placeholder="Enter your name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                  />
                   <div className="under-line-2"></div>
                 </div>
                 <div className="frame-12">
                   <label className="text-wrapper-9">
                     Email or Phone Number
                   </label>
-                  <input type="text" placeholder="Enter your email or phone" />
+                  <input
+                    type="text"
+                    placeholder="Enter your email or phone"
+                    value={emailOrPhone}
+                    onChange={(e) => setEmailOrPhone(e.target.value)}
+                    required
+                  />
                   <div className="under-line-3"></div>
                 </div>
                 <div className="frame-12">
                   <label className="text-wrapper-9">Password</label>
-                  <input type="password" placeholder="Enter your password" />
+                  <input
+                    type="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
                   <div className="under-line-4"></div>
                 </div>
               </div>
 
-              {/* 버튼 */}
               <div className="frame-13">
-                <button className="button">Create Account</button>
+                <button type="submit" className="button">
+                  Create Account
+                </button>
 
-                {/* Google 회원가입 */}
                 <div className="frame-14">
-                  <button className="google-sign-up">
+                  <button
+                    type="button"
+                    className="google-sign-up"
+                    onClick={handleGoogleSignUp}
+                  >
                     <img
-                      src="/img/icon-google.svg"
+                      src="../../public/Icon-Google.png"
                       alt="Google Icon"
                       className="img"
                     />
                     Sign up with Google
                   </button>
 
-                  {/* 이미 계정이 있는 경우 */}
                   <div className="frame-16">
                     <p>Already have an account?</p>
                     <a href="/login" className="text-wrapper-12">
@@ -71,7 +107,7 @@ const SignUp = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       </div>
