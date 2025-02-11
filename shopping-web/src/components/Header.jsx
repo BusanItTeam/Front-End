@@ -1,9 +1,12 @@
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "../components/Header.css";
 import Search from "./Search";
 import "../components/signup/SignUp";
 
 export const Header = () => {
+  const [showDropdown, setShowDropdown] = useState(false);
+
   return (
     <header className="header-wrapper">
       <div className="frame-2">
@@ -13,22 +16,46 @@ export const Header = () => {
           <a href="/" className="nav-link">
             Home
           </a>
+          <div
+            className="category-dropdown"
+            onMouseEnter={() => setShowDropdown(true)}
+            onMouseLeave={() => setShowDropdown(false)}
+          >
+            <Link to="/productCategory" className="nav-link">
+              카테고리
+            </Link>
+            {showDropdown && (
+              <ul className="dropdown-menu">
+                <li>
+                  <Link to="/category/pants">바지</Link>
+                </li>
+                <li>
+                  <Link to="/category/tops">상의</Link>
+                </li>
+                <li>
+                  <Link to="/category/outerwear">아우터</Link>
+                </li>
+                <li>
+                  <Link to="/category/dresses">원피스</Link>
+                </li>
+              </ul>
+            )}
+          </div>
           <a href="/contact" className="nav-link">
             Contact
           </a>
           <a href="/about" className="nav-link">
             About
           </a>
-          <a href="/signup" className="nav-link">
+          <Link to="/signup" className="nav-link">
             Sign Up
-          </a>
+          </Link>
           <a href="/login" className="nav-link">
             LogIn
           </a>
         </nav>
       </div>
 
-      {/* 검색 */}
       <Search />
       <div className="frame-5">
         <a href="/wishlist" className="icon wishlist"></a>
@@ -43,9 +70,6 @@ export const Header = () => {
         </Link>
         <Link to="/about" className="nav-link">
           About
-        </Link>
-        <Link to="/SignUp" className="nav-link">
-          Sign Up
         </Link>
       </div>
     </header>
