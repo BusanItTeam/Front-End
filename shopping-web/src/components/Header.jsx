@@ -1,10 +1,11 @@
+import { Link } from "react-router-dom";
 import "../components/Header.css";
 import Search from "./Search";
+import "../components/signup/SignUp";
 
 export const Header = () => {
   return (
     <header className="header-wrapper">
-      {/* 로고 및 네비게이션 */}
       <div className="frame-2">
         <img src="/Logo.png" alt="Logo" className="logo" />
 
@@ -33,6 +34,19 @@ export const Header = () => {
         <a href="/wishlist" className="icon wishlist"></a>
         <a href="/cart" className="icon cart"></a>
         <a href="/user" className="icon user"></a>
+
+        <Link to="/" className="nav-link">
+          Home
+        </Link>
+        <Link to="/contact" className="nav-link">
+          Contact
+        </Link>
+        <Link to="/about" className="nav-link">
+          About
+        </Link>
+        <Link to="/SignUp" className="nav-link">
+          Sign Up
+        </Link>
       </div>
     </header>
   );
