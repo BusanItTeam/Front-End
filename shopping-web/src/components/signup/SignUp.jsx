@@ -1,24 +1,45 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./SignUp.css";
 
 const SignUp = () => {
-  const [name, setName] = useState("");
-  const [emailOrPhone, setEmailOrPhone] = useState("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // 백엔드로 전송
-    console.log("Signing up with:", { name, emailOrPhone, password });
-    // 가입성공후 로그인페이지로
-    navigate("/login");
+    setError("");
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/api/auths/public/signup",
+        {
+          username,
+          email,
+          password,
+          role: ["user"],
+        }
+      );
+
+      console.log("Sign up successful:", response.data);
+      navigate("/login");
+    } catch (err) {
+      if (err.response && err.response.data) {
+        setError(err.response.data.message);
+      } else {
+        setError("An error occurred during sign up");
+      }
+      console.error("Sign up error:", err);
+    }
   };
 
   const handleGoogleSignUp = () => {
-    // 구글회원가입 로직 여기
     console.log("Signing up with Google");
+    // Google 회원가입 로직 구현
   };
 
   return (
@@ -40,28 +61,28 @@ const SignUp = () => {
               <p className="text-wrapper-8">Enter your details below</p>
             </div>
 
+            {error && <p className="error-message">{error}</p>}
+
             <form onSubmit={handleSubmit} className="frame-10">
               <div className="frame-11">
                 <div className="frame-12">
-                  <label className="text-wrapper-9">Name</label>
+                  <label className="text-wrapper-9">Username</label>
                   <input
                     type="text"
-                    placeholder="Enter your name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Enter your username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     required
                   />
                   <div className="under-line-2"></div>
                 </div>
                 <div className="frame-12">
-                  <label className="text-wrapper-9">
-                    Email or Phone Number
-                  </label>
+                  <label className="text-wrapper-9">Email</label>
                   <input
-                    type="text"
-                    placeholder="Enter your email or phone"
-                    value={emailOrPhone}
-                    onChange={(e) => setEmailOrPhone(e.target.value)}
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                   />
                   <div className="under-line-3"></div>
