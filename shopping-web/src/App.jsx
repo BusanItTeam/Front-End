@@ -1,16 +1,16 @@
 import { Route, Routes, BrowserRouter as Router } from "react-router-dom";
 import "./App.css";
-import { Header } from "./components/Header";
+import { Header } from "./components/header/Header";
 import SignUp from "./components/signup/SignUp";
 import { ContextProvider } from "./store/ContextApi";
-import Login from "./components/Login";
+import Login from "./components/login/Login";
 import ProductCategory from "./components/productCategory/ProductCategory";
 import Pants from "./components/productCategory/Pants";
 import Tops from "./components/productCategory/Tops";
 import Outerwear from "./components/productCategory/Outerwear";
 import Dresses from "./components/productCategory/Dresses";
-import Footer from "./components/Footer";
-import Sidebar from "./components/Sidebar";
+import Footer from "./components/footer/Footer";
+import Sidebar from "./components/siderbar/Sidebar";
 
 function App() {
   return (
@@ -29,6 +29,8 @@ function App() {
 
           <Route path="/signup" element={<SignUp />} />
         </Routes>
+        <Sidebar />
+        <Footer />
       </Router>
     </ContextProvider>
   );

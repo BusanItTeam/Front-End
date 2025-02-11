@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import "../components/Header.css";
-import Search from "./Search";
-import "../components/signup/SignUp";
+import "./Header.css";
+import Search from "../search/Search";
+import "../signup/SignUp";
 
 export const Header = () => {
   const [showDropdown, setShowDropdown] = useState(false);
