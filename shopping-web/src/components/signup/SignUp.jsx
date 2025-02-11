@@ -91,7 +91,7 @@ const SignUp = () => {
                     onClick={handleGoogleSignUp}
                   >
                     <img
-                      src="../../public/Icon-Google.png"
+                      src="/Icon-Google.png"
                       alt="Google Icon"
                       className="img"
                     />
