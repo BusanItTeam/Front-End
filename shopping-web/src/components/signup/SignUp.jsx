@@ -7,13 +7,42 @@ const SignUp = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
-  const [error, setError] = useState("");
+ 
   const navigate = useNavigate();
+
+  const validateForm = () => {
+    let isValid = true;
+    let newErrors = {};
+
+    if (username.length < 2 || username.length > 20) {
+      newErrors.username = "유저네임은 2~20글자로 입력해주세요";
+      isValid = false;
+    }
+
+    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if (!emailRegex.test(email)) {
+      newErrors.email = "이메일 형식에 맞게 써주세요";
+      isValid = false;
+    } else if (email.length > 50) {
+      newErrors.email = "이메일은 최대50글자입니다";
+      isValid = false;
+    }
+
+    if (password.length < 6 || password.length > 40) {
+      newErrors.password = "비밀번호는 6~40글자로 입력해주세요";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+
+    if (!validateForm()) {
+      return;
+    }
 
     try {
       const response = await axios.post(
@@ -30,9 +59,9 @@ const SignUp = () => {
       navigate("/login");
     } catch (err) {
       if (err.response && err.response.data) {
-        setError(err.response.data.message);
+        setErrors({ ...errors, server: err.response.data.message });
       } else {
-        setError("An error occurred during sign up");
+        setErrors({ ...errors, server: "An error occurred during sign up" });
       }
       console.error("Sign up error:", err);
     }
@@ -62,7 +91,7 @@ const SignUp = () => {
               <p className="text-wrapper-8">Enter your details below</p>
             </div>
 
-            {error && <p className="error-message">{error}</p>}
+            {errors.server && <p className="error-message">{errors.server}</p>}
 
             <form onSubmit={handleSubmit} className="frame-10">
               <div className="frame-11">
@@ -75,6 +104,9 @@ const SignUp = () => {
                     onChange={(e) => setUsername(e.target.value)}
                     required
                   />
+                  {errors.username && (
+                    <p className="error-message">{errors.username}</p>
+                  )}
                   <div className="under-line-2"></div>
                 </div>
                 <div className="frame-12">
@@ -86,6 +118,9 @@ const SignUp = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                   />
+                  {errors.email && (
+                    <p className="error-message">{errors.email}</p>
+                  )}
                   <div className="under-line-3"></div>
                 </div>
                 <div className="frame-12">
@@ -97,6 +132,9 @@ const SignUp = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
+                  {errors.password && (
+                    <p className="error-message">{errors.password}</p>
+                  )}
                   <div className="under-line-4"></div>
                 </div>
               </div>
