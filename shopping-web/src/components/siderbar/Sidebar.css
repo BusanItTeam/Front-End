@@ -67,3 +67,9 @@
   height: 384px;
   background-color: #ddd; /* 연한 회색 라인 */
 }
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}

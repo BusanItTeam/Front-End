@@ -1,6 +1,3 @@
-import React, { useState, useEffect } from "react";
-import "./ProductCategory.css";
-
 const Dresses = () => {
   const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -81,33 +78,9 @@ const Dresses = () => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
-    <div className="product-category-container">
-      <h2>원피스</h2>
-      <div className="product-category">
-        {currentProducts.map((product) => (
-          <div key={product.id} className="product-card">
-            <img
-              src={product.image}
-              alt={product.name}
-              className="product-image"
-            />
-            <div className="product-info">
-              <h3 className="product-name">{product.name}</h3>
-              <p className="product-price">${product.price}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="pagination">
-        {Array.from(
-          { length: Math.ceil(products.length / productsPerPage) },
-          (_, i) => (
-            <button key={i} onClick={() => paginate(i + 1)}>
-              {i + 1}
-            </button>
-          )
-        )}
-      </div>
+    <div>
+      <h1>원피스 카테고리</h1>
+      <p>여기에 원피스 관련 상품들이 표시됩니다.</p>
     </div>
   );
 };
