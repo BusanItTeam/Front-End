@@ -9,6 +9,8 @@ import Pants from "./components/productCategory/Pants";
 import Tops from "./components/productCategory/Tops";
 import Outerwear from "./components/productCategory/Outerwear";
 import Dresses from "./components/productCategory/Dresses";
+import Footer from "./components/Footer";
+import Sidebar from "./components/Sidebar";
 
 function App() {
   return (
@@ -29,6 +31,7 @@ function App() {
         </Routes>
       </Router>
     </ContextProvider>
+
   );
 }
 
