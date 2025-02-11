@@ -1,0 +1,19 @@
+.frame-4 {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  
+  .search-bar {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    outline: none;
+  }
+  
+  .frame-5 {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
