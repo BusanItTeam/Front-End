@@ -10,7 +10,6 @@ export const Header = () => {
         <img src="/Logo.png" alt="Logo" className="logo" />
 
         <nav className="frame-3">
-
           <a href="/" className="nav-link">
             Home
           </a>
@@ -36,26 +35,18 @@ export const Header = () => {
         <a href="/cart" className="icon cart"></a>
         <a href="/user" className="icon user"></a>
 
-          <Link to="/" className="nav-link">
-            Home
-          </Link>
-          <Link to="/contact" className="nav-link">
-            Contact
-          </Link>
-          <Link to="/about" className="nav-link">
-            About
-          </Link>
-          <Link to="/SignUp" className="nav-link">
-            Sign Up
-          </Link>
-        </nav>
-      </div>
-
-      <Search />
-      <div className="frame-5">
-        <Link to="/wishlist" className="icon wishlist"></Link>
-        <Link to="/cart" className="icon cart"></Link>
-        <Link to="/user" className="icon user"></Link>
+        <Link to="/" className="nav-link">
+          Home
+        </Link>
+        <Link to="/contact" className="nav-link">
+          Contact
+        </Link>
+        <Link to="/about" className="nav-link">
+          About
+        </Link>
+        <Link to="/SignUp" className="nav-link">
+          Sign Up
+        </Link>
       </div>
     </header>
   );
