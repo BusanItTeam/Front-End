@@ -57,58 +57,59 @@ const Login = () => {
   }, [navigate, token]);
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      {/* 전체 컨테이너 */}
-      <div className="flex flex-col md:flex-row bg-white shadow-lg rounded-lg overflow-hidden w-full max-w-4xl">
-        
-        {/* Left Side Image (데스크톱에서만 보이게) */}
-        <div className="hidden md:flex w-1/2 bg-blue-100 items-center justify-center">
-          <img src="/dl.beatsnoop.png" alt="Shopping Cart" className="w-full h-full object-cover" />
-        </div>
+    <div className="flex h-screen bg-white mt-25 mb-25">
+      {/* 왼쪽 이미지 영역 */}
+      <div className="hidden md:flex w-[65%] min-h-[700px] bg-[#cbe4e8] overflow-hidden relative rounded-tr-md rounded-br-md">
+        <img 
+          src="/dl.beatsnoop.png" 
+          alt="Shopping Cart" 
+          className="absolute w-full h-[90%] object-contain mx-auto"
+        />
+      </div>
 
-        {/* Login Form */}
-        <div className="w-full md:w-1/2 p-8 flex flex-col justify-center gap-4">
-          <h2 className="text-2xl font-semibold text-gray-800">로그인 페이지</h2>
-          <p className="text-gray-600 mt-2">아이디와 비밀번호를 입력해주세요</p>
+      {/* 중간 실선 */}
+      <div className="hidden md:block w-[2px] bg-gray-300"></div>
 
-          <form onSubmit={handleSubmit(onLoginHandler)} className="mt-4 space-y-4">
+      {/* 로그인 폼 */}
+      <div className="w-full md:w-1/2 flex flex-col justify-center items-start px-30 mb-12">
+        <div className="w-full max-w-sm">
+          <h2 className="text-4xl font-semibold text-gray-900 mb-6 self-start">Log in to Exclusive</h2>
+          <p className="text-gray-500 mb-14 self-start">Enter your details below</p>
+
+          <form onSubmit={handleSubmit(onLoginHandler)} className="space-y-6">
             
-            {/* Username Input */}
+            {/* 유저네임 */}
             <div>
-              <label className="block text-gray-700">아이디</label>
               <input
                 type="text"
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="아이디를 입력해주세요"
+                className="w-full px-2 pb-2 border-b border-gray-300 focus:outline-none focus:border-gray-600"
+                placeholder="Email or Phone Number"
                 {...register("username", { required: "아이디를 입력해주세요" })}
               />
-              {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
+              {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username.message}</p>}
             </div>
 
-            {/* Password Input */}
+            {/* 비밀번호 */}
             <div>
-              <label className="block text-gray-700">비밀번호</label>
               <input
                 type="password"
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="비밀번호를 입력해주세요"
+                className="w-full px-2 pb-2 border-b border-gray-300 focus:outline-none focus:border-gray-600"
+                placeholder="Password"
                 {...register("password", { required: "비밀번호를 입력해주세요" })}
               />
-              {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
+              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
             </div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              className="w-full py-2 px-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md transition duration-200"
-              disabled={loading}
-            >
-              {loading ? "로그인 중..." : "로그인"}
-            </button>
-
-            {/* 비밀번호 찾기 */}
-            <div className="text-center mt-4">
-              <Link to="/" className="text-blue-500 hover:underline">비밀번호 찾기</Link>
+            {/* 로그인 버튼 & 비밀번호 찾기 */}
+            <div className="flex justify-between items-center">
+              <button
+                type="submit"
+                className="w-32 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-md transition duration-200"
+                disabled={loading}
+              >
+                {loading ? "로그인 중..." : "Log In"}
+              </button>
+              <Link to="/" className="text-red-500 text-sm hover:underline">Forgot Password?</Link>
             </div>
           </form>
         </div>
