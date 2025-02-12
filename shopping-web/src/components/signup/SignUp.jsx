@@ -1,174 +1,146 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import "./SignUp.css";
+import api from "../../services/Api"; 
+import { useMyContext } from "../../store/ContextApi";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 const SignUp = () => {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState({});
+  const apiUrl = import.meta.env.VITE_APP_API_URL;
+  const [role, setRole] = useState();
+  const [loading, setLoading] = useState(false);
+  const { token } = useMyContext();
   const navigate = useNavigate();
 
-  const validateForm = () => {
-    let isValid = true;
-    let newErrors = {};
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setError,
+    formState: { errors },
+  } = useForm({
+    defaultValues: { username: "", email: "", password: "" },
+    mode: "onTouched",
+  });
 
-    if (username.length < 2 || username.length > 20) {
-      newErrors.username = "유저네임은 2~20글자로 입력해주세요";
-      isValid = false;
-    }
+  useEffect(() => {
+    setRole("ROLE_USER");
+  }, []);
 
-    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    if (!emailRegex.test(email)) {
-      newErrors.email = "이메일 형식에 맞게 써주세요";
-      isValid = false;
-    } else if (email.length > 50) {
-      newErrors.email = "이메일은 최대50글자입니다";
-      isValid = false;
-    }
-
-    if (password.length < 6 || password.length > 40) {
-      newErrors.password = "비밀번호는 6~40글자로 입력해주세요";
-      isValid = false;
-    }
-
-    setErrors(newErrors);
-    return isValid;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
+  const onSubmitHandler = async (data) => {
+    const { username, email, password } = data;
+    const sendData = { username, email, password, role: [role] };
 
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/auths/public/signup",
-        {
-          username,
-          email,
-          password,
-          role: ["user"],
-        }
-      );
-
-      console.log("Sign up successful:", response.data);
-      navigate("/login");
-    } catch (err) {
-      if (err.response && err.response.data) {
-        setErrors({ ...errors, server: err.response.data.message });
-      } else {
-        setErrors({ ...errors, server: "An error occurred during sign up" });
+      setLoading(true);
+      const response = await api.post("/auths/public/signup", sendData);
+      toast.success("회원가입 성공");
+      reset();
+      if (response.data) {
+        navigate("/login");
       }
-      console.error("Sign up error:", err);
+    } catch (error) {
+      if (error?.response?.data?.message === "Error: 유저네임이 이미 존재합니다.") {
+        setError("username", { type: "manual", message: "유저네임이 이미 존재합니다." });
+      } else if (error?.response?.data?.message === "Error: 이메일이 이미 사용중 입니다.") {
+        setError("email", { type: "manual", message: "이메일이 이미 사용 중입니다." });
+      } else {
+        setError("server", { type: "manual", message: "회원가입 중 오류가 발생했습니다." });
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleGoogleSignUp = () => {
-    console.log("Signing up with Google");
-    // Google 회원가입 로직 구현
-  };
+  useEffect(() => {
+    if (token) navigate("/");
+  }, [navigate, token]);
 
   return (
-    <div className="sign-up">
-      <div className="div">
-        <div className="line"></div>
-        <div className="frame-7">
-          <div className="side-image">
-            <img
-              className="dl-beatsnoop"
-              src="/dl.beatsnoop1.png"
-              alt="Shopping Cart"
-            />
-          </div>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+      <div className="flex flex-col md:flex-row bg-white shadow-lg rounded-lg overflow-hidden w-full max-w-4xl">
+        
+        {/* Left Side Image */}
+        <div className="hidden md:block w-1/2 bg-blue-100">
+          <img src="/dl.beatsnoop1.png" alt="Shopping Cart" className="w-full h-full object-cover" />
+        </div>
 
-          <div className="frame-8">
-            <div className="frame-9">
-              <h2 className="text-wrapper-7">Create an account</h2>
-              <p className="text-wrapper-8">Enter your details below</p>
+        {/* Signup Form */}
+        <div className="w-full md:w-1/2 p-8">
+          <h2 className="text-2xl font-semibold text-gray-800">Create an account</h2>
+          <p className="text-gray-600 mt-2">Enter your details below</p>
+
+          {errors.server && <p className="text-red-500 text-sm mt-2">{errors.server.message}</p>}
+
+          <form onSubmit={handleSubmit(onSubmitHandler)} className="mt-4 space-y-4">
+            
+            {/* Username Input */}
+            <div>
+              <label className="block text-gray-700">Username</label>
+              <input
+                type="text"
+                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder="Enter your username"
+                {...register("username", { required: "유저네임을 입력해주세요" })}
+              />
+              {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
             </div>
 
-            {errors.server && <p className="error-message">{errors.server}</p>}
+            {/* Email Input */}
+            <div>
+              <label className="block text-gray-700">Email</label>
+              <input
+                type="email"
+                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder="Enter your email"
+                {...register("email", { required: "이메일을 입력해주세요" })}
+              />
+              {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
+            </div>
 
-            <form onSubmit={handleSubmit} className="frame-10">
-              <div className="frame-11">
-                <div className="frame-12">
-                  <label className="text-wrapper-9">Username</label>
-                  <input
-                    type="text"
-                    placeholder="Enter your username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    required
-                  />
-                  {errors.username && (
-                    <p className="error-message">{errors.username}</p>
-                  )}
-                  <div className="under-line-2"></div>
-                </div>
-                <div className="frame-12">
-                  <label className="text-wrapper-9">Email</label>
-                  <input
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                  {errors.email && (
-                    <p className="error-message">{errors.email}</p>
-                  )}
-                  <div className="under-line-3"></div>
-                </div>
-                <div className="frame-12">
-                  <label className="text-wrapper-9">Password</label>
-                  <input
-                    type="password"
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                  {errors.password && (
-                    <p className="error-message">{errors.password}</p>
-                  )}
-                  <div className="under-line-4"></div>
-                </div>
-              </div>
+            {/* Password Input */}
+            <div>
+              <label className="block text-gray-700">Password</label>
+              <input
+                type="password"
+                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder="Enter your password"
+                {...register("password", { 
+                  required: "비밀번호를 입력해주세요",
+                  minLength: { value: 6, message: "비밀번호는 최소 6자 이상이어야 합니다." }
+                })}
+              />
+              {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
+            </div>
 
-              <div className="frame-13">
-                <button type="submit" className="button">
-                  Create Account
-                </button>
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className="w-full py-2 px-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md transition duration-200"
+              disabled={loading}
+            >
+              {loading ? "Loading..." : "Create Account"}
+            </button>
 
-                <div className="frame-14">
-                  <button
-                    type="button"
-                    className="google-sign-up"
-                    onClick={handleGoogleSignUp}
-                  >
-                    <img
-                      src="/Icon-Google.png"
-                      alt="Google Icon"
-                      className="img"
-                    />
-                    Sign up with Google
-                  </button>
+            {/* Google Signup Button */}
+            <button
+              type="button"
+              className="w-full py-2 px-4 flex items-center justify-center border rounded-md text-gray-700 hover:bg-gray-100 transition"
+              onClick={() => console.log("Signing up with Google")}
+            >
+              <img src="/Icon-Google.png" alt="Google Icon" className="w-5 h-5 mr-2" />
+              Sign up with Google
+            </button>
 
-                  <div className="frame-16">
-                    <p>Already have an account?</p>
-                    <a href="/login" className="text-wrapper-12">
-                      Log in
-                    </a>
-                    <div className="under-line-5"></div>
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div>
+            {/* Already have an account */}
+            <div className="text-center mt-4">
+              <p className="text-gray-600">
+                Already have an account?{" "}
+                <a href="/login" className="text-blue-500 hover:underline">Log in</a>
+              </p>
+            </div>
+
+          </form>
         </div>
       </div>
     </div>
