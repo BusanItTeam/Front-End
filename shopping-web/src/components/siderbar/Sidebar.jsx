@@ -4,7 +4,7 @@ import "./Sidebar.css";
 const Sidebar = () => {
   return (
     <div className="frame">
-      <div classNameName="box"></div> {/* 사이드바 오른쪽에 라인 추가 */}
+      <div className="box"></div> {/* 사이드바 오른쪽에 라인 추가 */}
       <div className="div">
         <a href="/best" className="text-wrapper">
           BEST

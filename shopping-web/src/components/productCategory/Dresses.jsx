@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import "./ProductCategory.css";
 
 const Dresses = () => {
   const [products, setProducts] = useState([]);
@@ -7,8 +6,7 @@ const Dresses = () => {
   const productsPerPage = 8;
 
   useEffect(() => {
-    // 여기서 실제 데이터를 가져오는 API 호출을 수행합니다.
-    // 예시를 위해 더미 데이터를 사용합니다.
+    //더미사진
     const dummyProducts = [
       {
         id: 1,
@@ -81,28 +79,35 @@ const Dresses = () => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
-    <div className="product-category-container">
-      <h2>원피스</h2>
-      <div className="product-category">
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <h2 className="text-3xl font-bold mb-6">원피스</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {currentProducts.map((product) => (
-          <div key={product.id} className="product-card">
+          <div
+            key={product.id}
+            className="bg-white shadow-md rounded-lg overflow-hidden"
+          >
             <img
               src={product.image}
               alt={product.name}
-              className="product-image"
+              className="w-full h-48 object-cover"
             />
-            <div className="product-info">
-              <h3 className="product-name">{product.name}</h3>
-              <p className="product-price">${product.price}</p>
+            <div className="p-4">
+              <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
+              <p className="text-gray-700 font-bold">${product.price}</p>
             </div>
           </div>
         ))}
       </div>
-      <div className="pagination">
+      <div className="flex justify-center mt-8">
         {Array.from(
           { length: Math.ceil(products.length / productsPerPage) },
           (_, i) => (
-            <button key={i} onClick={() => paginate(i + 1)}>
+            <button
+              key={i}
+              onClick={() => paginate(i + 1)}
+              className="mx-1 px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 focus:outline-none"
+            >
               {i + 1}
             </button>
           )
