@@ -11,7 +11,8 @@ import Outerwear from "./components/productCategory/Outerwear";
 import Dresses from "./components/productCategory/Dresses";
 import Footer from "./components/footer/Footer";
 import Sidebar from "./components/siderbar/Sidebar";
-import Cart from "./components/cart/Cart";
+import CartPage from "./components/cart/CartPage";
+import Payment from "./components/cart/Payment";
 
 function App() {
   return (
@@ -29,7 +30,8 @@ function App() {
           <Route path="/login" element={<Login />} />
 
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/cart" element={<Cart />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/payment" element={<Payment />} />
         </Routes>
 
         <Footer />
