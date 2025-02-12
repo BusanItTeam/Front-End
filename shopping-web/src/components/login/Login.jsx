@@ -1,40 +1,26 @@
-import "./Login.css";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../services/Api";
 import { jwtDecode } from "jwt-decode";
-import InputField from "../InputField/InputField";
 import toast from "react-hot-toast";
 import { useMyContext } from "../../store/ContextApi";
-import { useEffect } from "react";
-
-const apiUrl = import.meta.env.VITE_APP_API_URL;
 
 const Login = () => {
-  // 로그인 페이지
-  const [jwtToken, setJwtToken] = useState("");
   const [loading, setLoading] = useState(false);
-  // 컨텍스트로 토큰 가져옴
   const { setToken, token } = useMyContext();
-  const navigate = useNavigate(); //이동객체
+  const navigate = useNavigate();
 
-  //리액트 훅 폼 사용
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm({
-    defaultValues: {
-      username: "",
-      password: "",
-      code: "",
-    },
+    defaultValues: { username: "", password: "" },
     mode: "onTouched",
   });
 
-  //로그인 성공시
   const handleSuccessfulLogin = (token, decodedToken) => {
     const user = {
       username: decodedToken.sub,
@@ -42,76 +28,88 @@ const Login = () => {
     };
     localStorage.setItem("JWT_TOKEN", token);
     localStorage.setItem("USER", JSON.stringify(user));
-
-    //컨텍스트에 토큰을 저장
     setToken(token);
-
-    navigate("/"); //홈페이지로 이동
+    navigate("/");
   };
 
-  //로그인 함수
   const onLoginHandler = async (data) => {
     try {
-      setLoading(true); //로딩시작
-      const response = await api.post("/auth/public/signin", data);
-
+      setLoading(true);
+      const response = await api.post("/auths/public/signin", data);
       toast.success("로그인 성공!");
-      reset(); //입력창 리셋
+      reset();
 
       if (response.status === 200 && response.data.jwtToken) {
-        setJwtToken(response.data.jwtToken);
         const decodedToken = jwtDecode(response.data.jwtToken);
-        console.log(decodedToken); //토큰해석
         handleSuccessfulLogin(response.data.jwtToken, decodedToken);
       } else {
-        toast.error("로그인 실패! 유저네임과 패스워드 확인필요.");
+        toast.error("로그인 실패! 유저네임과 패스워드를 확인해주세요.");
       }
     } catch (error) {
-      if (error) {
-        toast.error("로그인 실패! 에러발생!");
-      }
+      toast.error("로그인 실패! 에러가 발생했습니다.");
     } finally {
       setLoading(false);
     }
   };
 
-  //토큰이 있으면 홈페이지로 감(로그인 필요없음)
   useEffect(() => {
     if (token) navigate("/");
   }, [navigate, token]);
 
   return (
-    <div className="log-in">
-      <div className="div">
-        <div className="frame-7">
-          <div className="side-image">
-            <img className="dl-beatsnoop" src="dl.beatsnoop.png" />
-          </div>
-          <form onSubmit={handleSubmit(onLoginHandler)} className="frame-8">
-            <div className="frame-9">
-              <div className="frame-10">
-                <div className="text-wrapper-6">로그인 페이지</div>
-                <div className="text-wrapper-7">아이디와 비밀번호를 입력해주세요</div>
-              </div>
-              <div className="frame-8">
-                <div className="frame-11">
-                  <InputField className="text-wrapper-8" required id="username" type="text" message="*아이디를 입력해주세요" placeholder="type your username" register={register} errors={errors} /> <div className="under-line"></div>
-                </div>
-                <div className="frame-11">
-                  <InputField className="text-wrapper-8" required id="password" type="password" message="*비밀번호를 입력해주세요" placeholder="type your password" register={register} errors={errors} />
-                  <div className="under-line-2"></div>
-                </div>
-              </div>
+    <div className="flex h-screen bg-white mt-25 mb-25">
+      {/* 왼쪽 이미지 영역 */}
+      <div className="hidden md:flex w-[65%] min-h-[700px] bg-[#cbe4e8] overflow-hidden relative rounded-tr-md rounded-br-md">
+        <img 
+          src="/dl.beatsnoop.png" 
+          alt="Shopping Cart" 
+          className="absolute w-full h-[90%] object-contain mx-auto"
+        />
+      </div>
+
+      {/* 중간 실선 */}
+      <div className="hidden md:block w-[2px] bg-gray-300"></div>
+
+      {/* 로그인 폼 */}
+      <div className="w-full md:w-1/2 flex flex-col justify-center items-start px-30 mb-12">
+        <div className="w-full max-w-sm">
+          <h2 className="text-4xl font-semibold text-gray-900 mb-6 self-start">Log in to Exclusive</h2>
+          <p className="text-gray-500 mb-14 self-start">Enter your details below</p>
+
+          <form onSubmit={handleSubmit(onLoginHandler)} className="space-y-6">
+            
+            {/* 유저네임 */}
+            <div>
+              <input
+                type="text"
+                className="w-full px-2 pb-2 border-b border-gray-300 focus:outline-none focus:border-gray-600"
+                placeholder="Email or Phone Number"
+                {...register("username", { required: "아이디를 입력해주세요" })}
+              />
+              {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username.message}</p>}
             </div>
-            <div className="frame-12">
-              <div className="frame-13">
-                <button type="submit" className="button">
-                  <div className="view-all-products">로그인</div>
-                </button>
-              </div>
-              <Link to="/" className="text-wrapper-9">
-                비밀번호 찾기
-              </Link>
+
+            {/* 비밀번호 */}
+            <div>
+              <input
+                type="password"
+                className="w-full px-2 pb-2 border-b border-gray-300 focus:outline-none focus:border-gray-600"
+                placeholder="Password"
+                {...register("password", { required: "비밀번호를 입력해주세요" })}
+              />
+              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
+            </div>
+
+            {/* 로그인 버튼 & 비밀번호 찾기 */}
+            <div className="flex justify-between items-center">
+              <button
+                type="submit"
+                className="w-32 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-md transition duration-200"
+                disabled={loading}
+              >
+                {loading ? "로그인 중..." : "Log In"}
+              </button>
+              <Link to="/" className="text-red-500 text-sm hover:underline">Forgot Password?</Link>
             </div>
           </form>
         </div>
