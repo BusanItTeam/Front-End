@@ -1,6 +1,82 @@
-import React from "react";
-
 const Dresses = () => {
+  const [products, setProducts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 8;
+
+  useEffect(() => {
+    // 여기서 실제 데이터를 가져오는 API 호출을 수행합니다.
+    // 예시를 위해 더미 데이터를 사용합니다.
+    const dummyProducts = [
+      {
+        id: 1,
+        name: "Breed Dry Dog Food",
+        price: 100,
+        image: "/woman-6626615_1280.jpg",
+      },
+      {
+        id: 2,
+        name: "CANON EOS DSLR Camera",
+        price: 360,
+        image: "/woman-6626615_1280.jpg",
+      },
+      {
+        id: 3,
+        name: "ASUS FHD Gaming Laptop",
+        price: 700,
+        image: "/woman-6626615_1280.jpg",
+      },
+      {
+        id: 4,
+        name: "Curology Product Set",
+        price: 500,
+        image: "/woman-6626615_1280.jpg",
+      },
+      {
+        id: 5,
+        name: "Kids Electric Car",
+        price: 960,
+        image: "/woman-6626615_1280.jpg",
+      },
+      {
+        id: 6,
+        name: "Jr. Zoom Soccer Cleats",
+        price: 1160,
+        image: "/woman-6626615_1280.jpg",
+      },
+      {
+        id: 7,
+        name: "GP11 Shooter USB Gamepad",
+        price: 660,
+        image: "/woman-6626615_1280.jpg",
+      },
+      {
+        id: 8,
+        name: "Quilted Satin Jacket",
+        price: 660,
+        image: "/woman-6626615_1280.jpg",
+      },
+      {
+        id: 9,
+        name: "Quilted Satin Jacket",
+        price: 760,
+        image: "/woman-6626615_1280.jpg",
+      },
+      // 추가 제품
+    ];
+    setProducts(dummyProducts);
+  }, []);
+
+  // 현재 페이지의 제품들을 계산합니다.
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = products.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
+
+  // 페이지 변경 함수
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   return (
     <div>
       <h1>원피스 카테고리</h1>
