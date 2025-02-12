@@ -57,17 +57,17 @@ const Login = () => {
   }, [navigate, token]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-red-500">
+    <div className="flex items-center justify-center h-screen bg-gray-100">
       {/* 전체 컨테이너 */}
-      <div className="flex flex-col md:flex-row bg-white shadow-lg rounded-lg overflow-hidden w-full max-w-4xl h-[600px]">
+      <div className="flex flex-col md:flex-row bg-white shadow-lg rounded-lg overflow-hidden w-full max-w-4xl">
         
         {/* Left Side Image (데스크톱에서만 보이게) */}
-        <div className="hidden md:flex w-1/2 bg-blue-100">
+        <div className="hidden md:flex w-1/2 bg-blue-100 items-center justify-center">
           <img src="/dl.beatsnoop.png" alt="Shopping Cart" className="w-full h-full object-cover" />
         </div>
 
         {/* Login Form */}
-        <div className="w-full md:w-1/2 p-8 flex flex-col justify-center">
+        <div className="w-full md:w-1/2 p-8 flex flex-col justify-center gap-4">
           <h2 className="text-2xl font-semibold text-gray-800">로그인 페이지</h2>
           <p className="text-gray-600 mt-2">아이디와 비밀번호를 입력해주세요</p>
 
