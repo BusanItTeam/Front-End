@@ -91,14 +91,35 @@ const Login = () => {
             <div className="frame-9">
               <div className="frame-10">
                 <div className="text-wrapper-6">로그인 페이지</div>
-                <div className="text-wrapper-7">아이디와 비밀번호를 입력해주세요</div>
+                <div className="text-wrapper-7">
+                  아이디와 비밀번호를 입력해주세요
+                </div>
               </div>
               <div className="frame-8">
                 <div className="frame-11">
-                  <InputField className="text-wrapper-8" required id="username" type="text" message="*아이디를 입력해주세요" placeholder="type your username" register={register} errors={errors} /> <div className="under-line"></div>
+                  <InputField
+                    className="text-wrapper-8"
+                    required
+                    id="username"
+                    type="text"
+                    message="*아이디를 입력해주세요"
+                    placeholder="type your username"
+                    register={register}
+                    errors={errors}
+                  />{" "}
+                  <div className="under-line"></div>
                 </div>
                 <div className="frame-11">
-                  <InputField className="text-wrapper-8" required id="password" type="password" message="*비밀번호를 입력해주세요" placeholder="type your password" register={register} errors={errors} />
+                  <InputField
+                    className="text-wrapper-8"
+                    required
+                    id="password"
+                    type="password"
+                    message="*비밀번호를 입력해주세요"
+                    placeholder="type your password"
+                    register={register}
+                    errors={errors}
+                  />
                   <div className="under-line-2"></div>
                 </div>
               </div>
