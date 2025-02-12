@@ -60,9 +60,9 @@ const Login = () => {
     <div className="flex h-screen bg-white mt-25 mb-25">
       {/* 왼쪽 이미지 영역 */}
       <div className="hidden md:flex w-[65%] min-h-[700px] bg-[#cbe4e8] overflow-hidden relative rounded-tr-md rounded-br-md">
-        <img 
-          src="/dl.beatsnoop.png" 
-          alt="Shopping Cart" 
+        <img
+          src="/dl.beatsnoop.png"
+          alt="Shopping Cart"
           className="absolute w-full h-[90%] object-contain mx-auto"
         />
       </div>
@@ -73,11 +73,14 @@ const Login = () => {
       {/* 로그인 폼 */}
       <div className="w-full md:w-1/2 flex flex-col justify-center items-start px-30 mb-12">
         <div className="w-full max-w-sm">
-          <h2 className="text-4xl font-semibold text-gray-900 mb-6 self-start">Log in to Exclusive</h2>
-          <p className="text-gray-500 mb-14 self-start">Enter your details below</p>
+          <h2 className="text-4xl font-semibold text-gray-900 mb-6 self-start">
+            Log in to Exclusive
+          </h2>
+          <p className="text-gray-500 mb-14 self-start">
+            Enter your details below
+          </p>
 
           <form onSubmit={handleSubmit(onLoginHandler)} className="space-y-6">
-            
             {/* 유저네임 */}
             <div>
               <input
@@ -86,7 +89,11 @@ const Login = () => {
                 placeholder="Email or Phone Number"
                 {...register("username", { required: "아이디를 입력해주세요" })}
               />
-              {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username.message}</p>}
+              {errors.username && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.username.message}
+                </p>
+              )}
             </div>
 
             {/* 비밀번호 */}
@@ -95,9 +102,15 @@ const Login = () => {
                 type="password"
                 className="w-full px-2 pb-2 border-b border-gray-300 focus:outline-none focus:border-gray-600"
                 placeholder="Password"
-                {...register("password", { required: "비밀번호를 입력해주세요" })}
+                {...register("password", {
+                  required: "비밀번호를 입력해주세요",
+                })}
               />
-              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
 
             {/* 로그인 버튼 & 비밀번호 찾기 */}
@@ -109,7 +122,9 @@ const Login = () => {
               >
                 {loading ? "로그인 중..." : "Log In"}
               </button>
-              <Link to="/" className="text-red-500 text-sm hover:underline">Forgot Password?</Link>
+              <Link to="/" className="text-red-500 text-sm hover:underline">
+                Forgot Password?
+              </Link>
             </div>
           </form>
         </div>
