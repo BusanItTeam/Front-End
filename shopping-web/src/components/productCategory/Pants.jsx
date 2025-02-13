@@ -106,7 +106,11 @@ const Pants = () => {
             <button
               key={i}
               onClick={() => paginate(i + 1)}
-              className="mx-1 px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 focus:outline-none"
+              className={`mx-1 px-3 py-1 ${
+                currentPage === i + 1
+                  ? "bg-gray-700 text-white"
+                  : "bg-gray-200 text-gray-700"
+              } rounded hover:bg-gray-300 focus:outline-none`}
             >
               {i + 1}
             </button>

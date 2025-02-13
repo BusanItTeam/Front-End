@@ -11,8 +11,10 @@ import Outerwear from "./components/productCategory/Outerwear";
 import Dresses from "./components/productCategory/Dresses";
 import Footer from "./components/footer/Footer";
 import Sidebar from "./components/siderbar/Sidebar";
+import Mypage from "./components/myPage/myPage";
 import CartPage from "./components/cart/CartPage";
 import Payment from "./components/cart/Payment";
+import EditProfile from "./components/myPage/EditProfile";
 
 function App() {
   return (
@@ -30,6 +32,10 @@ function App() {
           <Route path="/login" element={<Login />} />
 
           <Route path="/signup" element={<SignUp />} />
+
+          <Route path="/myPage" element={<Mypage />} />
+          <Route path="/myPage/editProfile" element={<EditProfile />} />
+
           <Route path="/cart" element={<CartPage />} />
           <Route path="/payment" element={<Payment />} />
         </Routes>
