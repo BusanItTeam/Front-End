@@ -59,7 +59,7 @@ const Login = () => {
   return (
     <div className="flex h-screen bg-white mt-30 mb-30">
       {/* 왼쪽 이미지 영역 */}
-      <div className="hidden md:flex w-[60%] min-h-[700px] bg-[#cbe4e8] overflow-hidden relative rounded-tr-md rounded-br-md">
+      <div className="hidden md:flex w-[55%] min-h-[700px] bg-[#cbe4e8] overflow-hidden relative rounded-tr-md rounded-br-md">
         <img
           src="/dl.beatsnoop.png"
           alt="Shopping Cart"
@@ -71,7 +71,7 @@ const Login = () => {
       <div className="hidden md:block w-[2px] bg-gray-300"></div>
 
       {/* 로그인 폼 */}
-      <div className="w-full md:w-1/2 flex flex-col justify-center items-start px-70 mb-35">
+      <div className="w-full md:w-1/2 flex flex-col justify-center items-start px-35 mb-30">
         <div className="w-full max-w-sm">
           <h2 className="text-4xl font-semibold text-gray-900 mb-6 self-start">
             Log in to Exclusive
