@@ -73,6 +73,10 @@
   background-image: url("/user.png");
 }
 
+.user-active {
+  background-image: url("/user2.png");
+}
+
 .category-dropdown {
   position: relative;
   display: inline-block;
