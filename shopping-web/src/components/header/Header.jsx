@@ -8,6 +8,7 @@ import { useLocation } from "react-router-dom";
 export const Header = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const location = useLocation(); // 현재 경로 가져오기
+  const isMyPageActive = location.pathname.startsWith("/myPage");
 
   return (
     <header className="header-wrapper">
@@ -58,8 +59,7 @@ export const Header = () => {
       <div className="frame-5">
         <a href="/wishlist" className="icon wishlist"></a>
         <a href="/cart" className="icon cart"></a>
-        {location.pathname === "/myPage" ? <a href="/myPage" className="icon user-active"></a> : <a href="/myPage" className="icon user"></a>}
-
+        <a href="/myPage" className={`icon ${isMyPageActive ? "user-active" : "user"}`}></a>
         <Link to="/" className="nav-link">
           Home
         </Link>

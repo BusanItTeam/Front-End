@@ -15,6 +15,8 @@ import Mypage from "./components/myPage/myPage";
 import CartPage from "./components/cart/CartPage";
 import Payment from "./components/cart/Payment";
 import EditProfile from "./components/myPage/EditProfile";
+import BoardList from "./components/myPage/BoardList";
+import InquiryForm from "./components/myPage/InquiryForm";
 
 function App() {
   return (
@@ -35,6 +37,8 @@ function App() {
 
           <Route path="/myPage" element={<Mypage />} />
           <Route path="/myPage/editProfile" element={<EditProfile />} />
+          <Route path="/myPage/boardList" element={<BoardList />} />
+          <Route path="/myPage/inquiryForm" element={<InquiryForm />} />
 
           <Route path="/cart" element={<CartPage />} />
           <Route path="/payment" element={<Payment />} />
