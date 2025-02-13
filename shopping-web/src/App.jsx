@@ -12,6 +12,8 @@ import Dresses from "./components/productCategory/Dresses";
 import Footer from "./components/footer/Footer";
 import Sidebar from "./components/siderbar/Sidebar";
 import Mypage from "./components/myPage/myPage";
+import CartPage from "./components/cart/CartPage";
+import Payment from "./components/cart/Payment";
 
 function App() {
   return (
@@ -31,9 +33,12 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
 
           <Route path="/myPage" element={<Mypage />} />
+
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/payment" element={<Payment />} />
         </Routes>
-        <Sidebar />
-        {/* <Footer /> */}
+
+        <Footer />
       </Router>
     </ContextProvider>
   );
