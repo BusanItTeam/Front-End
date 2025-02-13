@@ -10,7 +10,7 @@ const Sidebar = () => {
       {/* MAN Section */}
       <div className="mb-4">
         <button
-          className="text-wrapper block w-full text-left p-2 bg-white rounded-md shadow hover:bg-gray-50 transition duration-150 ease-in-out flex justify-between items-center"
+          className="text-wrapper  w-full text-left p-2 bg-white rounded-md shadow hover:bg-gray-50 transition duration-150 ease-in-out flex justify-between items-center"
           onClick={() => setManDropdown(!manDropdown)}
         >
           MAN
@@ -60,7 +60,7 @@ const Sidebar = () => {
       {/* WOMAN Section */}
       <div>
         <button
-          className="text-wrapper block w-full text-left p-2 bg-white rounded-md shadow hover:bg-gray-50 transition duration-150 ease-in-out flex justify-between items-center"
+          className="text-wrapper  w-full text-left p-2 bg-white rounded-md shadow hover:bg-gray-50 transition duration-150 ease-in-out flex justify-between items-center"
           onClick={() => setWomanDropdown(!womanDropdown)}
         >
           WOMAN
