@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
-const Sidebar = () => {
+const OuterSidebar = () => {
   const [manDropdown, setManDropdown] = useState(false);
   const [womanDropdown, setWomanDropdown] = useState(false);
 
@@ -21,26 +21,26 @@ const Sidebar = () => {
           <ul className="mt-2 bg-white shadow rounded-md">
             <li>
               <Link
-                to="/category/pants/short"
+                to="/category/outer/padding"
                 className="block p-2 hover:bg-gray-200 transition duration-150 ease-in-out"
               >
-                반바지
+                패딩
               </Link>
             </li>
             <li>
               <Link
-                to="/category/pants/long"
+                to="/category/outer/jacket"
                 className="block p-2 hover:bg-gray-200 transition duration-150 ease-in-out"
               >
-                긴바지
+                쟈켓
               </Link>
             </li>
             <li>
               <Link
-                to="/category/pants/jeans"
+                to="/category/outer/ggalggal"
                 className="block p-2 hover:bg-gray-200 transition duration-150 ease-in-out"
               >
-                청바지
+                깔깔이
               </Link>
             </li>
           </ul>
@@ -71,26 +71,26 @@ const Sidebar = () => {
           <ul className="mt-2 bg-white shadow rounded-md">
             <li>
               <Link
-                to="/category/pants/short"
+                to="/category/outer/wpadding"
                 className="block p-2 hover:bg-gray-200 transition duration-150 ease-in-out"
               >
-                반바지
+                패딩
               </Link>
             </li>
             <li>
               <Link
-                to="/category/pants/long"
+                to="/category/outer/wjacket"
                 className="block p-2 hover:bg-gray-200 transition duration-150 ease-in-out"
               >
-                긴바지
+                쟈켓
               </Link>
             </li>
             <li>
               <Link
-                to="/category/pants/jeans"
+                to="/category/outer/wggalggal"
                 className="block p-2 hover:bg-gray-200 transition duration-150 ease-in-out"
               >
-                청바지
+                깔깔이
               </Link>
             </li>
           </ul>
@@ -100,4 +100,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default OuterSidebar;
