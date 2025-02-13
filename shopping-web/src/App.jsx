@@ -11,6 +11,7 @@ import Outerwear from "./components/productCategory/Outerwear";
 import Dresses from "./components/productCategory/Dresses";
 import Footer from "./components/footer/Footer";
 import Sidebar from "./components/siderbar/Sidebar";
+import Mypage from "./components/myPage/myPage";
 
 function App() {
   return (
@@ -28,9 +29,11 @@ function App() {
           <Route path="/login" element={<Login />} />
 
           <Route path="/signup" element={<SignUp />} />
+
+          <Route path="/myPage" element={<Mypage />} />
         </Routes>
         <Sidebar />
-        <Footer />
+        {/* <Footer /> */}
       </Router>
     </ContextProvider>
   );

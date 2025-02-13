@@ -1,5 +1,5 @@
 .log-in {
-  background-color: #ffffff;
+  /* background-color: #ffffff; */
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -10,6 +10,7 @@
   background-color: var(--bg);
   width: 1440px;
   height: 1561px;
+  top: 30px;
   position: relative;
 }
 
@@ -24,7 +25,7 @@
   align-items: center;
   gap: 129px;
   position: absolute;
-  top: 60px;
+  top: 20px;
   left: 0;
 }
 
