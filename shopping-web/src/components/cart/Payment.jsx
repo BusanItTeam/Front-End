@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 const Payment = () => {
   const [cardNumber, setCardNumber] = useState("");
@@ -8,6 +8,9 @@ const Payment = () => {
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const price = searchParams.get("price");
 
   const handlePayment = (e) => {
     e.preventDefault();
@@ -71,7 +74,7 @@ const Payment = () => {
               type="text"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              placeholder="10,000"
+              placeholder={`${price}원`}
               className="w-full p-2 border rounded-md"
             />
           </div>

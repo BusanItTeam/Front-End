@@ -64,11 +64,11 @@ const CartPage = () => {
             <tr className="bg-red-500 text-white">
               <th className="p-3">이미지</th>
               <th className="p-3">상품정보</th>
-              <th className="p-3">판매가</th>
+              <th className="p-3">가격</th>
               <th className="p-3">수량</th>
               <th className="p-3">적립금</th>
               <th className="p-3">배송비</th>
-              <th className="p-3">합계</th>
+              <th className="p-3">총금액</th>
               <th className="p-3">삭제</th>
             </tr>
           </thead>
@@ -123,20 +123,20 @@ const CartPage = () => {
           </tbody>
         </table>
       </div>
-      <div className="mt-8 p-6 border-2 rounded-lg shadow-md bg-gray-100 text-right w-2/3 mx-auto">
+      <div className="mt-8 p-4 border border-gray-300 rounded-md shadow-md bg-gray-100 text-right w-fit ml-auto">
         <h2 className="text-xl font-bold">
           Subtotal: {getTotalPrice().toLocaleString("ko-KR")}원
         </h2>
         <h2 className="text-xl font-bold">
           Shipping: {SHIPPING_COST.toLocaleString("ko-KR")}원
         </h2>
-        <h2 className="text-2xl font-bold text-red-600 border-t-2 pt-2 mt-2">
+        <h2 className="text-2xl font-bold text-red-600 border-t pt-2 mt-2">
           Total: {(getTotalPrice() + SHIPPING_COST).toLocaleString("ko-KR")}원
         </h2>
         <br />
         <Link
-          to="/payment"
-          className="mt-4 mb-4 w-full bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-white font-bold py-3 rounded-xl shadow-lg transition-transform transform hover:scale-105"
+          to="/orderPayment"
+          className="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg"
         >
           결재하기 💳
         </Link>
