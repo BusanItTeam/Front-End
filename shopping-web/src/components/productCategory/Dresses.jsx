@@ -6,7 +6,7 @@ const Dresses = () => {
   const productsPerPage = 8;
 
   useEffect(() => {
-    //더미사진
+    // Dummy Products
     const dummyProducts = [
       {
         id: 1,
@@ -62,12 +62,11 @@ const Dresses = () => {
         price: 760,
         image: "/woman-6626615_1280.jpg",
       },
-      // 추가 제품
     ];
     setProducts(dummyProducts);
   }, []);
 
-  // 현재 페이지의 제품들을 계산합니다.
+  // Calculate current products for the page
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const currentProducts = products.slice(
@@ -75,12 +74,12 @@ const Dresses = () => {
     indexOfLastProduct
   );
 
-  // 페이지 변경 함수
+  // Pagination function
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <h2 className="text-3xl font-bold mb-6">원피스1</h2>
+      <h2 className="text-3xl font-bold mb-6">원피스</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {currentProducts.map((product) => (
           <div
@@ -106,7 +105,11 @@ const Dresses = () => {
             <button
               key={i}
               onClick={() => paginate(i + 1)}
-              className="mx-1 px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 focus:outline-none"
+              className={`mx-1 px-3 py-1 ${
+                currentPage === i + 1
+                  ? "bg-gray-700 text-white"
+                  : "bg-gray-200 text-gray-700"
+              } rounded hover:bg-gray-300 focus:outline-none`}
             >
               {i + 1}
             </button>
