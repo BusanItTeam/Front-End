@@ -15,6 +15,9 @@ import Mypage from "./components/myPage/myPage";
 import CartPage from "./components/cart/CartPage";
 import Payment from "./components/cart/Payment";
 import EditProfile from "./components/myPage/EditProfile";
+import OrderComplete from "./order/OrderComplete";
+import OrderPayment from "./order/OrderPayment";
+import { useState } from "react";
 
 function App() {
   return (
@@ -37,7 +40,10 @@ function App() {
           <Route path="/myPage/editProfile" element={<EditProfile />} />
 
           <Route path="/cart" element={<CartPage />} />
+
           <Route path="/payment" element={<Payment />} />
+          <Route path="/ordercomplete" element={<OrderComplete />} />
+          <Route path="/orderpayment" element={<OrderPayment />} />
         </Routes>
 
         <Footer />
