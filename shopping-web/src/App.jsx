@@ -18,6 +18,8 @@ import EditProfile from "./components/myPage/EditProfile";
 import OrderComplete from "./order/OrderComplete";
 import OrderPayment from "./order/OrderPayment";
 import { useState } from "react";
+import BoardList from "./components/myPage/BoardList";
+import InquiryForm from "./components/myPage/InquiryForm";
 
 function App() {
   return (
@@ -38,6 +40,8 @@ function App() {
 
           <Route path="/myPage" element={<Mypage />} />
           <Route path="/myPage/editProfile" element={<EditProfile />} />
+          <Route path="/myPage/boardList" element={<BoardList />} />
+          <Route path="/myPage/inquiryForm" element={<InquiryForm />} />
 
           <Route path="/cart" element={<CartPage />} />
 
