@@ -59,7 +59,7 @@ const Login = () => {
   return (
     <div className="flex h-screen bg-white mt-30 mb-30">
       {/* 왼쪽 이미지 영역 */}
-      <div className="hidden md:flex w-[60%] min-h-[700px] bg-[#cbe4e8] overflow-hidden relative rounded-tr-md rounded-br-md">
+      <div className="hidden md:flex w-[61%] min-h-[700px] bg-[#cbe4e8] overflow-hidden relative rounded-tr-md rounded-br-md">
         <img
           src="/dl.beatsnoop.png"
           alt="Shopping Cart"
