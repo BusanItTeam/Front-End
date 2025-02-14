@@ -23,7 +23,7 @@ const SignUp = () => {
     setValue,
     formState: { errors },
   } = useForm({
-    defaultValues: { username: "", email: "", phone: "", address: "", password: "", confirmPassword: "" },
+    defaultValues: { username: "", email: "", phoneNumber: "", address: "", password: "", confirmPassword: "" },
     mode: "onTouched",
   });
 
@@ -37,12 +37,12 @@ const SignUp = () => {
 
   const handlePhoneChange = (event) => {
     const formatted = formatPhoneNumber(event.target.value);
-    setValue("phone", formatted);
+    setValue("phoneNumber", formatted);
   };
 
   const onSubmitHandler = async (data) => {
-    const { username, email, phone, address, password } = data;
-    const sendData = { username, email, phone, address, password, role: [role] };
+    const { username, email, phoneNumber, address, password } = data;
+    const sendData = { username, email, phoneNumber, address, password, role: [role] };
 
     try {
       setLoading(true);
@@ -141,10 +141,10 @@ const SignUp = () => {
               type="text"
               className="w-full pb-2 border-b border-gray-300 focus:outline-none focus:border-gray-600"
               placeholder="010-1234-5678"
-              {...register("phone", { required: "핸드폰 번호를 입력해주세요" })}
+              {...register("phoneNumber", { required: "핸드폰 번호를 입력해주세요" })}
               onChange={handlePhoneChange}
             />
-            {errors.phone && <p className="text-red-500 text-sm">{errors.phone.message}</p>}
+            {errors.phoneNumber && <p className="text-red-500 text-sm">{errors.phoneNumber.message}</p>}
 
             {/* 비밀번호 */}
             <input
