@@ -59,7 +59,7 @@ const Login = () => {
   return (
     <div className="flex h-screen bg-white mt-30 mb-30">
       {/* 왼쪽 이미지 영역 */}
-      <div className="hidden md:flex w-[60%] min-h-[700px] bg-[#cbe4e8] overflow-hidden relative rounded-tr-md rounded-br-md">
+      <div className="hidden sm:flex md:w-[60%] min-h-[700px] bg-[#cbe4e8] overflow-hidden relative rounded-tr-md rounded-br-md">
         <img
           src="/dl.beatsnoop.png"
           alt="Shopping Cart"
@@ -67,57 +67,42 @@ const Login = () => {
         />
       </div>
 
-      {/* 중간 실선 */}
-      <div className="hidden md:block w-[2px] bg-gray-300"></div>
-
       {/* 로그인 폼 */}
-      <div className="w-full md:w-1/2 flex flex-col justify-center items-start px-70 mb-35">
-        <div className="w-full max-w-sm">
-          <h2 className="text-4xl font-semibold text-gray-900 mb-6 self-start">
+      <div className="w-full sm:w-1/2 flex flex-col justify-center items-center px-6 sm:px-10 mb-30">
+        <div className="w-full max-w-md">
+          <h2 className="text-3xl sm:text-4xl font-semibold text-gray-900 mb-10 self-start">
             Log in to Exclusive
           </h2>
-          <p className="text-black-500 mb-12 self-start">
-            Enter your details below
-          </p>
+          <p className="text-gray-500 mb-10 self-start">Enter your details below</p>
 
           <form onSubmit={handleSubmit(onLoginHandler)} className="space-y-6">
             {/* 유저네임 */}
-            <div>
-              <input
-                type="text"
-                className="w-full pb-2 border-b border-gray-300 focus:outline-none focus:border-gray-600"
-                placeholder="Email or Phone Number"
-                {...register("username", { required: "아이디를 입력해주세요" })}
-              />
-              {errors.username && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.username.message}
-                </p>
-              )}
-            </div>
+            <input
+              type="text"
+              className="w-full pb-2 border-b border-gray-300 focus:outline-none focus:border-gray-600"
+              placeholder="Email or Phone Number"
+              {...register("username", { required: "아이디를 입력해주세요" })}
+            />
+            {errors.username && (
+              <p className="text-red-500 text-sm">{errors.username.message}</p>
+            )}
 
             {/* 비밀번호 */}
-            <div>
-              <input
-                type="password"
-                className="w-full pb-2 border-b border-gray-300 focus:outline-none focus:border-gray-600"
-                placeholder="Password"
-                {...register("password", {
-                  required: "비밀번호를 입력해주세요",
-                })}
-              />
-              {errors.password && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
+            <input
+              type="password"
+              className="w-full pb-2 border-b border-gray-300 focus:outline-none focus:border-gray-600"
+              placeholder="Password"
+              {...register("password", { required: "비밀번호를 입력해주세요" })}
+            />
+            {errors.password && (
+              <p className="text-red-500 text-sm">{errors.password.message}</p>
+            )}
 
             {/* 로그인 버튼 & 비밀번호 찾기 */}
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center w-full">
               <button
                 type="submit"
-                className="w-34 py-4 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-md transition duration-200"
+                className="w-36 py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-md transition duration-200"
                 disabled={loading}
               >
                 {loading ? "로그인 중..." : "Log In"}
