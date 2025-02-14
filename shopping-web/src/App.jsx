@@ -16,6 +16,10 @@ import Payment from "./components/cart/Payment";
 import EditProfile from "./components/myPage/EditProfile";
 import OrderComplete from "./components/order/OrderComplete";
 import OrderPayment from "./components/order/OrderPayment";
+
+
+
+
 import BoardList from "./components/myPage/BoardList";
 import InquiryForm from "./components/myPage/InquiryForm";
 

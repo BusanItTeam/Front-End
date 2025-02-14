@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useMyContext } from "../../store/ContextApi";
 
@@ -96,6 +97,7 @@ const OrderPaymentPage = () => {
       <button className="w-full bg-gray-900 text-white py-3 mt-6 rounded-lg font-medium hover:bg-gray-800">
         결제하기
       </button>
+
     </div>
   );
 };
