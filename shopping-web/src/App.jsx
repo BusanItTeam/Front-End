@@ -10,14 +10,12 @@ import Tops from "./components/productCategory/Tops";
 import Outerwear from "./components/productCategory/Outerwear";
 import Dresses from "./components/productCategory/Dresses";
 import Footer from "./components/footer/Footer";
-import Sidebar from "./components/siderbar/Sidebar";
 import Mypage from "./components/myPage/myPage";
 import CartPage from "./components/cart/CartPage";
 import Payment from "./components/cart/Payment";
 import EditProfile from "./components/myPage/EditProfile";
-import OrderComplete from "./order/OrderComplete";
-import OrderPayment from "./order/OrderPayment";
-import { useState } from "react";
+import OrderComplete from "./components/order/OrderComplete";
+import OrderPayment from "./components/order/OrderPayment";
 import BoardList from "./components/myPage/BoardList";
 import InquiryForm from "./components/myPage/InquiryForm";
 
