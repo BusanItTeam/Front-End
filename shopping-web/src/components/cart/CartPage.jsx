@@ -37,6 +37,7 @@ const CartPage = () => {
     const selectedProducts = cartItems.filter((item) =>
       selectedItems.includes(item.id)
     );
+    setCartItems(selectedProducts);
     console.log("Processing order for: ", selectedProducts);
   };
 
@@ -51,26 +52,27 @@ const CartPage = () => {
       </h1>
       {cartItems.length === 0 ? (
         <div className="text-center text-gray-600 text-lg py-10">
-          <hr className="border-gray-300 mb-4" />
-          Cart is empty^^
-          <hr className="border-gray-300 mt-4" />
+          <hr className="border-b " />
+          장바구니가 비어있습니다.
+          <hr className="border-b" />
         </div>
       ) : (
         <>
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse rounded-lg bg-white shadow-md text-sm">
+            <table className="w-full border-t text-sm text-center">
               <thead>
-                <tr className="bg-gray-200 text-gray-700">
-                  <th className="p-4">선택</th>
-                  <th className="p-4">이미지</th>
-                  <th className="p-4">상품정보</th>
-                  <th className="p-4">가격</th>
-                  <th className="p-4">수량</th>
-                  <th className="p-4">적립금</th>
-                  <th className="p-4">삭제</th>
+                <tr className="border-b">
+                  <th className="py-2">선택</th>
+                  <th className="py-2">이미지</th>
+                  <th className="py-2">상품정보</th>
+                  <th className="py-2">가격</th>
+                  <th className="py-2">수량</th>
+                  <th className="py-2">적립금</th>
+                  <th className="py-2">삭제</th>
                 </tr>
               </thead>
               <tbody>
+                <tr></tr>
                 {cartItems.map((item) => (
                   <tr
                     key={item.id}
@@ -131,7 +133,9 @@ const CartPage = () => {
               </tbody>
             </table>
           </div>
-          <div className="p-6 border border-gray-200 rounded-md shadow-md bg-gray-50 text-center text-sm mt-6">
+          <br />
+          <br />
+          <div className="  text-center text-sm mt-6">
             <h2 className="text-gray-700 font-medium text-lg">
               선택한 상품{" "}
               <span className="font-bold text-gray-900">
