@@ -15,7 +15,6 @@ const SignUp = () => {
   const navigate = useNavigate();
 
 
-  
 
   const {
     register,
