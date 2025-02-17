@@ -17,11 +17,13 @@ import EditProfile from "./components/myPage/EditProfile";
 import OrderComplete from "./components/order/OrderComplete";
 import OrderPayment from "./components/order/OrderPayment";
 
-
-
-
 import BoardList from "./components/myPage/BoardList";
 import InquiryForm from "./components/myPage/InquiryForm";
+import CustomerSupport from "./components/adminPage/CustomerSupport";
+import MemberManagement from "./components/adminPage/MemberManagement";
+import OrderManagement from "./components/adminPage/OrderManagement";
+import ProductManagement from "./components/adminPage/ProductManagement";
+import AdminDashboard from "./components/adminPage/AdminDashboard";
 
 function App() {
   return (
@@ -50,6 +52,13 @@ function App() {
           <Route path="/payment" element={<Payment />} />
           <Route path="/ordercomplete" element={<OrderComplete />} />
           <Route path="/orderpayment" element={<OrderPayment />} />
+
+          {/* 관리자 페이지 라우트 */}
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/products" element={<ProductManagement />} />
+          <Route path="/admin/orders" element={<OrderManagement />} />
+          <Route path="/admin/members" element={<MemberManagement />} />
+          <Route path="/admin/support" element={<CustomerSupport />} />
         </Routes>
 
         <Footer />
