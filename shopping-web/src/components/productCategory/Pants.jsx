@@ -1,77 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Sidebar from "../../components/siderbar/Sidebar";
+import { useMyContext } from "../../store/ContextApi";
 
 const Pants = () => {
-  const [products, setProducts] = useState([]);
+  const { products } = useMyContext();
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 8;
 
-  useEffect(() => {
-    //더미사진
-    const dummyProducts = [
-      {
-        id: 1,
-        name: "Breed Dry Dog Food",
-        price: 100,
-        image: "/woman-2799490_1280.jpg",
-      },
-      {
-        id: 2,
-        name: "CANON EOS DSLR Camera",
-        price: 360,
-        image: "/woman-2799490_1280.jpg",
-      },
-      {
-        id: 3,
-        name: "ASUS FHD Gaming Laptop",
-        price: 700,
-        image: "/woman-2799490_1280.jpg",
-      },
-      {
-        id: 4,
-        name: "Curology Product Set",
-        price: 500,
-        image: "/woman-2799490_1280.jpg",
-      },
-      {
-        id: 5,
-        name: "Kids Electric Car",
-        price: 960,
-        image: "/woman-2799490_1280.jpg",
-      },
-      {
-        id: 6,
-        name: "Jr. Zoom Soccer Cleats",
-        price: 1160,
-        image: "/woman-2799490_1280.jpg",
-      },
-      {
-        id: 7,
-        name: "GP11 Shooter USB Gamepad",
-        price: 660,
-        image: "/woman-2799490_1280.jpg",
-      },
-      {
-        id: 8,
-        name: "Quilted Satin Jacket",
-        price: 660,
-        image: "/woman-2799490_1280.jpg",
-      },
-      {
-        id: 9,
-        name: "Quilted Satin Jacket",
-        price: 760,
-        image: "/woman-2799490_1280.jpg",
-      },
-      // 추가 제품
-    ];
-    setProducts(dummyProducts);
-  }, []);
+  // 해당 카테고리에 맞는 상품만 필터링
+  const pantsProducts = products.filter(
+    (product) => product.category === "pants"
+  );
 
   // 현재 페이지의 제품들을 계산합니다.
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = products.slice(
+  const currentProducts = pantsProducts.slice(
     indexOfFirstProduct,
     indexOfLastProduct
   );
@@ -94,6 +38,7 @@ const Pants = () => {
                 src={product.image}
                 alt={product.name}
                 className="w-full h-48 object-cover"
+                style={{ maxWidth: "100%", height: "auto" }} // 이미지 크기 제한 추가
               />
               <div className="p-4">
                 <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
@@ -104,7 +49,7 @@ const Pants = () => {
         </div>
         <div className="flex justify-center mt-8">
           {Array.from(
-            { length: Math.ceil(products.length / productsPerPage) },
+            { length: Math.ceil(pantsProducts.length / productsPerPage) },
             (_, i) => (
               <button
                 key={i}
