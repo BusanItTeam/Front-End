@@ -17,6 +17,37 @@ export const ContextProvider = ({ children }) => {
 
   //토큰 상태관리
   const [token, setToken] = useState(getToken);
+  //장바구니
+  const [cartItems, setCartItems] = useState([]);
+  useEffect(() => {
+    const sampleItems = [
+      {
+        id: 1,
+        name: "Product 1",
+        price: 25000,
+        image: "/woman-2799490_1280.jpg",
+        quantity: 1,
+        points: 2,
+      },
+      {
+        id: 2,
+        name: "Product 2",
+        price: 19000,
+        image: "/khaki-2723896_1280.jpg",
+        quantity: 1,
+        points: 1,
+      },
+      {
+        id: 3,
+        name: "Product 3",
+        price: 15000,
+        image: "/shirts-1184914_1280.jpg",
+        quantity: 1,
+        points: 1,
+      },
+    ];
+    setCartItems(sampleItems);
+  }, []);
 
   //현재 로그인 유저 관리
   const [currentUser, setCurrentUser] = useState(null);
@@ -68,6 +99,8 @@ export const ContextProvider = ({ children }) => {
         setOpenSidebar,
         isAdmin,
         setIsAdmin,
+        cartItems,
+        setCartItems,
       }}
     >
       {children}
