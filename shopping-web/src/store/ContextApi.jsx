@@ -18,7 +18,6 @@ export const ContextProvider = ({ children }) => {
   const [token, setToken] = useState(getToken);
   //장바구니
   const [cartItems, setCartItems] = useState([]);
-
   //현재 로그인 유저 관리
   const [currentUser, setCurrentUser] = useState(null);
   //관리자 패널 관리

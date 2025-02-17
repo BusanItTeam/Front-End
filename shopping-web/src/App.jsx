@@ -17,8 +17,6 @@ import EditProfile from "./components/myPage/EditProfile";
 import OrderComplete from "./components/order/OrderComplete";
 import OrderPayment from "./components/order/OrderPayment";
 
-import { useState } from "react";
-
 import BoardList from "./components/myPage/BoardList";
 import InquiryForm from "./components/myPage/InquiryForm";
 import CustomerSupport from "./components/adminPage/CustomerSupport";
