@@ -19,6 +19,7 @@ export const ContextProvider = ({ children }) => {
   const [token, setToken] = useState(getToken);
   //장바구니
   const [cartItems, setCartItems] = useState([]);
+
   useEffect(() => {
     const sampleItems = [
       {
