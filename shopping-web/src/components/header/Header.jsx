@@ -4,11 +4,13 @@ import "./Header.css";
 import Search from "../search/Search";
 import "../signup/SignUp";
 import { useLocation } from "react-router-dom";
+import { useMyContext } from "../../store/ContextApi"; // ContextApi import 추가
 
 export const Header = () => {
   const [showDropdown, setShowDropdown] = useState(false);
-  const location = useLocation(); // 현재 경로 가져오기
+  const location = useLocation();
   const isMyPageActive = location.pathname.startsWith("/myPage");
+  const { currentUser, isAdmin } = useMyContext(); // ContextApi에서 currentUser와 isAdmin 가져오기
 
   return (
     <header className="header-wrapper">
@@ -19,7 +21,11 @@ export const Header = () => {
           <a href="/" className="nav-link">
             Home
           </a>
-          <div className="category-dropdown" onMouseEnter={() => setShowDropdown(true)} onMouseLeave={() => setShowDropdown(false)}>
+          <div
+            className="category-dropdown"
+            onMouseEnter={() => setShowDropdown(true)}
+            onMouseLeave={() => setShowDropdown(false)}
+          >
             <Link to="/productCategory" className="nav-link">
               카테고리
             </Link>
@@ -46,12 +52,25 @@ export const Header = () => {
           <a href="/about" className="nav-link">
             About
           </a>
-          <Link to="/signup" className="nav-link">
-            Sign Up
-          </Link>
-          <a href="/login" className="nav-link">
-            LogIn
-          </a>
+          {!currentUser ? ( //로그인상태되면 가입,로그인페이지안보임
+            <>
+              <Link to="/signup" className="nav-link">
+                Sign Up
+              </Link>
+              <a href="/login" className="nav-link">
+                LogIn
+              </a>
+            </>
+          ) : (
+            <a href="/logout" className="nav-link">
+              Logout
+            </a> //로그아웃눌러도 진짜 로그아웃은안됨
+          )}
+          {isAdmin && (
+            <Link to="/admin" className="nav-link">
+              관리자
+            </Link> // admin으로 로그인했을때만 보임
+          )}
         </nav>
       </div>
 
@@ -59,7 +78,10 @@ export const Header = () => {
       <div className="frame-5">
         <a href="/wishlist" className="icon wishlist"></a>
         <a href="/cart" className="icon cart"></a>
-        <a href="/myPage" className={`icon ${isMyPageActive ? "user-active" : "user"}`}></a>
+        <a
+          href="/myPage"
+          className={`icon ${isMyPageActive ? "user-active" : "user"}`}
+        ></a>
         <Link to="/" className="nav-link">
           Home
         </Link>
