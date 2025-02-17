@@ -22,7 +22,7 @@ const SignUp = () => {
     watch,
     setValue,
     formState: { errors },
-  } = useForm({
+  } = useForm({       //phoneNumber = 아 으
     defaultValues: { username: "", email: "", phoneNumber: "", address: "", password: "", confirmPassword: "" },
     mode: "onTouched",
   });

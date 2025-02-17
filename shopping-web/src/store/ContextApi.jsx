@@ -1,5 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
-import { useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import api from "../services/Api";
 import toast from "react-hot-toast";
 
@@ -19,6 +18,16 @@ export const ContextProvider = ({ children }) => {
   const [token, setToken] = useState(getToken);
   //장바구니
   const [cartItems, setCartItems] = useState([]);
+
+  //현재 로그인 유저 관리
+  const [currentUser, setCurrentUser] = useState(null);
+  //관리자 패널 관리
+  const [openSidebar, setOpenSidebar] = useState(true);
+  //관리자 인지 확인
+  const [isAdmin, setIsAdmin] = useState(isADmin);
+
+  // 상품 목록 상태 추가
+  const [products, setProducts] = useState([]);
 
   useEffect(() => {
     const sampleItems = [
@@ -49,13 +58,6 @@ export const ContextProvider = ({ children }) => {
     ];
     setCartItems(sampleItems);
   }, []);
-
-  //현재 로그인 유저 관리
-  const [currentUser, setCurrentUser] = useState(null);
-  //관리자 패널 관리
-  const [openSidebar, setOpenSidebar] = useState(true);
-  //관리자 인지 확인
-  const [isAdmin, setIsAdmin] = useState(isADmin);
 
   const fetchUser = async () => {
     const user = JSON.parse(localStorage.getItem("USER"));
@@ -102,6 +104,8 @@ export const ContextProvider = ({ children }) => {
         setIsAdmin,
         cartItems,
         setCartItems,
+        products, // 상품 목록 상태 추가
+        setProducts, // 상품 목록 상태 설정 함수 추가
       }}
     >
       {children}
@@ -112,6 +116,5 @@ export const ContextProvider = ({ children }) => {
 //useMyContext() 로 이 컨텍스트를 사용함
 export const useMyContext = () => {
   const context = useContext(ContextApi);
-
   return context;
 };
