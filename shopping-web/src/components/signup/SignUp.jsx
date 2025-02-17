@@ -42,7 +42,7 @@ const SignUp = () => {
 
   const onSubmitHandler = async (data) => {
     const { username, email, phone, address, password } = data;
-    const sendData = { username, email, phone, address, password, role: [role] };
+    const sendData = { username, email, phoneNumber, address, password, role: [role] };
 
     try {
       setLoading(true);
