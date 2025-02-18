@@ -73,7 +73,9 @@ const Login = () => {
           <h2 className="text-3xl sm:text-4xl font-semibold text-gray-900 mb-10 self-start">
             Log in to Exclusive
           </h2>
-          <p className="text-gray-500 mb-10 self-start">Enter your details below</p>
+          <p className="text-gray-500 mb-10 self-start">
+            Enter your details below
+          </p>
 
 
           <form onSubmit={handleSubmit(onLoginHandler)} className="space-y-6">
