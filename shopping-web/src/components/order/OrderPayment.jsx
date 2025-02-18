@@ -1,12 +1,30 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMyContext } from "../../store/ContextApi";
 
 const OrderPaymentPage = () => {
   const { cartItems, currentUser } = useMyContext();
   console.log(currentUser);
+  // console.log(currentUser.points);
   const SHIPPING_COST = 3000;
   const [sameAsOrderer, setSameAsOrderer] = useState(false);
   const [selectedValue, setSelectedValue] = useState("적립금");
+  const [selectedMethod, setSelectedMethod] = useState("credit");
+  const [point, setPoint] = useState(0);
+  // const balance = 5000; // 예시보유 잔액
+
+  //포인트 적립
+  useEffect(() => {
+    if (currentUser?.points) {
+      setPoint(currentUser.points);
+    }
+  }, [currentUser]);
+
+  //포인트 전액사용 함수
+  const handleFullUse = () => {
+    setPoint(currentUser?.points || 0);
+  };
+
+  //결제 메소드
   const paymentMethods = [
     { id: "bank", name: "무통장입금" },
     { id: "credit", name: "신용카드" },
@@ -17,18 +35,12 @@ const OrderPaymentPage = () => {
     { id: "kakaopay", name: "카카오PAY" },
     { id: "smilepay", name: "스마일PAY" },
   ];
-  const [selectedMethod, setSelectedMethod] = useState("credit");
-  const [point, setPoint] = useState(0);
-  const balance = 5000; // 예시보유 잔액
 
-  const handleFullUse = () => {
-    setPoint(balance);
-  };
-
+  //전액이 보유 포인트를 넘지 않도록
   const handlePointChange = (e) => {
     const value = Number(e.target.value);
-    if (value > balance) {
-      setPoint(balance);
+    if (value > (currentUser?.points || 0)) {
+      setPoint(currentUser?.points || 0);
     } else if (value < 0) {
       setPoint(0);
     } else {
@@ -36,74 +48,64 @@ const OrderPaymentPage = () => {
     }
   };
 
+  //주문자 정보
   const [formData, setFormData] = useState({
-    name: "",
-    postalCode: "",
-    baseAddress: "",
-    detailAddress: "",
-    phonePrefix: "010",
-    phoneMiddle: "",
-    phoneLast: "",
-    email: "",
-    emailDomain: "",
-    message: "",
+    username: currentUser?.username || "",
+    email: currentUser?.email || "",
+    phoneNumber: currentUser?.phoneNumber || "",
+    postcode: currentUser?.postcode || "",
+    address: currentUser?.address || "",
+    detailAddress: currentUser?.detailAddress || "",
+    extraAddress: currentUser?.extraAddress || "",
   });
 
-  const [formData2, setFormData2] = useState({
-    name: "",
-    postalCode: "",
-    baseAddress: "",
-    detailAddress: "",
-    phonePrefix: "010",
-    phoneMiddle: "",
-    phoneLast: "",
-    email: "",
-    emailDomain: "",
-    message: "",
-  });
+  //배송지 정보
+  const [formData2, setFormData2] = useState({ ...formData });
 
+  useEffect(() => {
+    if (sameAsOrderer) {
+      setFormData2({ ...formData });
+    } else {
+      setFormData2({
+        username: "",
+        email: "",
+        phoneNumber: "",
+        postcode: "",
+        address: "",
+        detailAddress: "",
+        extraAddress: "",
+      });
+    }
+  }, [sameAsOrderer, formData]);
+
+  //주문자 정보 저장
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
+  //배송지 정보 저장
   const handleChange2 = (e) => {
     const { name, value } = e.target;
-    setFormData2({ ...formData, [name]: value });
+    setFormData2({ ...formData2, [name]: value });
   };
 
+  // 체크박스 핸들러: 주문자 정보와 동일하게 설정
   const handleSameOrderer = (event) => {
     setSameAsOrderer(event.target.checked);
     if (event.target.checked) {
-      handleChange2({ target: { name: "name", value: formData.name } });
-      handleChange2({
-        target: { name: "phonePrefix", value: formData.phonePrefix },
-      });
-      handleChange2({
-        target: { name: "phoneMiddle", value: formData.phoneMiddle },
-      });
-      handleChange2({
-        target: { name: "phoneLast", value: formData.phoneLast },
-      });
-      handleChange2({
-        target: { name: "postalCode", value: formData.postalCode },
-      });
-      handleChange2({
-        target: { name: "baseAddress", value: formData.baseAddress },
-      });
-      handleChange2({
-        target: { name: "detailAddress", value: formData.detailAddress },
-      });
+      setFormData2({ ...formData }); // 주문자 정보 복사
     } else {
-      handleChange2({ target: { name: "name", value: "" } });
-      handleChange2({ target: { name: "phonePrefix", value: "" } });
-      handleChange2({ target: { name: "phoneMiddle", value: "" } });
-      handleChange2({ target: { name: "phoneLast", value: "" } });
-      handleChange2({ target: { name: "postalCode", value: "" } });
-      handleChange2({ target: { name: "baseAddress", value: "" } });
-      handleChange2({ target: { name: "detailAddress", value: "" } });
+      setFormData2({
+        username: "",
+        email: "",
+        phoneNumber: "",
+        postcode: "",
+        address: "",
+        detailAddress: "",
+        extraAddress: "",
+      }); // 체크 해제 시 초기화
     }
-    console.log("체크된 객체", sameAsOrderer);
   };
 
   const handleChange3 = (event) => {
@@ -111,9 +113,11 @@ const OrderPaymentPage = () => {
   };
 
   const getTotalPrice = () => {
-    return cartItems.reduce(
-      (total, item) => total + item.price * item.quantity,
-      0
+    return (
+      cartItems?.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0
+      ) || 0
     );
   };
 
@@ -183,8 +187,8 @@ const OrderPaymentPage = () => {
               <td className="p-2 border-gray-200">
                 <input
                   type="text"
-                  name="name"
-                  value={formData.name}
+                  name="username"
+                  value={currentUser?.username}
                   onChange={handleChange}
                   required
                   className="w-300px; p-1 border rounded border-gray-200 text-xs"
@@ -196,27 +200,27 @@ const OrderPaymentPage = () => {
               <td className="p-2 border-gray-200 space-y-2">
                 <input
                   type="text"
-                  name="postalCode"
+                  name="postCode"
                   placeholder=""
-                  value={formData.postalCode}
+                  value={currentUser?.postcode}
                   onChange={handleChange}
                   required
                   className="w- p-1 border rounded border-gray-200 text-xs"
                 />
-                <span>
+                {/* <span>
                   <button
                     type="button"
-                    onClick={handleChange}
+                    onClick={() => alert("우편번호 검색 기능 추가 필요")}
                     className="p-1 border rounded border-gray-200 text-xs bg-gray-100 hover:bg-gray-200 mr-2"
                   >
-                    {formData.postalCode ? formData.postalCode : ""}
+                    우편번호 찾기
                   </button>
-                </span>
+                </span> */}
                 <input
                   type="text"
-                  name="baseAddress"
-                  placeholder="기본주소"
-                  value={formData.baseAddress}
+                  name="address"
+                  placeholder="주소"
+                  value={currentUser?.address}
                   onChange={handleChange}
                   required
                   className="w-full p-1 border rounded border-gray-200 text-xs"
@@ -225,39 +229,30 @@ const OrderPaymentPage = () => {
                   type="text"
                   name="detailAddress"
                   placeholder="상세주소"
-                  value={formData.detailAddress}
+                  value={currentUser?.detailAddress}
                   onChange={handleChange}
                   className="w-full p-1 border rounded border-gray-200 text-xs"
                 />
+                <span>
+                  <input
+                    type="text"
+                    name="extraAddress"
+                    placeholder="추가주소"
+                    value={currentUser?.extraAddress}
+                    onChange={handleChange}
+                    className="w-full p-1 border rounded border-gray-200 text-xs"
+                  />
+                </span>
               </td>
             </tr>
 
             <tr className="border-b border-gray-200">
               <td className="p-2 border-gray-200">휴대폰 번호</td>
               <td className="p-2 border-gray-200 flex space-x-2">
-                <select
-                  name="phonePrefix"
-                  value={formData.phonePrefix}
-                  onChange={handleChange}
-                  className="w-100px p-1 border rounded border-gray-200 text-xs"
-                >
-                  <option value="010">010</option>
-                  <option value="011">011</option>
-                  <option value="016">016</option>
-                </select>
-                <span>-</span>
                 <input
                   type="text"
-                  name="phoneMiddle"
-                  value={formData.phoneMiddle}
-                  onChange={handleChange}
-                  className="w-100px p-1 border rounded border-gray-200 text-xs"
-                />
-                <span>-</span>
-                <input
-                  type="text"
-                  name="phoneLast"
-                  value={formData.phoneLast}
+                  name="phoneNumber"
+                  value={currentUser?.phoneNumber}
                   onChange={handleChange}
                   className="w-100px p-1 border rounded border-gray-200 text-xs"
                 />
@@ -269,30 +264,11 @@ const OrderPaymentPage = () => {
                 <input
                   type="text"
                   name="email"
-                  value={formData.email}
+                  value={currentUser?.email}
                   onChange={handleChange}
                   required
                   className="w-full p-1 border rounded border-gray-200 text-xs"
                 />
-                <span>@</span>
-                <input
-                  type="text"
-                  name="emailDomain"
-                  value={formData.emailDomain}
-                  onChange={handleChange}
-                  required
-                  className="w-full p-1 border rounded border-gray-200 text-xs"
-                />
-                <select
-                  name="emailDomain"
-                  value={formData.emailDomain}
-                  onChange={handleChange}
-                  className="w-full p-1 border rounded border-gray-200 text-xs"
-                >
-                  <option value="직접입력">직접입력</option>
-                  <option value="naver.com">naver.com</option>
-                  <option value="daum.net">daum.net</option>
-                </select>
               </td>
             </tr>
           </tbody>
@@ -321,7 +297,7 @@ const OrderPaymentPage = () => {
                 <input
                   type="text"
                   name="name"
-                  value={formData2.name}
+                  value={formData2.username}
                   onChange={handleChange2}
                   required
                   className="w-300px; p-1 border rounded border-gray-200 text-xs"
@@ -329,6 +305,7 @@ const OrderPaymentPage = () => {
                 <label className="flex items-center text-xs">
                   <input
                     type="checkbox"
+                    checked={sameAsOrderer}
                     onChange={handleSameOrderer}
                     className="mr-1"
                   />
@@ -340,29 +317,10 @@ const OrderPaymentPage = () => {
             <tr className="border-b border-gray-200">
               <td className="p-2 border-gray-200">휴대폰 번호</td>
               <td className="p-2 border-gray-200 flex space-x-2">
-                <select
-                  name="phonePrefix"
-                  value={formData2.phonePrefix}
-                  onChange={handleChange2}
-                  className="w-100px p-1 border rounded border-gray-200 text-xs"
-                >
-                  <option value="010">010</option>
-                  <option value="011">011</option>
-                  <option value="016">016</option>
-                </select>
-                <span>-</span>
                 <input
                   type="text"
-                  name="phoneMiddle"
-                  value={formData2.phoneMiddle}
-                  onChange={handleChange2}
-                  className="w-100px p-1 border rounded border-gray-200 text-xs"
-                />
-                <span>-</span>
-                <input
-                  type="text"
-                  name="phoneLast"
-                  value={formData2.phoneLast}
+                  name="phoneNumber"
+                  value={formData2.phoneNumber}
                   onChange={handleChange2}
                   className="w-100px p-1 border rounded border-gray-200 text-xs"
                 />
@@ -374,9 +332,9 @@ const OrderPaymentPage = () => {
               <td className="p-2 border-gray-200 space-y-2">
                 <input
                   type="text"
-                  name="postalCode"
+                  name="postcode"
                   placeholder=""
-                  value={formData2.postalCode}
+                  value={formData2.postcode}
                   onChange={handleChange2}
                   required
                   className="w- p-1 border rounded border-gray-200 text-xs"
@@ -384,17 +342,17 @@ const OrderPaymentPage = () => {
                 <span>
                   <button
                     type="button"
-                    onClick={handleChange2}
+                    onClick={() => alert("우편번호 검색 기능 추가 필요")}
                     className="p-1 border rounded border-gray-200 text-xs bg-gray-100 hover:bg-gray-200 mr-2"
                   >
-                    {formData2.postalCode ? formData2.postalCode : "우편번호"}
+                    우편번호 찾기
                   </button>
                 </span>
                 <input
                   type="text"
-                  name="baseAddress"
+                  name="address"
                   placeholder="기본주소"
-                  value={formData2.baseAddress}
+                  value={formData2.address}
                   onChange={handleChange2}
                   required
                   className="w-full p-1 border rounded border-gray-200 text-xs"
@@ -407,6 +365,14 @@ const OrderPaymentPage = () => {
                   onChange={handleChange2}
                   className="w-full p-1 border rounded border-gray-200 text-xs"
                 />
+                <input
+                  type="text"
+                  name="extraAddress"
+                  placeholder="추가주소"
+                  value={formData2.extraAddress}
+                  onChange={handleChange2}
+                  className="w-full p-1 border rounded border-gray-200 text-xs"
+                />
               </td>
             </tr>
 
@@ -415,7 +381,7 @@ const OrderPaymentPage = () => {
               <td className="p-2 border-gray-200 flex justify-center items-center">
                 <textarea
                   name="message"
-                  value={formData2.message}
+                  value={currentUser?.message}
                   onChange={handleChange2}
                   className="w-full p-1 border rounded border-gray-200 text-xs"
                 />
@@ -435,7 +401,7 @@ const OrderPaymentPage = () => {
           <button
             onClick={handleFullUse}
             className="bg-gray-700 text-white py-2 rounded-lg font-small text-xs"
-            disabled={balance === 0}
+            disabled={!currentUser?.points}
           >
             <span>전액 사용</span>
           </button>
@@ -451,7 +417,7 @@ const OrderPaymentPage = () => {
           <span className="text-gray-500">원</span>
         </div>
         <p className="text-gray-500 text-sm mt-1">
-          보유 잔액 {balance.toLocaleString()}원
+          보유 잔액 {currentUser?.points?.toLocaleString()}원
         </p>
         <div className="mt-4 p-2 bg-gray-100 rounded">
           <p className="text-gray-700 text-sm">
@@ -584,12 +550,12 @@ const OrderPaymentPage = () => {
           </div>
           <div className="flex justify-between py-2 border-b">
             <span>적립금</span>
-            <span>- {balance.toLocaleString("ko-KR")}원</span>
+            <span>- {point.toLocaleString("ko-KR")}원</span>
           </div>
           <div className="flex justify-between py-3 font-bold text-lg text-gray-900">
             <span>총 결제금액</span>
             <span>
-              {(getTotalPrice() + SHIPPING_COST - balance).toLocaleString(
+              {(getTotalPrice() + SHIPPING_COST - point).toLocaleString(
                 "ko-KR"
               )}
               원
