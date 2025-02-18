@@ -2,10 +2,11 @@ import { useState } from "react";
 import { useMyContext } from "../../store/ContextApi";
 
 const OrderPaymentPage = () => {
-  const { cartItems } = useMyContext();
+  const { cartItems, currentUser } = useMyContext();
+  console.log(currentUser);
   const SHIPPING_COST = 3000;
   const [sameAsOrderer, setSameAsOrderer] = useState(false);
-  const [selectedValue, setSelectedValue] = useState("예치금");
+  const [selectedValue, setSelectedValue] = useState("적립금");
   const paymentMethods = [
     { id: "bank", name: "무통장입금" },
     { id: "credit", name: "신용카드" },
@@ -17,11 +18,26 @@ const OrderPaymentPage = () => {
     { id: "smilepay", name: "스마일PAY" },
   ];
   const [selectedMethod, setSelectedMethod] = useState("credit");
+  const [point, setPoint] = useState(0);
+  const balance = 5000; // 예시보유 잔액
+
+  const handleFullUse = () => {
+    setPoint(balance);
+  };
+
+  const handlePointChange = (e) => {
+    const value = Number(e.target.value);
+    if (value > balance) {
+      setPoint(balance);
+    } else if (value < 0) {
+      setPoint(0);
+    } else {
+      setPoint(value);
+    }
+  };
 
   const [formData, setFormData] = useState({
     name: "",
-    password: "",
-    confirmPassword: "",
     postalCode: "",
     baseAddress: "",
     detailAddress: "",
@@ -35,8 +51,6 @@ const OrderPaymentPage = () => {
 
   const [formData2, setFormData2] = useState({
     name: "",
-    password: "",
-    confirmPassword: "",
     postalCode: "",
     baseAddress: "",
     detailAddress: "",
@@ -58,15 +72,6 @@ const OrderPaymentPage = () => {
     setFormData2({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert("비밀번호가 맞지 않습니다.");
-      return;
-    }
-    console.log("Form submitted", formData);
-  };
-
   const handleSameOrderer = (event) => {
     setSameAsOrderer(event.target.checked);
     if (event.target.checked) {
@@ -80,13 +85,23 @@ const OrderPaymentPage = () => {
       handleChange2({
         target: { name: "phoneLast", value: formData.phoneLast },
       });
-      console.log("ㅇㅋ");
+      handleChange2({
+        target: { name: "postalCode", value: formData.postalCode },
+      });
+      handleChange2({
+        target: { name: "baseAddress", value: formData.baseAddress },
+      });
+      handleChange2({
+        target: { name: "detailAddress", value: formData.detailAddress },
+      });
     } else {
       handleChange2({ target: { name: "name", value: "" } });
       handleChange2({ target: { name: "phonePrefix", value: "" } });
       handleChange2({ target: { name: "phoneMiddle", value: "" } });
       handleChange2({ target: { name: "phoneLast", value: "" } });
-      console.log("ㄴㄴ");
+      handleChange2({ target: { name: "postalCode", value: "" } });
+      handleChange2({ target: { name: "baseAddress", value: "" } });
+      handleChange2({ target: { name: "detailAddress", value: "" } });
     }
     console.log("체크된 객체", sameAsOrderer);
   };
@@ -157,11 +172,13 @@ const OrderPaymentPage = () => {
       </div>
       <br />
       {/* 주문자 정보 */}
-      <h2 className="text-lg  text-gray-800 mb-1 font-semibold">주문자 정보</h2>
-      <form onSubmit={handleSubmit} className="  p-4 w-[870px]  ml-[-10px]">
+      <h2 className="text-lg  text-gray-800  font-semibold ml-1">
+        주문자 정보
+      </h2>
+      <form className="  p-4 w-[870px]  ml-[-10px]">
         <table className="w-full border-collapse border border-gray-200">
           <tbody>
-            <tr className="border-b border-gray-200">
+            <tr className="border-b border-gray-200 mt-0.5">
               <td className="p-2 border-gray-200">이름</td>
               <td className="p-2 border-gray-200">
                 <input
@@ -175,28 +192,42 @@ const OrderPaymentPage = () => {
               </td>
             </tr>
             <tr className="border-b border-gray-200">
-              <td className="p-1 border-gray-200">주문조회 비밀번호 </td>
-              <td className="p-2 border-gray-200">
+              <td className="p-2 border-gray-200">주소</td>
+              <td className="p-2 border-gray-200 space-y-2">
                 <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
+                  type="text"
+                  name="postalCode"
+                  placeholder=""
+                  value={formData.postalCode}
                   onChange={handleChange}
                   required
-                  className="w-300px p-1 border rounded border-gray-200 text-xs"
+                  className="w- p-1 border rounded border-gray-200 text-xs"
                 />
-              </td>
-            </tr>
-            <tr className="border-b border-gray-200">
-              <td className="p-2 border-gray-200">주문조회 비밀번호 확인</td>
-              <td className="p-2 border-gray-200">
+                <span>
+                  <button
+                    type="button"
+                    onClick={handleChange}
+                    className="p-1 border rounded border-gray-200 text-xs bg-gray-100 hover:bg-gray-200 mr-2"
+                  >
+                    {formData.postalCode ? formData.postalCode : ""}
+                  </button>
+                </span>
                 <input
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
+                  type="text"
+                  name="baseAddress"
+                  placeholder="기본주소"
+                  value={formData.baseAddress}
                   onChange={handleChange}
                   required
-                  className="w-300px p-1 border rounded border-gray-200 text-xs"
+                  className="w-full p-1 border rounded border-gray-200 text-xs"
+                />
+                <input
+                  type="text"
+                  name="detailAddress"
+                  placeholder="상세주소"
+                  value={formData.detailAddress}
+                  onChange={handleChange}
+                  className="w-full p-1 border rounded border-gray-200 text-xs"
                 />
               </td>
             </tr>
@@ -393,20 +424,59 @@ const OrderPaymentPage = () => {
           </tbody>
         </table>
       </form>
+      <br />
+      {/* 적립금 */}
+      <h2 className="text-lg text-gray-800 font-semibold mb-2 mt-3">
+        할인/적립금
+      </h2>
+      <div className="p-2 border border-gray-200 w-210 ml-1 mt-1">
+        <div className="mb-2 flex justify-between items-center">
+          <label className="text-gray-700">적립금</label>
+          <button
+            onClick={handleFullUse}
+            className="bg-gray-700 text-white py-2 rounded-lg font-small text-xs"
+            disabled={balance === 0}
+          >
+            <span>전액 사용</span>
+          </button>
+        </div>
+        <div className="flex border rounded p-2 items-center">
+          <input
+            type="number"
+            value={point}
+            onChange={handlePointChange}
+            className="flex-grow outline-none"
+            placeholder="0"
+          />
+          <span className="text-gray-500">원</span>
+        </div>
+        <p className="text-gray-500 text-sm mt-1">
+          보유 잔액 {balance.toLocaleString()}원
+        </p>
+        <div className="mt-4 p-2 bg-gray-100 rounded">
+          <p className="text-gray-700 text-sm">
+            적립금은 사용제한 없이 언제든 결제가 가능합니다.
+          </p>
+        </div>
+        <div className="mt-4 border-t pt-2 flex justify-between">
+          <span className="text-gray-700">적용금액</span>
+          <span className="text-gray-700">{point.toLocaleString()}원</span>
+        </div>
+      </div>
       {/* 환불방법 */}
       <div className="p-4 w-full max-w-md">
-        <h2 className="text-lg  text-gray-800 mb-1 font-semibold">
+        <h2 className="text-lg  text-gray-800 mb-1 font-semibold mt-5 mr-1">
           품절시 환불방법
         </h2>
 
         <label className="mr-4">
           <input
             type="radio"
-            value="deposit"
-            checked={selectedValue === "deposit"}
+            value="point"
+            checked={selectedValue === "point"}
             onChange={handleChange3}
           />
-          예치금
+          적립금
         </label>
 
         <label className="mr-4">
@@ -430,7 +500,7 @@ const OrderPaymentPage = () => {
         </label>
 
         <p className="mt-2 text-sm text-gray-600">
-          {selectedValue === "deposit"
+          {selectedValue === "point"
             ? "추후 환불 시 쿠폰조건이 해지될 경우 할인금액이 차감되어 결제방법으로 환불됩니다."
             : ""}
           {selectedValue === "change"
@@ -443,7 +513,7 @@ const OrderPaymentPage = () => {
       </div>
       {/* 결제방법 */}
       <div className="p-3 max-w-xl mx-300px w-500px">
-        <h2 className="text-lg  text-gray-800 mb-1 font-semibold">
+        <h2 className="text-lg  text-gray-800 mb-2 font-semibold mt-4">
           결제방법 선택
         </h2>
         <div className="grid grid-cols-4 gap-2 ">
@@ -500,7 +570,9 @@ const OrderPaymentPage = () => {
 
       {/* 결제창 */}
       <div className=" ml-1 p-4 bg-white  w-full">
-        <h2 className="text-lg font-semibold text-gray-800 mb-3">결제정보</h2>
+        <h2 className="text-lg font-semibold text-gray-800 mb-3 mt-4">
+          결제정보
+        </h2>
         <div className="text-gray-700 text-sm">
           <div className="flex justify-between py-2 border-b">
             <span>총 상품금액</span>
@@ -510,10 +582,17 @@ const OrderPaymentPage = () => {
             <span>배송료</span>
             <span>+ {SHIPPING_COST.toLocaleString("ko-KR")}원</span>
           </div>
+          <div className="flex justify-between py-2 border-b">
+            <span>적립금</span>
+            <span>- {balance.toLocaleString("ko-KR")}원</span>
+          </div>
           <div className="flex justify-between py-3 font-bold text-lg text-gray-900">
             <span>총 결제금액</span>
             <span>
-              {(getTotalPrice() + SHIPPING_COST).toLocaleString("ko-KR")}원
+              {(getTotalPrice() + SHIPPING_COST - balance).toLocaleString(
+                "ko-KR"
+              )}
+              원
             </span>
           </div>
         </div>

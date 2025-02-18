@@ -1,12 +1,23 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useMyContext } from "../../store/ContextApi";
 
 const CartPage = () => {
   const [selectedItems, setSelectedItems] = useState([]);
-  const { cartItems, setCartItems } = useMyContext();
+  const { cartItems, setCartItems, user } = useMyContext(); //사용자 정보 가져오기
+  const navigate = useNavigate();
 
   const SHIPPING_COST = 3000;
+
+  // 로그인하지 않은 사용자는 로그인 페이지로 이동
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
+
+  // 로그인하지 않은 경우 렌더링 방지
+  if (!user) return null;
 
   const removeItem = (id) => {
     setCartItems(cartItems.filter((item) => item.id !== id));
