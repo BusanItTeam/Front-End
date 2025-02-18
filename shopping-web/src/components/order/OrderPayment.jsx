@@ -10,6 +10,7 @@ const OrderPaymentPage = () => {
   const [selectedValue, setSelectedValue] = useState("적립금");
   const [selectedMethod, setSelectedMethod] = useState("credit");
   const [point, setPoint] = useState(0);
+  const [deliveryMessage, setDeliveryMessage] = useState("");
   // const balance = 5000; // 예시보유 잔액
 
   //포인트 적립
@@ -106,6 +107,50 @@ const OrderPaymentPage = () => {
         extraAddress: "",
       }); // 체크 해제 시 초기화
     }
+  };
+
+  //우편번호 검색
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src =
+      "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
+
+  const handleAddressSearch = () => {
+    if (!window.daum) {
+      alert("주소 검색 기능을 불러오는 중입니다. 잠시 후 다시 시도해주세요.");
+      return;
+    }
+
+    new window.daum.Postcode({
+      oncomplete: function (data) {
+        let addr = data.roadAddress || data.jibunAddress;
+        let extraAddr = "";
+
+        if (data.userSelectedType === "R") {
+          if (data.bname !== "" && /[동|로|가]$/g.test(data.bname)) {
+            extraAddr += data.bname;
+          }
+          if (data.buildingName !== "" && data.apartment === "Y") {
+            extraAddr +=
+              extraAddr !== "" ? `, ${data.buildingName}` : data.buildingName;
+          }
+          if (extraAddr !== "") {
+            extraAddr = `(${extraAddr})`;
+          }
+        }
+
+        setFormData2((prevState) => ({
+          ...prevState,
+          postcode: data.zonecode,
+          address: addr,
+          extraAddress: extraAddr,
+          detailAddress: "",
+        }));
+      },
+    }).open();
   };
 
   const handleChange3 = (event) => {
@@ -219,7 +264,7 @@ const OrderPaymentPage = () => {
                 <input
                   type="text"
                   name="address"
-                  placeholder="주소"
+                  placeholder="기본주소"
                   value={currentUser?.address}
                   onChange={handleChange}
                   required
@@ -342,7 +387,7 @@ const OrderPaymentPage = () => {
                 <span>
                   <button
                     type="button"
-                    onClick={() => alert("우편번호 검색 기능 추가 필요")}
+                    onClick={handleAddressSearch}
                     className="p-1 border rounded border-gray-200 text-xs bg-gray-100 hover:bg-gray-200 mr-2"
                   >
                     우편번호 찾기
@@ -381,8 +426,8 @@ const OrderPaymentPage = () => {
               <td className="p-2 border-gray-200 flex justify-center items-center">
                 <textarea
                   name="message"
-                  value={currentUser?.message}
-                  onChange={handleChange2}
+                  value={deliveryMessage}
+                  onChange={(e) => setDeliveryMessage(e.target.value)}
                   className="w-full p-1 border rounded border-gray-200 text-xs"
                 />
               </td>
