@@ -14,11 +14,11 @@ const SignUp = () => {
   const { token } = useMyContext();
   const navigate = useNavigate();
 
-<<<<<<< HEAD
-=======
 
 
->>>>>>> origin
+
+
+  
   const {
     register,
     handleSubmit,
