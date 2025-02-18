@@ -47,7 +47,7 @@ const TopsSidebar = () => {
         )}
       </div>
 
-      {/* BEST Section */}
+      {/* 베스트 Section */}
       <div className="mb-4">
         <Link
           to="/best"
@@ -57,7 +57,7 @@ const TopsSidebar = () => {
         </Link>
       </div>
 
-      {/* WOMAN Section */}
+      {/* 여자 Section */}
       <div>
         <button
           className="text-wrapper  w-full text-left p-2 bg-white rounded-md shadow hover:bg-gray-50 transition duration-150 ease-in-out flex justify-between items-center"

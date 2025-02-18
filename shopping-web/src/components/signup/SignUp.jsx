@@ -9,13 +9,10 @@ import { useMyContext } from "../../store/ContextApi";
 //boolean fuck = true;
 const SignUp = () => {
   const apiUrl = import.meta.env.VITE_APP_API_URL;
-  const [role, setRole] = useState("ROLE_USER");
+  const [role, setRole] = useState();
   const [loading, setLoading] = useState(false);
   const { token } = useMyContext();
   const navigate = useNavigate();
-
-
-  
 
   const {
     register,
@@ -29,6 +26,10 @@ const SignUp = () => {
     defaultValues: { username: "", email: "", phoneNumber: "", postcode: "", address: "", detailAddress: "", extraAddress: "",  password: "", confirmPassword: "" },
     mode: "onTouched",
   });
+
+  useEffect(() => {
+    setRole("ROLE_USER");
+  }, []);
 
   // 핸드폰 번호 포맷 변경
   const formatPhoneNumber = (value) => {

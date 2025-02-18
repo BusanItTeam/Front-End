@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./Header.css";
 import Search from "../search/Search";
 import "../signup/SignUp";
@@ -10,17 +10,34 @@ export const Header = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const location = useLocation();
   const isMyPageActive = location.pathname.startsWith("/myPage");
-  const { currentUser, isAdmin } = useMyContext(); // ContextApi에서 currentUser와 isAdmin 가져오기
+  const navigate = useNavigate();
+  const { token, setToken, setCurrentUser, isAdmin, setIsAdmin } =
+  useMyContext(); // ContextApi에서 currentUser와 isAdmin 가져오기
 
+  const handleLogout = () => {
+    localStorage.removeItem("JWT_TOKEN"); // 로컬 스토리지 jwt 토큰 삭제
+    localStorage.removeItem("USER"); // 로컬스토리지 삭제 user
+    localStorage.removeItem("IS_ADMIN"); //로컬스토리지 어드민 삭제
+    if(setToken) setToken(null);  
+    if(setCurrentUser) setCurrentUser(null);
+    if(setIsAdmin) setIsAdmin(false);
+
+    navigate("/login");
+  };
+  
   return (
     <header className="header-wrapper">
       <div className="frame-2">
-        <img src="/Logo.png" alt="Logo" className="logo" />
+      
+          <img src="/Logo.png" alt="Logo" className="logo" />
+        
+     
+        
 
         <nav className="frame-3">
-          <a href="/" className="nav-link">
+          <Link to="/" className="nav-link">
             Home
-          </a>
+          </Link>
           <div
             className="category-dropdown"
             onMouseEnter={() => setShowDropdown(true)}
@@ -52,19 +69,22 @@ export const Header = () => {
           <a href="/about" className="nav-link">
             About
           </a>
-          {!currentUser ? ( //로그인상태되면 가입,로그인페이지안보임
+          {!token ? ( //로그인상태되면 가입,로그인페이지안보임
             <>
               <Link to="/signup" className="nav-link">
                 Sign Up
               </Link>
-              <a href="/login" className="nav-link">
+              <Link to="/login" className="nav-link">
                 LogIn
-              </a>
+              </Link>
             </>
           ) : (
-            <a href="/logout" className="nav-link">
-              Logout
-            </a> //로그아웃눌러도 진짜 로그아웃은안됨
+            <button
+                onClick={handleLogout}
+                className="nav-link"
+              >
+                LogOut
+              </button>
           )}
           {isAdmin && (
             <Link to="/admin" className="nav-link">
@@ -82,7 +102,7 @@ export const Header = () => {
           href="/myPage"
           className={`icon ${isMyPageActive ? "user-active" : "user"}`}
         ></a>
-        <Link to="/" className="nav-link">
+        <Link to="/home" className="nav-link">
           Home
         </Link>
         <Link to="/contact" className="nav-link">
