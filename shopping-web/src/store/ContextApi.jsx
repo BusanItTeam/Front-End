@@ -6,13 +6,9 @@ const ContextApi = createContext();
 
 export const ContextProvider = ({ children }) => {
   //로컬스토리지에 있는 토큰을 가져온다
-  const getToken = localStorage.getItem("JWT_TOKEN")
-    ? JSON.stringify(localStorage.getItem("JWT_TOKEN"))
-    : null;
+  const getToken = localStorage.getItem("JWT_TOKEN") ? JSON.stringify(localStorage.getItem("JWT_TOKEN")) : null;
   //로컬스토리지 유저가 관리자 인지 가져옴
-  const isADmin = localStorage.getItem("IS_ADMIN")
-    ? JSON.stringify(localStorage.getItem("IS_ADMIN"))
-    : false;
+  const isADmin = localStorage.getItem("IS_ADMIN") ? JSON.stringify(localStorage.getItem("IS_ADMIN")) : false;
 
   //토큰 상태관리
   const [token, setToken] = useState(getToken);
@@ -88,6 +84,14 @@ export const ContextProvider = ({ children }) => {
       fetchUser();
     }
   }, [token]);
+
+  // localstorage 에 user 데이터가 있으면 자동으로 currentuser를 설정
+  useEffect(() => {
+    const storedUser = localStorage.getItem("USER");
+    if (storedUser) {
+      setCurrentUser(JSON.parse(storedUser));
+    }
+  }, []);
 
   //컨텍스트 프로바이더가 value의 모든 정보를 모든 컴포넌트에 제공함
   return (

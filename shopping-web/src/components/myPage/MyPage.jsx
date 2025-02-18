@@ -1,9 +1,34 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useMyContext } from "../../store/ContextApi";
 
 const MyPage = () => {
-  const { currentUser } = useMyContext();
+  const { currentUser, setCurrentUser } = useMyContext();
+  const navigate = useNavigate();
+
+  //로그인 상태 확인하기
+  useEffect(() => {
+    // console.log("currentUser:", currentUser);
+    // console.log("JWT_TOKEN:", localStorage.getItem("JWT_TOKEN"));
+    // console.log("USER:", localStorage.getItem("USER"));
+
+    if (currentUser === null) {
+      const storedUser = localStorage.getItem("USER");
+      if (storedUser) {
+        setCurrentUser(JSON.parse(storedUser)); // localStorage에서 값 불러오기
+      } else {
+        setTimeout(() => {
+          navigate("/login");
+        }, 1);
+      }
+    }
+  }, [currentUser, navigate]);
+
+  // currentUser가 null이면 로딩 중 표시
+  if (currentUser === null) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="max-w-7xl mx-auto p-6 min-h-screen pt-9">
