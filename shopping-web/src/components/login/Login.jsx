@@ -77,12 +77,14 @@ const Login = () => {
             Enter your details below
           </p>
 
+
           <form onSubmit={handleSubmit(onLoginHandler)} className="space-y-6">
+            
             {/* 유저네임 */}
             <input
               type="text"
               className="w-full pb-2 border-b border-gray-300 focus:outline-none focus:border-gray-600"
-              placeholder="Email or Phone Number"
+              placeholder="아이디를 입력해주세요"
               {...register("username", { required: "아이디를 입력해주세요" })}
             />
             {errors.username && (
@@ -93,7 +95,7 @@ const Login = () => {
             <input
               type="password"
               className="w-full pb-2 border-b border-gray-300 focus:outline-none focus:border-gray-600"
-              placeholder="Password"
+              placeholder="비밀번호를 입력해주세요"
               {...register("password", { required: "비밀번호를 입력해주세요" })}
             />
             {errors.password && (
