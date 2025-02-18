@@ -30,9 +30,7 @@ export const Header = () => {
       <div className="frame-2">
       
           <img src="/Logo.png" alt="Logo" className="logo" />
-        
-     
-        
+
 
         <nav className="frame-3">
           <Link to="/" className="nav-link">
