@@ -63,6 +63,7 @@ export const ContextProvider = ({ children }) => {
         //서버에 유저정보를 요청
         const { data } = await api.get(`/auths/user`);
         const roles = data.roles;
+        console.log(data);
 
         if (roles.includes("ROLE_ADMIN")) {
           localStorage.setItem("IS_ADMIN", JSON.stringify(true));

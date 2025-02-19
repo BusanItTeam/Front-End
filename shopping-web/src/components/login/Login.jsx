@@ -77,9 +77,7 @@ const Login = () => {
             Enter your details below
           </p>
 
-
           <form onSubmit={handleSubmit(onLoginHandler)} className="space-y-6">
-            
             {/* 유저네임 */}
             <input
               type="text"
