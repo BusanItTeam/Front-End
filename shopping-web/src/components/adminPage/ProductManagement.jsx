@@ -1,86 +1,45 @@
 import React, { useState, useEffect } from "react";
-import { useMyContext } from "../../store/ContextApi"; // Context API import
+import { useMyContext } from "../../store/ContextApi";
+import Api from "../../services/Api";
+import toast from "react-hot-toast";
 
 function ProductManagement() {
-  const { products, setProducts } = useMyContext(); // Context API 사용
-  const [categories, setCategories] = useState([
-    { id: "pants", name: "바지" },
-    { id: "tops", name: "상의" },
-    { id: "outerwear", name: "아우터" },
-    { id: "dresses", name: "원피스" },
-  ]);
+  const { products, setProducts } = useMyContext();
   const [newProduct, setNewProduct] = useState({
     name: "",
     price: "",
-    category: "",
+    categoryId: "", // categoryId로 변경
     stock: "",
     description: "",
-    image: null, // 이미지 파일 상태 추가
+    image: null,
   });
   const [editingProduct, setEditingProduct] = useState(null);
   const [stockThreshold, setStockThreshold] = useState(10);
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
+    fetchCategories();
     fetchProducts();
   }, []);
 
+  const fetchCategories = async () => {
+    try {
+      const response = await Api.get("/categories");
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      toast.error("카테고리 목록을 불러오는데 실패했습니다.");
+    }
+  };
+
   const fetchProducts = async () => {
-    // 더미 데이터
-    const dummyData = [
-      {
-        id: 1,
-        name: "더미 상품 1",
-        price: 20000,
-        category: "tops",
-        stock: 10,
-        description: "더미 상품 1 설명",
-        image: "https://via.placeholder.com/150",
-      },
-      {
-        id: 2,
-        name: "더미 상품 2",
-        price: 30000,
-        category: "pants",
-        stock: 30,
-        description: "더미 상품 2 설명",
-        image: "https://via.placeholder.com/150",
-      },
-      {
-        id: 3,
-        name: "더미 상품 3",
-        price: 40000,
-        category: "outerwear",
-        stock: 5,
-        description: "더미 상품 3 설명",
-        image: "https://via.placeholder.com/150",
-      },
-      {
-        id: 4,
-        name: "더미 상품 4",
-        price: 50000,
-        category: "dresses",
-        stock: 40,
-        description: "더미 상품 4 설명",
-        image: "https://via.placeholder.com/150",
-      },
-      {
-        id: 5,
-        name: "더미 상품 5",
-        price: 60000,
-        category: "tops",
-        stock: 60,
-        description: "더미 상품 5 설명",
-        image: "https://via.placeholder.com/150",
-      },
-    ];
-    setProducts(dummyData);
-    // 실제 API 호출로 대체 (예시):
-    // try {
-    //   const response = await api.get('/products');
-    //   setProducts(response.data);
-    // } catch (error) {
-    //   console.error("Error fetching products:", error);
-    // }
+    try {
+      const response = await Api.get("/admin/products");
+      setProducts(response.data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      toast.error("상품 목록을 불러오는데 실패했습니다.");
+    }
   };
 
   const handleInputChange = (e) => {
@@ -94,88 +53,110 @@ function ProductManagement() {
 
   const handleAddProduct = async (e) => {
     e.preventDefault();
-    // const imageUrl = newProduct.image
-    //   ? URL.createObjectURL(newProduct.image)
-    //   : "https://via.placeholder.com/150"; // 이미지가 없을 경우 기본 이미지 URL 설정
+    try {
+      const token = localStorage.getItem("JWT_TOKEN");
+      if (!token) {
+        toast.error("로그인이 필요합니다.");
+        return;
+      }
 
-    // 실제 API 호출로 대체 (예시):
-    // try {
-    //   const formData = new FormData();
-    //   formData.append("image", newProduct.image);
-    //   formData.append("name", newProduct.name);
-    //   formData.append("price", newProduct.price);
-    //   formData.append("category", newProduct.category);
-    //   formData.append("stock", newProduct.stock);
-    //   formData.append("description", newProduct.description);
+      const formData = new FormData();
+      formData.append("name", newProduct.name);
+      formData.append("price", newProduct.price);
+      formData.append("categoryId", newProduct.categoryId); // categoryId로 변경
+      formData.append("stock", newProduct.stock);
+      formData.append("description", newProduct.description);
 
-    //   const response = await api.post('/products', formData, {
-    //     headers: {
-    //       'Content-Type': 'multipart/form-data'
-    //     }
-    //   });
+      if (newProduct.image) {
+        formData.append("image", newProduct.image);
+      }
 
-    //   const newProductToAdd = response.data;
+      const response = await Api.post("/admin/products", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    //   setProducts([...products, newProductToAdd]); // Context API를 통해 상품 추가
-
-    //   setNewProduct({
-    //     name: "",
-    //     price: "",
-    //     category: "",
-    //     stock: "",
-    //     description: "",
-    //     image: null,
-    //   });
-    //   alert("상품 추가 완료!");
-    // } catch (error) {
-    //   console.error("Error adding product:", error);
-    //   alert("상품 추가 실패!");
-    // }
-
-    const imageUrl = newProduct.image
-      ? URL.createObjectURL(newProduct.image)
-      : "https://via.placeholder.com/150"; // 이미지가 없을 경우 기본 이미지 URL 설정
-
-    const newProductToAdd = {
-      ...newProduct,
-      id: products.length + 1,
-      image: imageUrl,
-    };
-
-    setProducts([...products, newProductToAdd]); // Context API를 통해 상품 추가
-
-    setNewProduct({
-      name: "",
-      price: "",
-      category: "",
-      stock: "",
-      description: "",
-      image: null,
-    });
-    alert("상품 추가 완료!");
+      setProducts([...products, response.data]);
+      setNewProduct({
+        name: "",
+        price: "",
+        categoryId: "", // categoryId로 변경
+        stock: "",
+        description: "",
+        image: null,
+      });
+      toast.success("상품이 성공적으로 등록되었습니다.");
+    } catch (error) {
+      console.error("Error adding product:", error);
+      toast.error("상품 등록에 실패했습니다.");
+    }
   };
 
   const handleUpdateProduct = async (e) => {
     e.preventDefault();
-    // 상품 업데이트 로직 (실제 API 연동 시 구현 필요)
-    setProducts(
-      products.map((product) =>
-        product.id === editingProduct.id ? editingProduct : product
-      )
-    );
-    setEditingProduct(null);
-    alert("상품 수정 완료!");
+    try {
+      const token = localStorage.getItem("JWT_TOKEN");
+      if (!token) {
+        toast.error("로그인이 필요합니다.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("name", editingProduct.name);
+      formData.append("price", editingProduct.price);
+      formData.append("categoryId", editingProduct.categoryId); // categoryId로 변경
+      formData.append("stock", editingProduct.stock);
+      formData.append("description", editingProduct.description);
+
+      // 이미지가 변경된 경우에만 추가
+      if (editingProduct.image) {
+        formData.append("image", editingProduct.image);
+      }
+
+      const response = await Api.put(
+        `/products/${editingProduct.productId}`, // productId로 변경
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setProducts(
+        products.map((product) =>
+          product.productId === editingProduct.productId // productId로 변경
+            ? response.data
+            : product
+        )
+      );
+      setEditingProduct(null);
+      toast.success("상품이 성공적으로 수정되었습니다.");
+    } catch (error) {
+      console.error("Error updating product:", error);
+      toast.error("상품 수정에 실패했습니다.");
+    }
   };
 
-  const handleDeleteProduct = async (id) => {
-    // 상품 삭제 로직 (실제 API 연동 시 구현 필요)
-    const newProductList = products.filter((product) => product.id !== id);
-    setProducts(newProductList);
-    alert("삭제 완료!");
+  const handleDeleteProduct = async (productId) => {
+    // productId로 변경
+    try {
+      await Api.delete(`/products/${productId}`); // productId로 변경
+      setProducts(
+        products.filter((product) => product.productId !== productId)
+      ); // productId로 변경
+      toast.success("상품이 성공적으로 삭제되었습니다.");
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      toast.error("상품 삭제에 실패했습니다.");
+    }
   };
 
   const handleEditProduct = (product) => {
-    setEditingProduct(product);
+    setEditingProduct({ ...product }); // 수정 시 기존 상품 정보 복사
   };
 
   const handleStockThresholdChange = (e) => {
@@ -185,7 +166,6 @@ function ProductManagement() {
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">상품 관리</h2>
-      {/* 상품 등록 폼 */}
       <form onSubmit={handleAddProduct} className="mb-8">
         <h3 className="text-xl font-semibold mb-2">상품 등록</h3>
         <div className="grid grid-cols-2 gap-4">
@@ -208,15 +188,15 @@ function ProductManagement() {
             required
           />
           <select
-            name="category"
-            value={newProduct.category}
+            name="categoryId" // categoryId로 변경
+            value={newProduct.categoryId}
             onChange={handleInputChange}
             className="border p-2"
             required
           >
             <option value="">카테고리 선택</option>
             {categories.map((category) => (
-              <option key={category.id} value={category.id}>
+              <option key={category.categoryId} value={category.categoryId}>
                 {category.name}
               </option>
             ))}
@@ -249,7 +229,6 @@ function ProductManagement() {
           상품 등록
         </button>
       </form>
-      {/* 재고 알림 설정 */}
       <div className="mb-8">
         <h3 className="text-xl font-semibold mb-2">재고 알림 설정</h3>
         <label className="block">
@@ -263,7 +242,6 @@ function ProductManagement() {
           개 이하
         </label>
       </div>
-      ... {/* 상품 목록 및 관리 UI */}
       <div>
         <h3 className="text-xl font-semibold mb-2">상품 목록</h3>
         <table className="w-full border-collapse border">
@@ -280,19 +258,26 @@ function ProductManagement() {
           <tbody>
             {products.map((product) => (
               <tr
-                key={product.id}
+                key={product.productId} // productId로 변경
                 className={product.stock <= stockThreshold ? "bg-red-100" : ""}
               >
                 <td className="border p-2">
                   <img
-                    src={product.image}
+                    src={product.imageUrl} // imageUrl로 변경
                     alt={product.name}
                     className="w-16 h-16 object-cover"
                   />
                 </td>
                 <td className="border p-2">{product.name}</td>
                 <td className="border p-2">{product.price}</td>
-                <td className="border p-2">{product.category}</td>
+                <td className="border p-2">
+                  {
+                    categories.find(
+                      (category) => category.categoryId === product.categoryId
+                    )?.name
+                  }
+                </td>{" "}
+                // categoryId로 변경
                 <td className="border p-2">{product.stock}</td>
                 <td className="border p-2">
                   <button
@@ -302,7 +287,7 @@ function ProductManagement() {
                     수정
                   </button>
                   <button
-                    onClick={() => handleDeleteProduct(product.id)}
+                    onClick={() => handleDeleteProduct(product.productId)} // productId로 변경
                     className="bg-red-500 text-white px-2 py-1"
                   >
                     삭제
@@ -342,19 +327,19 @@ function ProductManagement() {
                 required
               />
               <select
-                name="category"
-                value={editingProduct.category}
+                name="categoryId" // categoryId로 변경
+                value={editingProduct.categoryId}
                 onChange={(e) =>
                   setEditingProduct({
                     ...editingProduct,
-                    category: e.target.value,
+                    categoryId: e.target.value,
                   })
                 }
                 className="border p-2 mb-2 w-full"
                 required
               >
                 {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
+                  <option key={category.categoryId} value={category.categoryId}>
                     {category.name}
                   </option>
                 ))}
