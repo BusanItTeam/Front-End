@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../../services/api"; // API 호출을 위한 axios 인스턴스
 import { useMyContext } from "../../store/ContextApi"; // 사용자 상태를 가져오기 위한 Context
 
 function BoardList() {
   const { currentUser, setCurrentUser } = useMyContext(); // 로그인된 유저 정보
   const [inquiries, setInquiries] = useState([]); // 유저의 문의 리스트 상태
+
+  const [currentPage, setCurrentPage] = useState(1); // 현재 페이지
+  const [totalPages, setTotalPages] = useState(0); // 총 페이지 수
+  const inquiriesPerPage = 10; // 페이지당 문의 수
+  const navigate = useNavigate();
 
   useEffect(() => {
     // currentUser가 null일 경우에만 localStorage에서 불러오기
@@ -37,8 +42,14 @@ function BoardList() {
           withCredentials: true, // 인증 쿠키 전송 여부
         });
 
-        console.log("✅ 요청 헤더 확인:", response.config.headers);
+        console.log("API 응답:", response.data);
+
+        // inquiries 상태를 API 응답으로 설정
         setInquiries(response.data);
+
+        // totalCount를 계산하여 totalPages 설정
+        const totalCount = response.data.length || 0; // API에서 직접 length를 사용
+        setTotalPages(Math.ceil(totalCount / inquiriesPerPage));
       } catch (error) {
         console.error("문의 목록을 불러오는 데 오류가 발생했습니다.", error);
         if (error.response) {
@@ -50,6 +61,17 @@ function BoardList() {
 
     fetchInquiries();
   }, [currentUser]); // currentUser가 변경될 때마다 문의 목록을 가져옵니다.
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const startIndex = (currentPage - 1) * inquiriesPerPage;
+  const endIndex = startIndex + inquiriesPerPage;
+  const currentInquiries = inquiries.slice(startIndex, endIndex);
+
+  console.log("Total Pages:", totalPages);
+  console.log("Current Page:", currentPage);
 
   return (
     <div className="max-w-7xl mx-auto p-6 min-h-screen pt-9">
@@ -77,16 +99,16 @@ function BoardList() {
           </tr>
         </thead>
         <tbody>
-          {inquiries.length === 0 ? (
+          {currentInquiries.length === 0 ? (
             <tr>
               <td colSpan="6" className="py-4 text-gray-500">
                 게시물이 없습니다.
               </td>
             </tr>
           ) : (
-            inquiries.map((inquiry, index) => (
+            currentInquiries.map((inquiry, index) => (
               <tr key={inquiry.id}>
-                <td className="py-2">{index + 1}</td>
+                <td className="py-2">{(currentPage - 1) * inquiriesPerPage + index + 1}</td>
                 <td className="py-2">{inquiry.type}</td>
                 <td className="py-2">{inquiry.title}</td>
                 <td className="py-2">{inquiry.user.username}</td>
@@ -97,6 +119,15 @@ function BoardList() {
           )}
         </tbody>
       </table>
+
+      {/* 페이지네이션 */}
+      <div className="flex justify-center mt-4">
+        {Array.from({ length: totalPages }, (_, index) => (
+          <button key={index} className={`mx-1 px-3 py-1 rounded ${currentPage === index + 1 ? "bg-pink-500 text-white" : "bg-gray-200"}`} onClick={() => handlePageChange(index + 1)}>
+            {index + 1}
+          </button>
+        ))}
+      </div>
 
       <div className="mt-4 flex items-center">
         <div className="flex-grow flex justify-center space-x-2">
