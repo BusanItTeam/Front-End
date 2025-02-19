@@ -6,7 +6,6 @@ import { FaGithub } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useMyContext } from "../../store/ContextApi";
-//boolean fuck = true;
 const SignUp = () => {
   const apiUrl = import.meta.env.VITE_APP_API_URL;
   const [role, setRole] = useState();
