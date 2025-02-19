@@ -25,6 +25,7 @@ import ProductManagement from "./components/adminPage/ProductManagement";
 import AdminDashboard from "./components/adminPage/AdminDashboard";
 import MyPage from "./components/myPage/MyPage";
 import Homepage from "./components/home/Homepage";
+import OAuth2RedirectHandler from "./components/Auth/OAuth2RedirectHandler";
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
           <Route path="/" element={<Homepage />} />
 
           <Route path="/productcategory" element={<ProductCategory />} />
+
           <Route path="/category/pants" element={<Pants />} />
           <Route path="/category/tops" element={<Tops />} />
           <Route path="/category/outerwear" element={<Outerwear />} />
@@ -59,6 +61,9 @@ function App() {
           <Route path="/admin/orders" element={<OrderManagement />} />
           <Route path="/admin/members" element={<MemberManagement />} />
           <Route path="/admin/support" element={<CustomerSupport />} />
+
+          {/* OAuth2 리다이렉트  */}
+          <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
         </Routes>
 
         <Footer />

@@ -32,7 +32,6 @@ export const ContextProvider = ({ children }) => {
         price: 25000,
         image: "/woman-2799490_1280.jpg",
         quantity: 1,
-        points: 2,
       },
       {
         id: 2,
@@ -40,7 +39,6 @@ export const ContextProvider = ({ children }) => {
         price: 19000,
         image: "/khaki-2723896_1280.jpg",
         quantity: 1,
-        points: 1,
       },
       {
         id: 3,
@@ -48,9 +46,12 @@ export const ContextProvider = ({ children }) => {
         price: 15000,
         image: "/shirts-1184914_1280.jpg",
         quantity: 1,
-        points: 1,
       },
-    ];
+    ].map((item) => ({
+      ...item,
+      points: Math.floor(item.price * 0.1), // 10% of price as integer
+    }));
+
     setCartItems(sampleItems);
   }, []);
 
