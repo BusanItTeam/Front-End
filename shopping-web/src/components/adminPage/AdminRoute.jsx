@@ -6,7 +6,7 @@ const AdminRoute = ({ children }) => {
   const { isAdmin } = useMyContext();
 
   if (!isAdmin) {
-    // 관리자가 아닌 경우, 로그인 페이지로 리다이렉트
+    // 관리자가 아닌 경우, 홈 페이지로 리다이렉트
     return <Navigate to="/" replace />;
   }
 

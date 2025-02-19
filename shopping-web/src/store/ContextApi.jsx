@@ -59,6 +59,10 @@ export const ContextProvider = ({ children }) => {
     setCartItems(sampleItems);
   }, []);
 
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
   const fetchUser = async () => {
     const user = JSON.parse(localStorage.getItem("USER"));
 
@@ -90,6 +94,16 @@ export const ContextProvider = ({ children }) => {
     }
   }, [token]);
 
+  // 상품 목록을 가져오는 함수
+  const fetchProducts = async () => {
+    try {
+      const response = await api.get("/products");
+      setProducts(response.data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
+
   //컨텍스트 프로바이더가 value의 모든 정보를 모든 컴포넌트에 제공함
   return (
     <ContextApi.Provider
@@ -106,6 +120,7 @@ export const ContextProvider = ({ children }) => {
         setCartItems,
         products, // 상품 목록 상태 추가
         setProducts, // 상품 목록 상태 설정 함수 추가
+        fetchProducts, // 상품 목록 업데이트 함수 추가
       }}
     >
       {children}
