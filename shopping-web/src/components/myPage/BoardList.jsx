@@ -9,6 +9,7 @@ function BoardList() {
 
   useEffect(() => {
     // currentUser가 null일 경우에만 localStorage에서 불러오기
+
     if (!currentUser) {
       const storedUser = localStorage.getItem("USER");
       if (storedUser) {
@@ -18,15 +19,29 @@ function BoardList() {
   }, [currentUser, setCurrentUser]); // currentUser가 바뀔 때마다 실행
 
   useEffect(() => {
+    console.log("🟢 currentUser 변경됨:", currentUser);
+  }, [currentUser]);
+
+  useEffect(() => {
     const fetchInquiries = async () => {
-      if (!currentUser) return; // 유저가 없으면 API 호출하지 않음
+      if (!currentUser) {
+        console.warn("⚠️ currentUser가 없습니다. 로그인 페이지로 이동합니다.");
+        navigate("/login");
+        return;
+      }
+
       try {
-        const response = await api.get(`/inquiries/user/${currentUser.id}`); // 유저 ID를 이용해 문의 목록을 가져옴
-        setInquiries(response.data); // API 응답으로 받은 데이터를 상태에 저장
+        console.log("🔍 저장된 JWT 토큰:", localStorage.getItem("JWT_TOKEN"));
+
+        const response = await api.get(`/inquiries/user/${currentUser.id}`, {
+          withCredentials: true, // 인증 쿠키 전송 여부
+        });
+
+        console.log("✅ 요청 헤더 확인:", response.config.headers);
+        setInquiries(response.data);
       } catch (error) {
         console.error("문의 목록을 불러오는 데 오류가 발생했습니다.", error);
         if (error.response) {
-          // 서버에서 반환된 오류가 있을 경우
           console.error("서버 응답 오류 코드:", error.response.status);
           console.error("서버 응답 메시지:", error.response.data);
         }
