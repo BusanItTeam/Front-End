@@ -62,6 +62,7 @@ const OrderPaymentPage = () => {
     { id: "kakaopay", name: "카카오PAY" },
     { id: "smilepay", name: "스마일PAY" },
   ];
+  // dkfjl
 
   //전액이 보유 포인트를 넘지 않도록
   const handlePointChange = (e) => {

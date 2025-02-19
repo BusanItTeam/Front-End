@@ -23,7 +23,7 @@ const Login = () => {
 
   const handleSuccessfulLogin = (token, decodedToken) => {
     const user = {
-      username: decodedToken.sub,
+      email: decodedToken.sub,
       roles: decodedToken.roles ? decodedToken.roles.split(",") : [],
     };
     localStorage.setItem("JWT_TOKEN", token);

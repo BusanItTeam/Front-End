@@ -6,7 +6,6 @@ import { FaGithub } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useMyContext } from "../../store/ContextApi";
-//boolean fuck = true;
 const SignUp = () => {
   const apiUrl = import.meta.env.VITE_APP_API_URL;
   const [role, setRole] = useState();
@@ -28,7 +27,7 @@ const SignUp = () => {
     setValue,
     formState: { errors },
   } = useForm({       
-    defaultValues: { username: "", email: "", phoneNumber: "", postcode: "", address: "", detailAddress: "", extraAddress: "",  password: "", confirmPassword: "" },
+    defaultValues: { username: "",  name: "", email: "", phoneNumber: "", postcode: "", address: "", detailAddress: "", extraAddress: "",  password: "", confirmPassword: "" },
     mode: "onTouched",
   });
 
@@ -57,9 +56,10 @@ const SignUp = () => {
   const onSubmitHandler = async (data) => {
     console.log("회원가입 요청 데이터:", data); // 로그 확인
   
-    const { username, email, phoneNumber, postcode, address, detailAddress, extraAddress, password } = data;
+    const { username, name, email, phoneNumber, postcode, address, detailAddress, extraAddress, password } = data;
     const sendData = { 
       username, 
+      name,
       email, 
       phoneNumber, 
       postcode, 
@@ -178,6 +178,14 @@ const SignUp = () => {
               {...register("username", { required: "아이디를 입력해주세요" })}
             />
             {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
+
+            <input
+              type="text"
+              className="w-full pb-2 border-b border-gray-300 focus:outline-none focus:border-gray-600"
+              placeholder="이름"
+              {...register("name", { required: "이름을 입력해주세요" })}
+            />
+            {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
 
             {/* 이메일 */}
             <input
