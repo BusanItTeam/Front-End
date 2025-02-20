@@ -26,8 +26,7 @@ import AdminDashboard from "./components/adminPage/AdminDashboard";
 import MyPage from "./components/myPage/MyPage";
 import Homepage from "./components/home/Homepage";
 import OAuth2RedirectHandler from "./components/Auth/OAuth2RedirectHandler";
-import Homepage from "./components/home/Homepage";
-import Mypage from "./components/myPage/MyPage";
+
 function App() {
   return (
     <ContextProvider>
