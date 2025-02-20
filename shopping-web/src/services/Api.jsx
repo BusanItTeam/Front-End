@@ -31,7 +31,6 @@ Api.interceptors.request.use(
   (config) => {
     // 로컬스토리지에서 JWT 토큰 가져오기
     const token = localStorage.getItem("JWT_TOKEN");
-    console.log("JWT Token:", token);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
