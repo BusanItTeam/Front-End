@@ -26,6 +26,7 @@ import AdminDashboard from "./components/adminPage/AdminDashboard";
 import MyPage from "./components/myPage/MyPage";
 import Homepage from "./components/home/Homepage";
 import OAuth2RedirectHandler from "./components/Auth/OAuth2RedirectHandler";
+import InquiryManagement from "./components/adminPage/InquiryManagement";
 
 function App() {
   return (
@@ -61,6 +62,7 @@ function App() {
           <Route path="/admin/orders" element={<OrderManagement />} />
           <Route path="/admin/members" element={<MemberManagement />} />
           <Route path="/admin/support" element={<CustomerSupport />} />
+          <Route path="/admin/inquiries" element={<InquiryManagement />} />
 
           {/* OAuth2 리다이렉트  */}
           <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />

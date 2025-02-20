@@ -12,6 +12,8 @@ function BoardList() {
   const inquiriesPerPage = 10; // 페이지당 문의 수
   const navigate = useNavigate();
 
+  const [expandedId, setExpandedId] = useState(null); // 🌟 추가: 펼쳐진 문의 ID 상태
+
   useEffect(() => {
     // currentUser가 null일 경우에만 localStorage에서 불러오기
 
@@ -44,8 +46,9 @@ function BoardList() {
 
         console.log("API 응답:", response.data);
 
-        // inquiries 상태를 API 응답으로 설정
-        setInquiries(response.data);
+        // 최신순 정렬 후 상태 업데이트
+        const sortedInquiries = [...response.data].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setInquiries(sortedInquiries);
 
         // totalCount를 계산하여 totalPages 설정
         const totalCount = response.data.length || 0; // API에서 직접 length를 사용
@@ -64,6 +67,16 @@ function BoardList() {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+    setExpandedId(null); // 페이지 변경 시 펼쳐진 문의 닫기
+  };
+
+  // 🌟 페이지가 변경될 때 확장된 ID 초기화
+  useEffect(() => {
+    setExpandedId(null);
+  }, [currentPage]);
+
+  const toggleExpand = (id) => {
+    setExpandedId((prevId) => (prevId === id ? null : id));
   };
 
   const startIndex = (currentPage - 1) * inquiriesPerPage;
@@ -75,17 +88,7 @@ function BoardList() {
 
   return (
     <div className="max-w-7xl mx-auto p-6 min-h-screen pt-9">
-      <h2 className="text-center text-2xl font-semibold mb-4">MY BOARD</h2>
-
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex space-x-2">
-          <label className="text-sm text-gray-600">분류 선택</label>
-          <select className="border p-1 text-sm">
-            <option>작성 일자별</option>
-            <option>분류별</option>
-          </select>
-        </div>
-      </div>
+      <h2 className="pb-7 text-center text-2xl font-semibold mb-4">MY BOARD</h2>
 
       <table className="w-full border-t text-sm text-center">
         <thead>
@@ -93,7 +96,6 @@ function BoardList() {
             <th className="py-2">번호</th>
             <th className="py-2">분류</th>
             <th className="py-2">제목</th>
-            <th className="py-2">작성자</th>
             <th className="py-2">작성일</th>
             <th className="py-2">답변</th>
           </tr>
@@ -107,21 +109,31 @@ function BoardList() {
             </tr>
           ) : (
             currentInquiries.map((inquiry, index) => (
-              <tr key={inquiry.id}>
-                <td className="py-2">{(currentPage - 1) * inquiriesPerPage + index + 1}</td>
-                <td className="py-2">{inquiry.type}</td>
-                <td className="py-2">{inquiry.title}</td>
-                <td className="py-2">{inquiry.user.username}</td>
-                <td className="py-2">{new Date(inquiry.createdAt).toLocaleDateString()}</td>
-                <td className="py-2">{inquiry.answer ? <span className="text-green-500">답변 완료</span> : <span className="text-red-500">답변 대기 중</span>}</td>
-              </tr>
+              <React.Fragment key={inquiry.id}>
+                <tr onClick={() => toggleExpand(inquiry.id)} className="cursor-pointer hover:bg-gray-100">
+                  <td className="py-2">{(currentPage - 1) * inquiriesPerPage + index + 1}</td>
+                  <td className="py-2">{inquiry.type}</td>
+                  <td className="py-2">{inquiry.title}</td>
+                  <td className="py-2">{new Date(inquiry.createdAt).toLocaleDateString()}</td>
+                  <td className="py-2">{inquiry.answer ? <span className="text-green-500">답변 완료</span> : <span className="text-red-500">답변 대기 중</span>}</td>
+                </tr>
+
+                {expandedId === inquiry.id && (
+                  <tr key={`${inquiry.id}-content`}>
+                    <td colSpan="5" className="p-4 bg-gray-50 text-left">
+                      <strong>문의 내용:</strong>
+                      <p className="mt-2 text-gray-700">{inquiry.content}</p>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
             ))
           )}
         </tbody>
       </table>
 
       {/* 페이지네이션 */}
-      <div className="flex justify-center mt-4">
+      <div className="pt-2 pb-2 flex justify-center mt-4">
         {Array.from({ length: totalPages }, (_, index) => (
           <button key={index} className={`mx-1 px-3 py-1 rounded ${currentPage === index + 1 ? "bg-pink-500 text-white" : "bg-gray-200"}`} onClick={() => handlePageChange(index + 1)}>
             {index + 1}
