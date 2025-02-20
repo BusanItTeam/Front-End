@@ -73,7 +73,7 @@ export const ContextProvider = ({ children }) => {
   const fetchUser = async () => {
     const user = JSON.parse(localStorage.getItem("USER"));
 
-    if (user?.username) {
+    if (user?.email) {
       try {
         //서버에 유저정보를 요청
         const { data } = await api.get(`/auths/user`);
