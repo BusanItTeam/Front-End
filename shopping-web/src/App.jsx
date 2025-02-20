@@ -98,6 +98,15 @@ function App() {
               </AdminRoute>
             }
           />
+          <Route
+            path="/admin/inquiries"
+            element={
+              <AdminRoute>
+                <InquiryManagement />
+              </AdminRoute>
+            }
+          />
+
           {/* OAuth2 리다이렉트  */}
           <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
         </Routes>
