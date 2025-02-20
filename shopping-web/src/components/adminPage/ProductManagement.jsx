@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useMyContext } from "../../store/ContextApi"; // Context API import
-import api from "../../services/Api"; // API import
+import { useMyContext } from "../../store/ContextApi";
+import api from "../../services/Api";
 
 function ProductManagement() {
-  const { products, setProducts, fetchProducts } = useMyContext(); // Context API 사용
+  const { products, setProducts, fetchProducts } = useMyContext();
   const [categories, setCategories] = useState([
     { categoryId: "1", name: "바지" },
     { categoryId: "2", name: "상의" },
@@ -16,7 +16,7 @@ function ProductManagement() {
     categoryId: "",
     stock: "",
     description: "",
-    imageUrl: null, // 이미지 파일 상태 추가
+    imageUrl: null,
   });
   const [editingProduct, setEditingProduct] = useState(null);
   const [stockThreshold, setStockThreshold] = useState(10);
@@ -34,37 +34,38 @@ function ProductManagement() {
     e.preventDefault();
 
     try {
-      const token = localStorage.getItem("JWT_TOKEN"); // 로컬 스토리지에서 JWT 토큰 가져오기
+      const token = localStorage.getItem("JWT_TOKEN");
 
-      // FormData 객체 생성
       const formData = new FormData();
       formData.append("name", newProduct.name);
-      formData.append("price", Number(newProduct.price));
-      formData.append("stock", Number(newProduct.stock));
+      formData.append("price", Number(newProduct.price)); // 숫자 타입으로 변환
+      formData.append("stock", Number(newProduct.stock)); // 숫자 타입으로 변환
       formData.append("description", newProduct.description);
-      formData.append("category", newProduct.categoryId);
-      // 이미지 파일이 있는 경우에만 추가
+      formData.append("categoryId", newProduct.categoryId);
+
       if (newProduct.imageUrl) {
         formData.append("imageUrl", newProduct.imageUrl);
       }
-      // 폼 데이터 로깅 (디버깅용)
+
       for (let [key, value] of formData.entries()) {
         console.log(`${key}: ${value}`);
       }
 
-      const response = await api.post(
-        `/products`,
-        formData,
+      const response = await api.post(`/products`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data", // Content-Type 설정
-          },
-        }
-      );
-
-      fetchProducts(); // 상품 목록 업데이트
+      // fetchProducts 함수가 제대로 호출되는지 확인
+      if (fetchProducts) {
+        fetchProducts();
+      } else {
+        console.error("fetchProducts is not a function!");
+        alert("상품 목록 갱신 실패!");
+        return; // 함수 실행 중단
+      }
 
       setNewProduct({
         name: "",
@@ -84,15 +85,12 @@ function ProductManagement() {
   const handleUpdateProduct = async (e) => {
     e.preventDefault();
     try {
-      await api.put(
-        `/api/products/${editingProduct.productId}`, // 수정된 URL
-        {
-          ...editingProduct,
-          price: Number(editingProduct.price),
-          stock: Number(editingProduct.stock),
-        }
-      );
-      fetchProducts(); // 상품 목록 업데이트
+      await api.put(`/api/products/${editingProduct.productId}`, {
+        ...editingProduct,
+        price: Number(editingProduct.price),
+        stock: Number(editingProduct.stock),
+      });
+      fetchProducts();
       setEditingProduct(null);
       alert("상품 수정 완료!");
     } catch (error) {
@@ -104,7 +102,7 @@ function ProductManagement() {
   const handleDeleteProduct = async (id) => {
     try {
       await api.delete(`/products/${id}`);
-      fetchProducts(); // 상품 목록 업데이트
+      fetchProducts();
       alert("삭제 완료!");
     } catch (error) {
       console.error("Error deleting product:", error);
@@ -115,7 +113,6 @@ function ProductManagement() {
   const handleEditProduct = (product) => {
     setEditingProduct(product);
   };
-
   const handleStockThresholdChange = (e) => {
     setStockThreshold(Number(e.target.value));
   };
