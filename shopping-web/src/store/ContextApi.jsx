@@ -6,13 +6,9 @@ const ContextApi = createContext();
 
 export const ContextProvider = ({ children }) => {
   //로컬스토리지에 있는 토큰을 가져온다
-  const getToken = localStorage.getItem("JWT_TOKEN")
-    ? JSON.stringify(localStorage.getItem("JWT_TOKEN"))
-    : null;
+  const getToken = localStorage.getItem("JWT_TOKEN") ? JSON.stringify(localStorage.getItem("JWT_TOKEN")) : null;
   //로컬스토리지 유저가 관리자 인지 가져옴
-  const isADmin = localStorage.getItem("IS_ADMIN")
-    ? JSON.stringify(localStorage.getItem("IS_ADMIN"))
-    : false;
+  const isADmin = localStorage.getItem("IS_ADMIN") ? JSON.stringify(localStorage.getItem("IS_ADMIN")) : false;
 
   //토큰 상태관리
   const [token, setToken] = useState(getToken);
@@ -59,10 +55,6 @@ export const ContextProvider = ({ children }) => {
     setCartItems(sampleItems);
   }, []);
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
   const fetchUser = async () => {
     const user = JSON.parse(localStorage.getItem("USER"));
 
@@ -95,15 +87,6 @@ export const ContextProvider = ({ children }) => {
     }
   }, [token]);
 
-  // 상품 목록을 가져오는 함수
-  const fetchProducts = async () => {
-    try {
-      const response = await api.get("/products");
-      setProducts(response.data);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    }
-  };
   // localstorage 에 user 데이터가 있으면 자동으로 currentuser를 설정
   useEffect(() => {
     const storedUser = localStorage.getItem("USER");
@@ -128,7 +111,6 @@ export const ContextProvider = ({ children }) => {
         setCartItems,
         products, // 상품 목록 상태 추가
         setProducts, // 상품 목록 상태 설정 함수 추가
-        fetchProducts, // 상품 목록 업데이트 함수 추가
       }}
     >
       {children}

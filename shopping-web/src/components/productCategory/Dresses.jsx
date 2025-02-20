@@ -9,7 +9,7 @@ const Dresses = () => {
 
   // 해당 카테고리에 맞는 상품만 필터링
   const dressesProducts = products.filter(
-    (product) => product.categoryId === "4"
+    (product) => product.category === "dresses"
   );
 
   // 현재 페이지의 제품들을 계산합니다.
@@ -31,14 +31,14 @@ const Dresses = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {currentProducts.map((product) => (
             <div
-              key={product.productId}
+              key={product.id}
               className="bg-white shadow-md rounded-lg overflow-hidden"
             >
               <img
-                src={product.imageUrl}
+                src={product.image}
                 alt={product.name}
                 className="w-full h-48 object-cover"
-                style={{ maxWidth: "100%", height: "auto" }}
+                style={{ maxWidth: "100%", height: "auto" }} // 이미지 크기 제한 추가
               />
               <div className="p-4">
                 <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
