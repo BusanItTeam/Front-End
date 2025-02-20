@@ -23,7 +23,7 @@ const Login = () => {
 
   const handleSuccessfulLogin = (token, decodedToken) => {
     const user = {
-      username: decodedToken.sub,
+      email: decodedToken.sub,
       roles: decodedToken.roles ? decodedToken.roles.split(",") : [],
     };
     localStorage.setItem("JWT_TOKEN", token);
@@ -77,9 +77,7 @@ const Login = () => {
             Enter your details below
           </p>
 
-
           <form onSubmit={handleSubmit(onLoginHandler)} className="space-y-6">
-            
             {/* 유저네임 */}
             <input
               type="text"

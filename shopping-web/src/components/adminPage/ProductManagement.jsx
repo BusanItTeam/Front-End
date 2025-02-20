@@ -1,87 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { useMyContext } from "../../store/ContextApi"; // Context API import
+import { useMyContext } from "../../store/ContextApi";
+import api from "../../services/Api";
 
 function ProductManagement() {
-  const { products, setProducts } = useMyContext(); // Context API 사용
+  const { products, setProducts, fetchProducts } = useMyContext();
   const [categories, setCategories] = useState([
-    { id: "pants", name: "바지" },
-    { id: "tops", name: "상의" },
-    { id: "outerwear", name: "아우터" },
-    { id: "dresses", name: "원피스" },
+    { categoryId: "1", name: "바지" },
+    { categoryId: "2", name: "상의" },
+    { categoryId: "3", name: "아우터" },
+    { categoryId: "4", name: "원피스" },
   ]);
   const [newProduct, setNewProduct] = useState({
     name: "",
     price: "",
-    category: "",
+    categoryId: "",
     stock: "",
     description: "",
-    image: null, // 이미지 파일 상태 추가
+    imageUrl: null,
   });
   const [editingProduct, setEditingProduct] = useState(null);
   const [stockThreshold, setStockThreshold] = useState(10);
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const fetchProducts = async () => {
-    // 더미 데이터
-    const dummyData = [
-      {
-        id: 1,
-        name: "더미 상품 1",
-        price: 20000,
-        category: "tops",
-        stock: 10,
-        description: "더미 상품 1 설명",
-        image: "https://via.placeholder.com/150",
-      },
-      {
-        id: 2,
-        name: "더미 상품 2",
-        price: 30000,
-        category: "pants",
-        stock: 30,
-        description: "더미 상품 2 설명",
-        image: "https://via.placeholder.com/150",
-      },
-      {
-        id: 3,
-        name: "더미 상품 3",
-        price: 40000,
-        category: "outerwear",
-        stock: 5,
-        description: "더미 상품 3 설명",
-        image: "https://via.placeholder.com/150",
-      },
-      {
-        id: 4,
-        name: "더미 상품 4",
-        price: 50000,
-        category: "dresses",
-        stock: 40,
-        description: "더미 상품 4 설명",
-        image: "https://via.placeholder.com/150",
-      },
-      {
-        id: 5,
-        name: "더미 상품 5",
-        price: 60000,
-        category: "tops",
-        stock: 60,
-        description: "더미 상품 5 설명",
-        image: "https://via.placeholder.com/150",
-      },
-    ];
-    setProducts(dummyData);
-    // 실제 API 호출로 대체 (예시):
-    // try {
-    //   const response = await api.get('/products');
-    //   setProducts(response.data);
-    // } catch (error) {
-    //   console.error("Error fetching products:", error);
-    // }
-  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -89,99 +27,95 @@ function ProductManagement() {
   };
 
   const handleImageChange = (e) => {
-    setNewProduct({ ...newProduct, image: e.target.files[0] });
+    setNewProduct({ ...newProduct, imageUrl: e.target.files[0] });
   };
 
   const handleAddProduct = async (e) => {
     e.preventDefault();
-    // const imageUrl = newProduct.image
-    //   ? URL.createObjectURL(newProduct.image)
-    //   : "https://via.placeholder.com/150"; // 이미지가 없을 경우 기본 이미지 URL 설정
 
-    // 실제 API 호출로 대체 (예시):
-    // try {
-    //   const formData = new FormData();
-    //   formData.append("image", newProduct.image);
-    //   formData.append("name", newProduct.name);
-    //   formData.append("price", newProduct.price);
-    //   formData.append("category", newProduct.category);
-    //   formData.append("stock", newProduct.stock);
-    //   formData.append("description", newProduct.description);
+    try {
+      const token = localStorage.getItem("JWT_TOKEN");
 
-    //   const response = await api.post('/products', formData, {
-    //     headers: {
-    //       'Content-Type': 'multipart/form-data'
-    //     }
-    //   });
+      const formData = new FormData();
+      formData.append("name", newProduct.name);
+      formData.append("price", Number(newProduct.price)); // 숫자 타입으로 변환
+      formData.append("stock", Number(newProduct.stock)); // 숫자 타입으로 변환
+      formData.append("description", newProduct.description);
+      formData.append("categoryId", newProduct.categoryId);
 
-    //   const newProductToAdd = response.data;
+      if (newProduct.imageUrl) {
+        formData.append("imageUrl", newProduct.imageUrl);
+      }
 
-    //   setProducts([...products, newProductToAdd]); // Context API를 통해 상품 추가
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+      }
 
-    //   setNewProduct({
-    //     name: "",
-    //     price: "",
-    //     category: "",
-    //     stock: "",
-    //     description: "",
-    //     image: null,
-    //   });
-    //   alert("상품 추가 완료!");
-    // } catch (error) {
-    //   console.error("Error adding product:", error);
-    //   alert("상품 추가 실패!");
-    // }
+      const response = await api.post(`/products`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-    const imageUrl = newProduct.image
-      ? URL.createObjectURL(newProduct.image)
-      : "https://via.placeholder.com/150"; // 이미지가 없을 경우 기본 이미지 URL 설정
+      // fetchProducts 함수가 제대로 호출되는지 확인
+      if (fetchProducts) {
+        fetchProducts();
+      } else {
+        console.error("fetchProducts is not a function!");
+        alert("상품 목록 갱신 실패!");
+        return; // 함수 실행 중단
+      }
 
-    const newProductToAdd = {
-      ...newProduct,
-      id: products.length + 1,
-      image: imageUrl,
-    };
-
-    setProducts([...products, newProductToAdd]); // Context API를 통해 상품 추가
-
-    setNewProduct({
-      name: "",
-      price: "",
-      category: "",
-      stock: "",
-      description: "",
-      image: null,
-    });
-    alert("상품 추가 완료!");
+      setNewProduct({
+        name: "",
+        price: "",
+        stock: "",
+        description: "",
+        imageUrl: null,
+        categoryId: "",
+      });
+      alert("상품 추가 완료!");
+    } catch (error) {
+      console.error("Error adding product:", error);
+      alert("상품 추가 실패!");
+    }
   };
 
   const handleUpdateProduct = async (e) => {
     e.preventDefault();
-    // 상품 업데이트 로직 (실제 API 연동 시 구현 필요)
-    setProducts(
-      products.map((product) =>
-        product.id === editingProduct.id ? editingProduct : product
-      )
-    );
-    setEditingProduct(null);
-    alert("상품 수정 완료!");
+    try {
+      await api.put(`/api/products/${editingProduct.productId}`, {
+        ...editingProduct,
+        price: Number(editingProduct.price),
+        stock: Number(editingProduct.stock),
+      });
+      fetchProducts();
+      setEditingProduct(null);
+      alert("상품 수정 완료!");
+    } catch (error) {
+      console.error("Error updating product:", error);
+      alert("상품 수정 실패!");
+    }
   };
 
   const handleDeleteProduct = async (id) => {
-    // 상품 삭제 로직 (실제 API 연동 시 구현 필요)
-    const newProductList = products.filter((product) => product.id !== id);
-    setProducts(newProductList);
-    alert("삭제 완료!");
+    try {
+      await api.delete(`/products/${id}`);
+      fetchProducts();
+      alert("삭제 완료!");
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      alert("삭제 실패!");
+    }
   };
 
   const handleEditProduct = (product) => {
     setEditingProduct(product);
   };
-
   const handleStockThresholdChange = (e) => {
     setStockThreshold(Number(e.target.value));
   };
-
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">상품 관리</h2>
@@ -208,15 +142,15 @@ function ProductManagement() {
             required
           />
           <select
-            name="category"
-            value={newProduct.category}
+            name="categoryId"
+            value={newProduct.categoryId}
             onChange={handleInputChange}
             className="border p-2"
             required
           >
             <option value="">카테고리 선택</option>
             {categories.map((category) => (
-              <option key={category.id} value={category.id}>
+              <option key={category.categoryId} value={category.categoryId}>
                 {category.name}
               </option>
             ))}
@@ -240,7 +174,7 @@ function ProductManagement() {
           ></textarea>
           <input
             type="file"
-            name="image"
+            name="imageUrl"
             onChange={handleImageChange}
             className="border p-2"
           />
@@ -263,7 +197,7 @@ function ProductManagement() {
           개 이하
         </label>
       </div>
-      ... {/* 상품 목록 및 관리 UI */}
+      {/* 상품 목록 및 관리 UI */}
       <div>
         <h3 className="text-xl font-semibold mb-2">상품 목록</h3>
         <table className="w-full border-collapse border">
@@ -280,19 +214,26 @@ function ProductManagement() {
           <tbody>
             {products.map((product) => (
               <tr
-                key={product.id}
+                key={product.productId}
                 className={product.stock <= stockThreshold ? "bg-red-100" : ""}
               >
                 <td className="border p-2">
                   <img
-                    src={product.image}
+                    src={product.imageUrl}
                     alt={product.name}
                     className="w-16 h-16 object-cover"
                   />
                 </td>
                 <td className="border p-2">{product.name}</td>
                 <td className="border p-2">{product.price}</td>
-                <td className="border p-2">{product.category}</td>
+                <td className="border p-2">
+                  {
+                    categories.find(
+                      (category) =>
+                        category.categoryId === product.category.categoryId
+                    )?.name
+                  }
+                </td>
                 <td className="border p-2">{product.stock}</td>
                 <td className="border p-2">
                   <button
@@ -302,7 +243,7 @@ function ProductManagement() {
                     수정
                   </button>
                   <button
-                    onClick={() => handleDeleteProduct(product.id)}
+                    onClick={() => handleDeleteProduct(product.productId)}
                     className="bg-red-500 text-white px-2 py-1"
                   >
                     삭제
@@ -342,19 +283,19 @@ function ProductManagement() {
                 required
               />
               <select
-                name="category"
-                value={editingProduct.category}
+                name="categoryId"
+                value={editingProduct.category.categoryId}
                 onChange={(e) =>
                   setEditingProduct({
                     ...editingProduct,
-                    category: e.target.value,
+                    category: { categoryId: e.target.value },
                   })
                 }
                 className="border p-2 mb-2 w-full"
                 required
               >
                 {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
+                  <option key={category.categoryId} value={category.categoryId}>
                     {category.name}
                   </option>
                 ))}

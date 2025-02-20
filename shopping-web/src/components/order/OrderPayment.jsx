@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useMyContext } from "../../store/ContextApi";
 
 const OrderPaymentPage = () => {
-  const { cartItems, currentUser } = useMyContext();
-  console.log(currentUser);
+  const { cartItems, currentUser, setCurrentUser } = useMyContext();
+  console.log("커런트", currentUser);
   // console.log(currentUser.points);
   const SHIPPING_COST = 3000;
   const [sameAsOrderer, setSameAsOrderer] = useState(false);
@@ -11,8 +11,34 @@ const OrderPaymentPage = () => {
   const [selectedMethod, setSelectedMethod] = useState("credit");
   const [point, setPoint] = useState(0);
   const [deliveryMessage, setDeliveryMessage] = useState("");
-  // const balance = 5000; // 예시보유 잔액
 
+  //백엔드에서 사용자 정보 가져오기
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetch("/api/auths/userdata");
+        console.log("리스판스", response);
+        if (!response.ok) throw new Error("User data fetch failed");
+
+        const data = await response.json();
+        setCurrentUser(data); // Context API에 저장
+        setPoint(data.points || 0); // 포인트 설정
+        setFormData({
+          username: data.username || "",
+          email: data.email || "",
+          phoneNumber: data.phoneNumber || "",
+          postcode: data.postcode || "",
+          address: data.address || "",
+          detailAddress: data.detailAddress || "",
+          extraAddress: data.extraAddress || "",
+        });
+      } catch (error) {
+        console.error("Failed to fetch user data:", error);
+      }
+    };
+
+    fetchUser();
+  }, []);
   //포인트 적립
   useEffect(() => {
     if (currentUser?.points) {
@@ -36,6 +62,7 @@ const OrderPaymentPage = () => {
     { id: "kakaopay", name: "카카오PAY" },
     { id: "smilepay", name: "스마일PAY" },
   ];
+  // dkfjl
 
   //전액이 보유 포인트를 넘지 않도록
   const handlePointChange = (e) => {
@@ -59,6 +86,17 @@ const OrderPaymentPage = () => {
     detailAddress: currentUser?.detailAddress || "",
     extraAddress: currentUser?.extraAddress || "",
   });
+
+  // // 주문자 정보 상태
+  // const [formData, setFormData] = useState({
+  //   username: "",
+  //   email: "",
+  //   phoneNumber: "",
+  //   postcode: "",
+  //   address: "",
+  //   detailAddress: "",
+  //   extraAddress: "",
+  // });
 
   //배송지 정보
   const [formData2, setFormData2] = useState({ ...formData });
@@ -245,7 +283,7 @@ const OrderPaymentPage = () => {
               <td className="p-2 border-gray-200 space-y-2">
                 <input
                   type="text"
-                  name="postCode"
+                  name="postcode"
                   placeholder=""
                   value={currentUser?.postcode}
                   onChange={handleChange}
