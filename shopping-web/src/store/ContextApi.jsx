@@ -11,7 +11,7 @@ export const ContextProvider = ({ children }) => {
     : null;
   //로컬스토리지 유저가 관리자 인지 가져옴
   const isADmin = localStorage.getItem("IS_ADMIN")
-    ? JSON.stringify(localStorage.getItem("IS_ADMIN"))
+    ? JSON.parse(localStorage.getItem("IS_ADMIN")) // JSON.parse 추가
     : false;
 
   //토큰 상태관리
@@ -82,10 +82,10 @@ export const ContextProvider = ({ children }) => {
 
         if (roles.includes("ROLE_ADMIN")) {
           localStorage.setItem("IS_ADMIN", JSON.stringify(true));
-          setIsAdmin(true);
+          setIsAdmin(true); // 상태 업데이트
         } else {
           localStorage.removeItem("IS_ADMIN");
-          setIsAdmin(false);
+          setIsAdmin(false); // 상태 업데이트
         }
         setCurrentUser(data);
       } catch (error) {
