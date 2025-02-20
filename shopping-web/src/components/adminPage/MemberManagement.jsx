@@ -1,212 +1,200 @@
-import React, { useState, useEffect } from "react";
-import api from "../../services/Api";
+import React, { useEffect, useState } from "react";
+import api from "../../services/Api.jsx";
+import { DataGrid } from "@mui/x-data-grid"; // 테이블 라이브러리
+import toast from "react-hot-toast";
+import moment from "moment";
+import { Link } from "react-router-dom";
+import { MdOutlineEmail, MdDateRange } from "react-icons/md";
+import { Blocks } from "react-loader-spinner";
 
-function MemberManagement() {
-  const [members, setMembers] = useState([]);
-  const [selectedMember, setSelectedMember] = useState(null);
-  const [memberLevel, setMemberLevel] = useState("");
-  const [memberPoint, setMemberPoint] = useState("");
+// 컬럼 정의 (DataGrid용)
+const userListsColumns = [
+  {
+    field: "id",
+    headerName: "userId",
+    headerAlign: "center",
+    minWidth: 200,
+    align: "center",
+    renderHeader: () => <span>유저 번호</span>,
+  },
+  
+  {
+    field: "username",
+    headerName: "userName",
+    headerAlign: "center",
+    minWidth: 200,
+    align: "center",
+    renderHeader: () => <span>유저 아이디</span>,
+  },
+
+  {
+    field: "name",
+    headerName: "userName",
+    headerAlign: "center",
+    minWidth: 200,
+    align: "center",
+    renderHeader: () => <span>이름</span>,
+  },
+  {
+    field: "phoneNumber",
+    headerName: "phoneNumber",
+    headerAlign: "center",
+    minWidth: 200,
+    align: "center",
+    renderHeader: () => <span>휴대폰번호</span>,
+  },
+  {
+    field: "email",
+    headerName: "Email",
+    headerAlign: "center",
+    width: 200,
+    align: "center",
+    renderHeader: () => <span>이메일</span>,
+    renderCell: (params) => (
+      <div className="flex items-center gap-1">
+        <MdOutlineEmail className="text-lg" />
+        <span>{params.row.email}</span>
+      </div>
+    ),
+  },
+  {
+    field: "created",
+    headerName: "Created At",
+    width: 220,
+    align: "center",
+    headerAlign: "center",
+    renderHeader: () => <span>생성 시간</span>,
+    renderCell: (params) => (
+      <div className="flex items-center gap-1">
+        <MdDateRange className="text-lg" />
+        <span>{params.row.created}</span>
+      </div>
+    ),
+  },
+  {
+    field: "postcode",
+    headerName: "postcode",
+    headerAlign: "center",
+    minWidth: 200,
+    align: "center",
+    renderHeader: () => <span>주소</span>,
+  },
+  {
+    field: "address",
+    headerName: "address",
+    headerAlign: "center",
+    minWidth: 200,
+    align: "center",
+    renderHeader: () => <span>주소</span>,
+  },
+  {
+    field: "detailAddress",
+    headerName: "detailAddress",
+    headerAlign: "center",
+    minWidth: 200,
+    align: "center",
+    renderHeader: () => <span>주소</span>,
+  },
+  {
+    field: "extraAddress",
+    headerName: "extraAddress",
+    headerAlign: "center",
+    minWidth: 200,
+    align: "center",
+    renderHeader: () => <span>주소</span>,
+  },
+  {
+    field: "status",
+    headerName: "Status",
+    headerAlign: "center",
+    width: 200,
+    align: "center",
+    renderHeader: () => <span>상태</span>,
+  },
+  {
+    field: "action",
+    headerName: "Action",
+      headerAlign: "center",
+    width: 200,
+    renderHeader: () => <span>Action</span>,
+    renderCell: (params) => (
+      <Link to={`/admin/users/${params.id}`}>
+        <button className="bg-btnColor text-white px-4 rounded-md">View</button>
+      </Link>
+    ),
+  },
+];
+
+// 회원 관리 페이지 컴포넌트
+const MemberManagement = () => {
+  const [users, setUsers] = useState([]);
+  console.log(users)
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchMembers();
+    setLoading(true);
+    const fetchUsers = async () => {
+      try {
+        const response = await api.get("/admin/getusers");
+        if (!response.data || !Array.isArray(response.data)) {
+          throw new Error("Invalid response data");
+        }
+        setUsers(response.data);
+      } catch (err) {
+        setError(err?.response?.data?.message || "Failed to fetch users");
+        toast.error("Error fetching users");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUsers();
   }, []);
 
-  const fetchMembers = async () => {
-    try {
-      // const response = await api.get("/members");
-      // setMembers(response.data);
-
-      // 더미 데이터 추가
-      const dummyData = [
-        {
-          id: 1,
-          name: "홍길동",
-          email: "hong@example.com",
-          joinDate: "2024-05-01",
-          lastLogin: "2024-05-15",
-          memberLevel: "일반",
-          memberPoint: 1000,
-        },
-        {
-          id: 2,
-          name: "김철수",
-          email: "kim@example.com",
-          joinDate: "2024-04-20",
-          lastLogin: "2024-05-10",
-          memberLevel: "VIP",
-          memberPoint: 2500,
-        },
-        {
-          id: 3,
-          name: "이영희",
-          email: "lee@example.com",
-          joinDate: "2024-03-15",
-          lastLogin: "2024-05-05",
-          memberLevel: "VVIP",
-          memberPoint: 5000,
-        },
-        {
-          id: 4,
-          name: "박민지",
-          email: "park@example.com",
-          joinDate: "2024-02-28",
-          lastLogin: "2024-05-01",
-          memberLevel: "일반",
-          memberPoint: 500,
-        },
-        {
-          id: 5,
-          name: "최준호",
-          email: "choi@example.com",
-          joinDate: "2024-01-10",
-          lastLogin: "2024-04-25",
-          memberLevel: "VIP",
-          memberPoint: 3000,
-        },
-      ];
-      setMembers(dummyData);
-    } catch (error) {
-      console.error("회원 목록을 불러오는데 실패했습니다.", error);
-    }
-  };
-
-  const handleMemberClick = (member) => {
-    setSelectedMember(member);
-    setMemberLevel(member.memberLevel);
-    setMemberPoint(member.memberPoint);
-  };
-
-  const handleMemberLevelChange = (e) => {
-    setMemberLevel(e.target.value);
-  };
-  const handleMemberPointChange = (e) => {
-    setMemberPoint(e.target.value);
-  };
-
-  const updateMemberInfo = async () => {
-    if (!selectedMember) return;
-
-    try {
-      // await api.put(`/members/${selectedMember.id}`, {
-      //   memberLevel,
-      //   memberPoint,
-      // });
-      // fetchMembers();
-      setSelectedMember(null);
-      alert("회원 정보가 업데이트되었습니다.");
-    } catch (error) {
-      console.error("회원 정보 업데이트에 실패했습니다.", error);
-    }
-  };
-
-  const handleDeleteMember = async (memberId) => {
-    try {
-      // await api.delete(`/members/${memberId}`);
-      // fetchMembers();
-      const newMembersList = members.filter((member) => member.id !== memberId);
-      setMembers(newMembersList);
-
-      alert("회원 정보가 삭제되었습니다.");
-    } catch (error) {
-      console.error("회원 정보 삭제에 실패했습니다.", error);
-    }
-  };
+  const rows = users.map((item) => ({
+    id: item.userId,
+    username: item.userName,
+    name: item.name,
+    email: item.email,
+    phoneNumber: item.phoneNumber,
+    postcode: item.addresses?.length > 0 ? item.addresses[0].postcode : "N/A",  // 첫 번째 주소의 postcode 가져오기
+    address: item.addresses?.length > 0 ? item.addresses[0].address : "N/A",
+    detailAddress: item.addresses?.length > 0 ? item.addresses[0].detailAddress : "N/A",
+    extraAddress: item.addresses?.length > 0 ? item.addresses[0].extraAddress : "N/A",
+    created: moment(item.createdDate).format("YYYY/MM/DD hh:mm:ss a"),
+    status: item?.enabled ? "Active" : "Inactive",
+  }));
 
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">회원 관리</h2>
-
-      {/* 회원 목록 */}
-      <div className="mb-8">
-        <h3 className="text-xl font-semibold mb-2">회원 목록</h3>
-        <table className="w-full border-collapse border">
-          <thead>
-            <tr className="bg-gray-200">
-              <th className="border p-2">회원 ID</th>
-              <th className="border p-2">이름</th>
-              <th className="border p-2">이메일</th>
-              <th className="border p-2">등급</th>
-              <th className="border p-2">포인트</th>
-              <th className="border p-2">관리</th>
-            </tr>
-          </thead>
-          <tbody>
-            {members.map((member) => (
-              <tr
-                key={member.id}
-                onClick={() => handleMemberClick(member)}
-                className="hover:bg-gray-100 cursor-pointer"
-              >
-                <td className="border p-2">{member.id}</td>
-                <td className="border p-2">{member.name}</td>
-                <td className="border p-2">{member.email}</td>
-                <td className="border p-2">{member.memberLevel}</td>
-                <td className="border p-2">{member.memberPoint}</td>
-                <td className="border p-2">
-                  <button
-                    onClick={() => handleDeleteMember(member.id)}
-                    className="bg-red-500 text-white px-4 py-2 rounded mr-2"
-                  >
-                    삭제
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <div className="p-4">
+      <h1 className="text-center text-2xl font-bold">All Users</h1>
+      <div className="overflow-x-auto w-full mx-auto">
+        {loading ? (
+          <div className="flex justify-center items-center h-72">
+            <Blocks height="70" width="70" color="#4fa94d" visible />
+            <span>Loading...</span>
+          </div>
+        ) : (
+          <DataGrid
+          className="w-fit mx-auto"
+          rows={rows}
+          columns={userListsColumns}
+          initialState={{
+            pagination: {
+              paginationModel: {
+                pageSize: 6,  // 기본 페이지 크기 설정
+              },
+            },
+          }}
+          disableRowSelectionOnClick
+          pageSizeOptions={[6, 10, 25, 50, 100]} 
+          disableColumnResize
+        />
+        
+        )}
       </div>
-
-      {/* 회원 상세 정보 및 수정 */}
-      {selectedMember && (
-        <div>
-          <h3 className="text-xl font-semibold mb-2">회원 상세 정보</h3>
-          <div className="mb-4">
-            <p>회원 ID: {selectedMember.id}</p>
-            <p>이름: {selectedMember.name}</p>
-            <p>이메일: {selectedMember.email}</p>
-            <p>가입일: {selectedMember.joinDate}</p>
-            <p>최근 접속일: {selectedMember.lastLogin}</p>
-          </div>
-
-          {/* 회원 등급 설정 */}
-          <div className="mb-4">
-            <label className="block font-semibold mb-1">회원 등급 변경:</label>
-            <select
-              value={memberLevel}
-              onChange={handleMemberLevelChange}
-              className="border p-2 rounded"
-            >
-              <option value="일반">일반</option>
-              <option value="VIP">VIP</option>
-              <option value="VVIP">VVIP</option>
-            </select>
-          </div>
-          {/* 회원 포인트 설정 */}
-          <div className="mb-4">
-            <label className="block font-semibold mb-1">
-              회원 포인트 변경:
-            </label>
-            <input
-              type="number"
-              value={memberPoint}
-              onChange={handleMemberPointChange}
-              className="border p-2 rounded"
-            />
-          </div>
-
-          {/* 정보 업데이트 */}
-          <div>
-            <button
-              onClick={updateMemberInfo}
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              회원 정보 업데이트
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
-}
+};
 
 export default MemberManagement;

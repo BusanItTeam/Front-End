@@ -71,6 +71,7 @@ export const ContextProvider = ({ children }) => {
         //서버에 유저정보를 요청
         const { data } = await api.get(`/auths/user`);
         const roles = data.roles;
+        console.log(data);
 
         if (roles.includes("ROLE_ADMIN")) {
           localStorage.setItem("IS_ADMIN", JSON.stringify(true));
@@ -103,6 +104,13 @@ export const ContextProvider = ({ children }) => {
       console.error("Error fetching products:", error);
     }
   };
+  // localstorage 에 user 데이터가 있으면 자동으로 currentuser를 설정
+  useEffect(() => {
+    const storedUser = localStorage.getItem("USER");
+    if (storedUser) {
+      setCurrentUser(JSON.parse(storedUser));
+    }
+  }, []);
 
   //컨텍스트 프로바이더가 value의 모든 정보를 모든 컴포넌트에 제공함
   return (
