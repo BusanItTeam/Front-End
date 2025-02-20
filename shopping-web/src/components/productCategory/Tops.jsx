@@ -8,9 +8,7 @@ const Tops = () => {
   const productsPerPage = 8;
 
   // 해당 카테고리에 맞는 상품만 필터링
-  const topsProducts = products.filter(
-    (product) => product.category === "tops"
-  );
+  const topsProducts = products.filter((product) => product.categoryId === "2");
 
   // 현재 페이지의 제품들을 계산합니다.
   const indexOfLastProduct = currentPage * productsPerPage;
@@ -31,14 +29,14 @@ const Tops = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {currentProducts.map((product) => (
             <div
-              key={product.id}
+              key={product.productId}
               className="bg-white shadow-md rounded-lg overflow-hidden"
             >
               <img
-                src={product.image}
+                src={product.imageUrl}
                 alt={product.name}
                 className="w-full h-48 object-cover"
-                style={{ maxWidth: "100%", height: "auto" }} // 이미지 크기 제한 추가
+                style={{ maxWidth: "100%", height: "auto" }}
               />
               <div className="p-4">
                 <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
