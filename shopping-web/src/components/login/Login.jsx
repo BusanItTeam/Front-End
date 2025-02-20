@@ -30,6 +30,13 @@ const Login = () => {
     localStorage.setItem("USER", JSON.stringify(user));
     setToken(token);
     navigate("/");
+
+    // 어드민 권한 확인 및 설정
+    const isAdmin = user.roles.includes("ROLE_ADMIN");
+    localStorage.setItem("IS_ADMIN", JSON.stringify(isAdmin));
+
+    setToken(token);
+    navigate("/");
   };
 
   const onLoginHandler = async (data) => {
