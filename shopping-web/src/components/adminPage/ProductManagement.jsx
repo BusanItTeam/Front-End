@@ -36,21 +36,30 @@ function ProductManagement() {
     try {
       const token = localStorage.getItem("JWT_TOKEN"); // 로컬 스토리지에서 JWT 토큰 가져오기
 
+      // FormData 객체 생성
+      const formData = new FormData();
+      formData.append("name", newProduct.name);
+      formData.append("price", Number(newProduct.price));
+      formData.append("stock", Number(newProduct.stock));
+      formData.append("description", newProduct.description);
+      formData.append("category", newProduct.categoryId);
+      // 이미지 파일이 있는 경우에만 추가
+      if (newProduct.imageUrl) {
+        formData.append("imageUrl", newProduct.imageUrl);
+      }
+      // 폼 데이터 로깅 (디버깅용)
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+      }
+
       const response = await api.post(
-        `/admin/products`,
-        {
-          name: newProduct.name,
-          price: Number(newProduct.price),
-          stock: Number(newProduct.stock),
-          description: newProduct.description,
-          imageUrl: newProduct.imageUrl,
-          category: {
-            categoryId: newProduct.categoryId,
-          },
-        },
+        `/products`,
+        formData,
+
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data", // Content-Type 설정
           },
         }
       );
@@ -60,13 +69,10 @@ function ProductManagement() {
       setNewProduct({
         name: "",
         price: "",
-        //categoryId: "",
         stock: "",
         description: "",
         imageUrl: null,
-        category: {
-          categoryId: newProduct.categoryId,
-        },
+        categoryId: "",
       });
       alert("상품 추가 완료!");
     } catch (error) {
@@ -79,7 +85,7 @@ function ProductManagement() {
     e.preventDefault();
     try {
       await api.put(
-        `/api/products/${editingProduct.productId}/${editingProduct.categoryId}`,
+        `/api/products/${editingProduct.productId}`, // 수정된 URL
         {
           ...editingProduct,
           price: Number(editingProduct.price),
