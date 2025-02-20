@@ -23,7 +23,8 @@ import OrderManagement from "./components/adminPage/OrderManagement";
 import ProductManagement from "./components/adminPage/ProductManagement";
 import AdminDashboard from "./components/adminPage/AdminDashboard";
 import OAuth2RedirectHandler from "./components/Auth/OAuth2RedirectHandler";
-
+import Homepage from "./components/home/Homepage";
+import Mypage from "./components/myPage/MyPage";
 function App() {
   return (
     <ContextProvider>
