@@ -26,7 +26,7 @@ const MemberManagementDetails = () => {
 
   useEffect(() => {
     if (!userId) {
-      console.error("❌ userId가 없습니다.");
+      console.error("userId가 없습니다.");
       toast.error("유효한 사용자 ID가 필요합니다.");
       return;
     }
@@ -51,7 +51,7 @@ const MemberManagementDetails = () => {
         });
 
         if (isMounted) {
-          console.log("✅ API 응답 데이터:", response.data);
+          console.log("API 응답 데이터:", response.data);
           setUser(response.data);
         }
       } catch (err) {
