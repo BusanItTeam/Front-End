@@ -3,47 +3,99 @@ import { Link, useNavigate } from "react-router-dom";
 import { useMyContext } from "../../store/ContextApi";
 
 const CartPage = () => {
-  const [selectedItems, setSelectedItems] = useState([]);
-  const { cartItems, setCartItems, currentUser } = useMyContext(); //사용자 정보 가져오기
-  // const navigate = useNavigate();
+  // const [cartItems, setCartItems] = useState([]); // 장바구니 아이템 상태
+  const [selectedItems, setSelectedItems] = useState([]); // 선택된 아이템 상태
+  const { token, currentUser, cartItems, setCartItems } = useMyContext(); // 현재 로그인한 유저 정보 가져오기
 
-  const SHIPPING_COST = 3000;
+  const navigate = useNavigate();
+  const SHIPPING_COST = 3000; //배송비
 
-  // // 로그인하지 않은 사용자는 로그인 페이지로 이동
-  // useEffect(() => {
-  //   if (!user) {
-  //     navigate("/login");
-  //   }
-  // }, [user, navigate]);
+  // 1. 로그인 여부 확인 -> 로그인 안 했으면 로그인 페이지로 이동
+  useEffect(() => {
+    console.log(token);
+    if (!token) {
+      navigate("/login");
+    } else {
+      fetchCart();
+    }
+  }, [currentUser]);
 
-  // // 로그인하지 않은 경우 렌더링 방지
-  // if (!user) return null;
+  // 🚀 2. 로그인한 유저의 장바구니 데이터 불러오기
+  const fetchCart = async () => {
+    try {
+      const response = await fetch("/api/cart", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${currentUser.token}`, // JWT 토큰으로 인증
+        },
+      });
 
-  const removeItem = (id) => {
-    setCartItems(cartItems.filter((item) => item.id !== id));
-    setSelectedItems(selectedItems.filter((itemId) => itemId !== id));
+      if (response.ok) {
+        const data = await response.json();
+        setCartItems(data);
+      } else {
+        console.error("장바구니 데이터를 불러오지 못했습니다.");
+      }
+    } catch (error) {
+      console.error("장바구니 불러오기 오류:", error);
+    }
   };
 
-  const updateQuantity = (id, quantity) => {
-    setCartItems(
-      cartItems.map((item) =>
-        item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
-      )
-    );
+  // 🚀 3. 장바구니 아이템 삭제
+  const removeItem = async (id) => {
+    try {
+      await fetch(`/api/cart/remove/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${currentUser.token}`,
+        },
+      });
+      setCartItems(cartItems.filter((item) => item.id !== id));
+      setSelectedItems(selectedItems.filter((itemId) => itemId !== id));
+    } catch (error) {
+      console.error("아이템 삭제 오류:", error);
+    }
   };
 
+  // 🚀 4. 장바구니 수량 변경
+  const updateQuantity = async (id, quantity) => {
+    const newQuantity = Math.max(1, quantity);
+    try {
+      await fetch(`/api/cart/update/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${currentUser.token}`,
+        },
+        body: JSON.stringify({ quantity: newQuantity }),
+      });
+
+      setCartItems(
+        cartItems.map((item) =>
+          item.id === id ? { ...item, quantity: newQuantity } : item
+        )
+      );
+    } catch (error) {
+      console.error("수량 변경 오류:", error);
+    }
+  };
+
+  //체크박스 토글
   const toggleSelectItem = (id) => {
     setSelectedItems((prev) =>
       prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
     );
   };
 
+  //선택된 아이템만 총합 구현
   const getSelectedTotalPrice = () => {
     return cartItems
       .filter((item) => selectedItems.includes(item.id))
       .reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
+  //선택된 아이템만 주문
   const handleSelectedOrder = () => {
     const selectedProducts = cartItems.filter((item) =>
       selectedItems.includes(item.id)
@@ -52,6 +104,7 @@ const CartPage = () => {
     console.log("Processing order for: ", selectedProducts);
   };
 
+  //전체상품 주문
   const handleAllOrder = () => {
     console.log("Processing order for all items: ", cartItems);
   };
