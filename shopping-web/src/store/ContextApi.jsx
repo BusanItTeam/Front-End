@@ -6,10 +6,16 @@ const ContextApi = createContext();
 
 export const ContextProvider = ({ children }) => {
   //로컬스토리지에 있는 토큰을 가져온다
-  const getToken = localStorage.getItem("JWT_TOKEN") ? JSON.stringify(localStorage.getItem("JWT_TOKEN")) : null;
+  const getToken = localStorage.getItem("JWT_TOKEN")
+    ? JSON.stringify(localStorage.getItem("JWT_TOKEN"))
+    : null;
   //로컬스토리지 유저가 관리자 인지 가져옴
   const isADmin = localStorage.getItem("IS_ADMIN")
+
+    ? JSON.stringify(localStorage.getItem("IS_ADMIN"))
+
     ? JSON.parse(localStorage.getItem("IS_ADMIN")) // JSON.parse 추가
+
     : false;
 
   //토큰 상태관리
