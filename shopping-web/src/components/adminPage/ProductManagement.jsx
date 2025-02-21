@@ -22,6 +22,10 @@ function ProductManagement() {
   const [stockThreshold, setStockThreshold] = useState(10);
   const backendURL = "http://localhost:8080"; // backendURL 추가
 
+  // Pagination 관련 state 추가
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 10;
+
   useEffect(() => {
     console.log("Products data:", products);
   }, [products]);
@@ -138,6 +142,17 @@ function ProductManagement() {
     setStockThreshold(Number(e.target.value));
   };
 
+  // 페이지 변경 함수
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // 현재 페이지에 해당하는 상품 목록 계산
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = products.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
+
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">상품 관리</h2>
@@ -234,8 +249,8 @@ function ProductManagement() {
             </tr>
           </thead>
           <tbody>
-            {products &&
-              products.map((product) => (
+            {currentProducts &&
+              currentProducts.map((product) => (
                 <tr
                   key={product.productId}
                   className={
@@ -278,6 +293,24 @@ function ProductManagement() {
               ))}
           </tbody>
         </table>
+      </div>
+      {/* Pagination UI */}
+      <div className="flex justify-center mt-4">
+        {Array.from({
+          length: Math.ceil(products.length / productsPerPage),
+        }).map((_, index) => (
+          <button
+            key={index}
+            onClick={() => paginate(index + 1)}
+            className={`mx-1 px-3 py-1 rounded ${
+              currentPage === index + 1
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+          >
+            {index + 1}
+          </button>
+        ))}
       </div>
       {editingProduct && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
