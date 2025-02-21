@@ -284,6 +284,7 @@ function ProductManagement() {
           <div className="bg-white p-4 rounded">
             <h3 className="text-xl font-semibold mb-2">상품 수정</h3>
             <form onSubmit={handleUpdateProduct}>
+              <p>상품명</p>
               <input
                 type="text"
                 name="name"
@@ -294,6 +295,7 @@ function ProductManagement() {
                 className="border p-2 mb-2 w-full"
                 required
               />
+              <p>가격</p>
               <input
                 type="number"
                 name="price"
@@ -307,6 +309,7 @@ function ProductManagement() {
                 className="border p-2 mb-2 w-full"
                 required
               />
+              <p>카테고리</p>
               <select
                 name="categoryId"
                 value={editingProduct.category.categoryId}
@@ -325,6 +328,7 @@ function ProductManagement() {
                   </option>
                 ))}
               </select>
+              <p>재고</p>
               <input
                 type="number"
                 name="stock"
@@ -338,6 +342,7 @@ function ProductManagement() {
                 className="border p-2 mb-2 w-full"
                 required
               />
+              <p>상품 설명</p>
               <textarea
                 name="description"
                 value={editingProduct.description}
