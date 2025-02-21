@@ -11,7 +11,11 @@ export const ContextProvider = ({ children }) => {
     : null;
   //로컬스토리지 유저가 관리자 인지 가져옴
   const isADmin = localStorage.getItem("IS_ADMIN")
+
     ? JSON.stringify(localStorage.getItem("IS_ADMIN"))
+
+    ? JSON.parse(localStorage.getItem("IS_ADMIN")) // JSON.parse 추가
+
     : false;
 
   //토큰 상태관리
@@ -27,6 +31,17 @@ export const ContextProvider = ({ children }) => {
 
   // 상품 목록 상태 추가
   const [products, setProducts] = useState([]);
+
+  // 상품 목록을 가져오는 함수
+  const fetchProducts = async () => {
+    try {
+      const response = await api.get("/products"); // 백엔드 API 엔드포인트
+      setProducts(response.data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      toast.error("상품 목록을 가져오는데 실패했습니다.");
+    }
+  };
 
   useEffect(() => {
     const sampleItems = [
@@ -66,17 +81,23 @@ export const ContextProvider = ({ children }) => {
       try {
         //서버에 유저정보를 요청
         const { data } = await api.get(`/auths/user`);
+        console.log("서버에서 가져온 유저 데이터:", data);
+
         const roles = data.roles;
         console.log(data);
 
         if (roles.includes("ROLE_ADMIN")) {
           localStorage.setItem("IS_ADMIN", JSON.stringify(true));
-          setIsAdmin(true);
+          setIsAdmin(true); // 상태 업데이트
         } else {
           localStorage.removeItem("IS_ADMIN");
-          setIsAdmin(false);
+          setIsAdmin(false); // 상태 업데이트
         }
-        setCurrentUser(data);
+
+        setCurrentUser({
+          ...data,
+          name: data.name, // 이 부분에서 name이 정확히 설정되었는지 확인
+        });
       } catch (error) {
         console.error("Error fetching current user", error);
         toast.error("Error fetching current user");
@@ -99,6 +120,11 @@ export const ContextProvider = ({ children }) => {
     }
   }, []);
 
+  useEffect(() => {
+    // 컴포넌트 마운트 시 상품 목록을 가져옵니다.
+    fetchProducts();
+  }, []);
+
   //컨텍스트 프로바이더가 value의 모든 정보를 모든 컴포넌트에 제공함
   return (
     <ContextApi.Provider
@@ -113,8 +139,9 @@ export const ContextProvider = ({ children }) => {
         setIsAdmin,
         cartItems,
         setCartItems,
-        products, // 상품 목록 상태 추가
-        setProducts, // 상품 목록 상태 설정 함수 추가
+        products,
+        setProducts,
+        fetchProducts, // fetchProducts 함수를 value에 추가
       }}
     >
       {children}
