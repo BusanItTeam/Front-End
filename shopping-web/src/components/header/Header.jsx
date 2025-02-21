@@ -88,7 +88,7 @@ export const Header = () => {
               <button onClick={handleLogout} className="nav-link">
                 LogOut
               </button>
-          )}
+         
 
               {isAdmin && (
                 <Link to="/admin" className="nav-link">
