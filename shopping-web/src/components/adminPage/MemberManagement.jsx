@@ -182,7 +182,7 @@ const MemberManagement = () => {
           initialState={{
             pagination: {
               paginationModel: {
-                pageSize: 10,  // 기본 페이지 크기 설정
+                pageSize: 10,  // 기본 사이즈 페이지 10개씩
               },
             },
           }}
