@@ -85,11 +85,23 @@ function ProductManagement() {
   const handleUpdateProduct = async (e) => {
     e.preventDefault();
     try {
-      await api.put(`/api/products/${editingProduct.productId}`, {
-        ...editingProduct,
-        price: Number(editingProduct.price),
-        stock: Number(editingProduct.stock),
-      });
+      const token = localStorage.getItem("JWT_TOKEN"); // 토큰 가져오기
+      await api.put(
+        `/products/${editingProduct.productId}`,
+        {
+          // 올바른 URL
+          ...editingProduct,
+          price: Number(editingProduct.price),
+          stock: Number(editingProduct.stock),
+        },
+        {
+          headers: {
+            // 헤더 포함
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json", // Content-Type 지정
+          },
+        }
+      );
       fetchProducts();
       setEditingProduct(null);
       alert("상품 수정 완료!");
