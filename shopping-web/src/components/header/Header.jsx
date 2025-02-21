@@ -84,7 +84,7 @@ export const Header = () => {
                 LogOut
               </button>
           )}
-          {isAdmin &&  (
+          {!isAdmin &&  (
             <Link to="/admin" className="nav-link">
               관리자
             </Link> // admin으로 로그인했을때만 보임

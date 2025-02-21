@@ -157,7 +157,7 @@ const MemberManagement = () => {
     name: item.name,
     email: item.email,
     phoneNumber: item.phoneNumber,
-    postcode: item.addresses?.length > 0 ? item.addresses[0].postcode : "N/A",  // 첫 번째 주소의 postcode 가져오기
+    postcode: item.addresses?.length > 0 ? item.addresses[0].postcode : "N/A",  
     address: item.addresses?.length > 0 ? item.addresses[0].address : "N/A",
     detailAddress: item.addresses?.length > 0 ? item.addresses[0].detailAddress : "N/A",
     extraAddress: item.addresses?.length > 0 ? item.addresses[0].extraAddress : "N/A",
