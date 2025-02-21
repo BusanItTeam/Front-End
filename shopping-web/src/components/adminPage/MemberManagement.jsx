@@ -157,18 +157,18 @@ const MemberManagement = () => {
     name: item.name,
     email: item.email,
     phoneNumber: item.phoneNumber,
-    postcode: item.addresses?.length > 0 ? item.addresses[0].postcode : "N/A",  // 첫 번째 주소의 postcode 가져오기
-    address: item.addresses?.length > 0 ? item.addresses[0].address : "N/A",
-    detailAddress: item.addresses?.length > 0 ? item.addresses[0].detailAddress : "N/A",
-    extraAddress: item.addresses?.length > 0 ? item.addresses[0].extraAddress : "N/A",
+    postcode: item.addresses?.length > 0 ? item.addresses[0].postcode : "등록된 주소 없음",  
+    address: item.addresses?.length > 0 ? item.addresses[0].address : "등록된 주소 없음",
+    detailAddress: item.addresses?.length > 0 ? item.addresses[0].detailAddress : "등록된 주소 없음",
+    extraAddress: item.addresses?.length > 0 ? item.addresses[0].extraAddress : "등록된 주소 없음",
     created: moment(item.createdDate).format("YYYY/MM/DD hh:mm:ss a"),
     status: item?.enabled ? "Active" : "Inactive",
   }));
 
   return (
     <div className="p-4">
-      <h1 className="text-center text-2xl font-bold">All Users</h1>
-      <div className="overflow-x-auto w-full mx-auto">
+      <h1 className="text-center text-2xl font-bold">전체 사용자</h1>
+      <div className="overflow-x-auto w-full mx-auto mt-4">
         {loading ? (
           <div className="flex justify-center items-center h-72">
             <Blocks height="70" width="70" color="#4fa94d" visible />
@@ -182,12 +182,12 @@ const MemberManagement = () => {
           initialState={{
             pagination: {
               paginationModel: {
-                pageSize: 6,  // 기본 페이지 크기 설정
+                pageSize: 10,  // 기본 사이즈 페이지 10개씩
               },
             },
           }}
           disableRowSelectionOnClick
-          pageSizeOptions={[6, 10, 25, 50, 100]} 
+          pageSizeOptions={[10, 25, 50, 100]} 
           disableColumnResize
         />
         

@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+// Header.jsx
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Header.css";
 import Search from "../search/Search";
 import "../signup/SignUp";
 import { useLocation } from "react-router-dom";
-import { useMyContext } from "../../store/ContextApi"; // ContextApi import 추가
+import { useMyContext } from "../../store/ContextApi";
 
 export const Header = () => {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -12,25 +13,31 @@ export const Header = () => {
   const isMyPageActive = location.pathname.startsWith("/myPage");
   const navigate = useNavigate();
   const { token, setToken, setCurrentUser, isAdmin, setIsAdmin } =
-  useMyContext(); // ContextApi에서 currentUser와 isAdmin 가져오기
+    useMyContext();
+
+  useEffect(() => {
+    const storedIsAdmin = localStorage.getItem("IS_ADMIN");
+    if (storedIsAdmin) {
+      setIsAdmin(JSON.parse(storedIsAdmin));
+    }
+  }, [token, isAdmin]);
 
   const handleLogout = () => {
-    localStorage.removeItem("JWT_TOKEN"); // 로컬 스토리지 jwt 토큰 삭제
-    localStorage.removeItem("USER"); // 로컬스토리지 삭제 user
-    localStorage.removeItem("IS_ADMIN"); //로컬스토리지 어드민 삭제
-    if(setToken) setToken(null);  
-    if(setCurrentUser) setCurrentUser(null);
-    if(setIsAdmin) setIsAdmin(false);
-
-    navigate("/login");
+    localStorage.removeItem("JWT_TOKEN");
+    localStorage.removeItem("USER");
+    localStorage.removeItem("IS_ADMIN");
+    setToken(null);
+    setCurrentUser(null);
+    setIsAdmin(false);
+    //navigate("/login");
   };
-  
+
   return (
     <header className="header-wrapper">
       <div className="frame-2">
-      
+        <Link to="/">
           <img src="/Logo.png" alt="Logo" className="logo" />
-
+        </Link>
 
         <nav className="frame-3">
           <Link to="/" className="nav-link">
@@ -67,7 +74,7 @@ export const Header = () => {
           <a href="/about" className="nav-link">
             About
           </a>
-          {!token ? ( //로그인상태되면 가입,로그인페이지안보임
+          {!token ? (
             <>
               <Link to="/signup" className="nav-link">
                 Sign Up
@@ -77,18 +84,18 @@ export const Header = () => {
               </Link>
             </>
           ) : (
-            <button
-                onClick={handleLogout}
-                className="nav-link"
-              >
+            <>
+              <button onClick={handleLogout} className="nav-link">
                 LogOut
               </button>
-          )}
+        
           {isAdmin &&  (
             <Link to="/admin" className="nav-link">
               관리자
             </Link> // admin으로 로그인했을때만 보임
             
+              )}
+            </>
           )}
         </nav>
       </div>
@@ -114,3 +121,5 @@ export const Header = () => {
     </header>
   );
 };
+
+export default Header;
