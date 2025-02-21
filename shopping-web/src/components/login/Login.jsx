@@ -30,6 +30,13 @@ const Login = () => {
     localStorage.setItem("USER", JSON.stringify(user));
     setToken(token);
     navigate("/");
+
+    // 어드민 권한 확인 및 설정
+    const isAdmin = user.roles.includes("ROLE_ADMIN");
+    localStorage.setItem("IS_ADMIN", JSON.stringify(isAdmin));
+
+    setToken(token);
+    navigate("/");
   };
 
   const onLoginHandler = async (data) => {
@@ -77,9 +84,7 @@ const Login = () => {
             Enter your details below
           </p>
 
-
           <form onSubmit={handleSubmit(onLoginHandler)} className="space-y-6">
-            
             {/* 유저네임 */}
             <input
               type="text"
