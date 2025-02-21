@@ -50,6 +50,7 @@ function App() {
     <ContextProvider>
       <Router>
         <Header />
+        
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/productcategory" element={<ProductCategory />} />
@@ -130,9 +131,9 @@ function App() {
 
           {/* OAuth2 리다이렉트  */}
           <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
-        </Routes>
+        </Routes>  
         <Footer />
-      </Router>
+      </Router> 
     </ContextProvider>
   );
 }
