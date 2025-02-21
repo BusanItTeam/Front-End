@@ -1,22 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import api from "../../services/api"; // API 호출을 위한 axios 인스턴스
 
 function InquiryManagement() {
   const [inquiries, setInquiries] = useState([]); // 문의 리스트 상태
+  const [user, setUser] = useState(null);
+
   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지
   const [totalPages, setTotalPages] = useState(0); // 총 페이지 수
   const inquiriesPerPage = 10; // 페이지당 문의 수
 
+  const [expandedId, setExpandedId] = useState(null); // 펼친 문의 ID
+  const [answers, setAnswers] = useState({}); // 답변 상태
+
   useEffect(() => {
     const fetchInquiries = async () => {
       try {
-        const response = await api.get("/inquiries"); // 모든 문의 불러오기
+        const token = localStorage.getItem("JWT_TOKEN"); // JWT 토큰 가져오기
+        const response = await api.get("/inquiries", {
+          headers: { Authorization: `Bearer ${token}` }, // 토큰을 Authorization 헤더에 추가
+        });
         setInquiries(response.data);
-
-        // totalCount를 계산하여 totalPages 설정
-        const totalCount = response.data.length || 0; // API에서 직접 length를 사용
-        setTotalPages(Math.ceil(totalCount / inquiriesPerPage));
+        setTotalPages(Math.ceil(response.data.length / inquiriesPerPage));
+        console.log("이거다", response.data);
       } catch (error) {
         console.error("문의 목록을 불러오는 데 오류가 발생했습니다.", error);
       }
@@ -29,6 +34,33 @@ function InquiryManagement() {
     setCurrentPage(page);
   };
 
+  const toggleExpand = (inquiryId) => {
+    setExpandedId(expandedId === inquiryId ? null : inquiryId);
+  };
+
+  const handleAnswerChange = (inquiryId, value) => {
+    setAnswers({ ...answers, [inquiryId]: value });
+  };
+
+  const submitAnswer = async (inquiryId) => {
+    try {
+      const token = localStorage.getItem("JWT_TOKEN");
+      await api.post(
+        `/inquiries/${inquiryId}/answer`,
+        { answer: answers[inquiryId] },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      alert("답변이 등록되었습니다.");
+      setAnswers({ ...answers, [inquiryId]: "" });
+    } catch (error) {
+      console.error("답변 등록 오류", error);
+      alert("답변 등록에 실패했습니다.");
+    }
+  };
+
+  // 현재 페이지에 해당하는 문의 데이터만 가져오기
   const startIndex = (currentPage - 1) * inquiriesPerPage;
   const endIndex = startIndex + inquiriesPerPage;
   const currentInquiries = inquiries.slice(startIndex, endIndex);
@@ -36,75 +68,58 @@ function InquiryManagement() {
   return (
     <div className="max-w-7xl mx-auto p-6 min-h-screen pt-9">
       <h2 className="text-center text-2xl font-semibold mb-4">1:1 문의 관리</h2>
-
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex space-x-2">
-          <label className="text-sm text-gray-600">분류 선택</label>
-          <select className="border p-1 text-sm">
-            <option>작성 일자별</option>
-            <option>분류별</option>
-          </select>
-        </div>
-      </div>
-
       <table className="w-full border-t text-sm text-center">
         <thead>
           <tr className="border-b">
             <th className="py-2">번호</th>
             <th className="py-2">고객명</th>
             <th className="py-2">분류</th>
-            <th className="py-2">문의 제목</th>
+            <th className="py-2">제목</th>
             <th className="py-2">작성일자</th>
             <th className="py-2">상태</th>
-            <th className="py-2">답변하기</th>
           </tr>
         </thead>
         <tbody>
           {currentInquiries.length === 0 ? (
             <tr>
-              <td colSpan="6" className="py-4 text-gray-500">
+              <td colSpan="7" className="py-4 text-gray-500">
                 게시물이 없습니다.
               </td>
             </tr>
           ) : (
             currentInquiries.map((inquiry, index) => (
-              <tr key={inquiry.inquiryId}>
-                <td className="py-2">{(currentPage - 1) * inquiriesPerPage + index + 1}</td>
-                <td className="py-2">{inquiry.user.username}</td>
-                <td className="py-2">{inquiry.title}</td>
-                <td className="py-2">{new Date(inquiry.createdAt).toLocaleDateString()}</td>
-                <td className="py-2">{inquiry.answer ? <span className="text-green-500">답변 완료</span> : <span className="text-red-500">답변 대기 중</span>}</td>
-                <td className="py-2">{inquiry.managementNotes || "없음"}</td>
-              </tr>
+              <React.Fragment key={inquiry.inquiryId}>
+                <tr onClick={() => toggleExpand(inquiry.inquiryId)} className="cursor-pointer hover:bg-gray-100">
+                  <td className="py-2">{startIndex + index + 1}</td>
+                  <td className="py-2">{inquiry.user ? inquiry.user.name : "알 수 없음"}</td>
+                  <td className="py-2">{inquiry.type}</td>
+                  <td className="py-2">{inquiry.title}</td>
+                  <td className="py-2">{new Date(inquiry.createdAt).toLocaleDateString()}</td>
+                  <td className="py-2">{inquiry.answer ? <span className="text-green-500">답변 완료</span> : <span className="text-red-500">답변 대기 중</span>}</td>
+                </tr>
+                {expandedId === inquiry.inquiryId && (
+                  <tr>
+                    <td colSpan="7" className="p-4 bg-gray-50 text-left">
+                      <strong>문의 내용:</strong>
+                      <p className="mt-2 text-gray-700">{inquiry.content}</p>
+                      <textarea className="w-full border p-2 mt-2 text-sm" rows="3" placeholder="답변을 입력하세요" value={answers[inquiry.inquiryId] || ""} onChange={(e) => handleAnswerChange(inquiry.inquiryId, e.target.value)} />
+                      <button className="bg-green-500 text-white px-4 py-1 mt-2 rounded" onClick={() => submitAnswer(inquiry.inquiryId)}>
+                        답변 등록
+                      </button>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
             ))
           )}
         </tbody>
       </table>
-
-      {/* 페이지네이션 */}
       <div className="flex justify-center mt-4">
         {Array.from({ length: totalPages }, (_, index) => (
           <button key={index} className={`mx-1 px-3 py-1 rounded ${currentPage === index + 1 ? "bg-pink-500 text-white" : "bg-gray-200"}`} onClick={() => handlePageChange(index + 1)}>
             {index + 1}
           </button>
         ))}
-      </div>
-
-      <div className="mt-4 flex items-center">
-        <div className="flex-grow flex justify-center space-x-2">
-          <select className="border p-1 text-sm">
-            <option>제목</option>
-            <option>내용</option>
-            <option>작성자</option>
-          </select>
-          <input type="text" className="border p-1 text-sm w-48" placeholder="검색어 입력" />
-          <button className="bg-gray-400 text-white px-4 py-1 text-sm rounded">찾기</button>
-        </div>
-        <div>
-          <Link to="/myPage/inquiryForm">
-            <button className="bg-gray-400 text-white px-4 py-1 text-sm rounded">글쓰기</button>
-          </Link>
-        </div>
       </div>
     </div>
   );
