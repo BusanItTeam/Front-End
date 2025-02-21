@@ -88,12 +88,15 @@ export const Header = () => {
               <button onClick={handleLogout} className="nav-link">
                 LogOut
               </button>
+          )}
+
               {isAdmin && (
                 <Link to="/admin" className="nav-link">
                   관리자
                 </Link>
               )}
             </>
+
           )}
         </nav>
       </div>
