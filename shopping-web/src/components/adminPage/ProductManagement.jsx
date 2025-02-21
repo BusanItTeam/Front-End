@@ -85,23 +85,11 @@ function ProductManagement() {
   const handleUpdateProduct = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem("JWT_TOKEN"); // 토큰 가져오기
-      await api.put(
-        `/products/${editingProduct.productId}`,
-        {
-          // 올바른 URL
-          ...editingProduct,
-          price: Number(editingProduct.price),
-          stock: Number(editingProduct.stock),
-        },
-        {
-          headers: {
-            // 헤더 포함
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json", // Content-Type 지정
-          },
-        }
-      );
+      await api.put(`/products/${editingProduct.productId}`, {
+        ...editingProduct,
+        price: Number(editingProduct.price),
+        stock: Number(editingProduct.stock),
+      });
       fetchProducts();
       setEditingProduct(null);
       alert("상품 수정 완료!");
@@ -110,7 +98,6 @@ function ProductManagement() {
       alert("상품 수정 실패!");
     }
   };
-
   const handleDeleteProduct = async (id) => {
     try {
       await api.delete(`/products/${id}`);
@@ -121,7 +108,6 @@ function ProductManagement() {
       alert("삭제 실패!");
     }
   };
-
   const handleEditProduct = (product) => {
     setEditingProduct(product);
   };
