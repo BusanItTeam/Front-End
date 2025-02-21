@@ -6,6 +6,7 @@ import moment from "moment";
 import { Link, useNavigate } from "react-router-dom";
 import { MdOutlineEmail, MdDateRange } from "react-icons/md";
 import { Blocks } from "react-loader-spinner";
+import { FaUser } from "react-icons/fa";
 // 컬럼 정의 (DataGrid용)
 const userListsColumns = [
   {
@@ -190,7 +191,7 @@ const MemberManagement = () => {
           pageSizeOptions={[10, 25, 50, 100]} 
           disableColumnResize
           onRowClick={(params) => {
-            console.log("이동할 URL:", `/admin/members/${params.row.id}`); // ✅ URL 로그 확인
+            console.log("이동할 URL:", `/admin/members/${params.row.id}`); 
             navigate(`/admin/members/${params.row.id}`);
           }}
         />
