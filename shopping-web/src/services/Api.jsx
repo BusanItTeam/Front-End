@@ -11,7 +11,7 @@ const Api = axios.create({
   withCredentials: true,
 });
 
-// ✅ 애플리케이션 시작 시 CSRF 토큰을 미리 가져오기
+// 애플리케이션 시작 시 CSRF 토큰을 미리 가져오기
 export const fetchCsrfToken = async () => {
   try {
     const response = await axios.get(
@@ -33,6 +33,8 @@ Api.interceptors.request.use(
     const token = localStorage.getItem("JWT_TOKEN");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }else{
+      console.warn("jwt 토큰이 없습니다. 인증이 필요합니다.");
     }
 
     // 로컬스토리지에서 CSRF 토큰 가져오기

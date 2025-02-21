@@ -31,6 +31,7 @@ import AdminDashboard from "./components/adminPage/AdminDashboard";
 import MyPage from "./components/myPage/MyPage";
 import Homepage from "./components/home/Homepage";
 import OAuth2RedirectHandler from "./components/Auth/OAuth2RedirectHandler";
+import MemberManagementDetails from "./components/adminPage/MemberManagementDetails";
 
 // 관리자 권한 확인 컴포넌트
 const AdminRoute = ({ children }) => {
@@ -91,6 +92,14 @@ function App() {
             element={
               <AdminRoute>
                 <MemberManagement />
+              </AdminRoute>
+            }
+          />
+         <Route
+            path="/admin/members/:userId"
+            element={
+              <AdminRoute>
+                <MemberManagementDetails />
               </AdminRoute>
             }
           />

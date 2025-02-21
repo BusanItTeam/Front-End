@@ -3,10 +3,9 @@ import api from "../../services/Api.jsx";
 import { DataGrid } from "@mui/x-data-grid"; // 테이블 라이브러리
 import toast from "react-hot-toast";
 import moment from "moment";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { MdOutlineEmail, MdDateRange } from "react-icons/md";
 import { Blocks } from "react-loader-spinner";
-
 // 컬럼 정의 (DataGrid용)
 const userListsColumns = [
   {
@@ -47,12 +46,12 @@ const userListsColumns = [
     field: "email",
     headerName: "Email",
     headerAlign: "center",
-    width: 200,
+    width: 220,
     align: "center",
     renderHeader: () => <span>이메일</span>,
     renderCell: (params) => (
       <div className="flex items-center gap-1">
-        <MdOutlineEmail className="text-lg" />
+        <MdOutlineEmail className="text-lg flex-shrink-0" />
         <span>{params.row.email}</span>
       </div>
     ),
@@ -127,6 +126,7 @@ const userListsColumns = [
 
 // 회원 관리 페이지 컴포넌트
 const MemberManagement = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   console.log(users)
   const [loading, setLoading] = useState(false);
@@ -189,6 +189,10 @@ const MemberManagement = () => {
           disableRowSelectionOnClick
           pageSizeOptions={[10, 25, 50, 100]} 
           disableColumnResize
+          onRowClick={(params) => {
+            console.log("이동할 URL:", `/admin/members/${params.row.id}`); // ✅ URL 로그 확인
+            navigate(`/admin/members/${params.row.id}`);
+          }}
         />
         
         )}
