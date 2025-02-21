@@ -50,6 +50,7 @@ function App() {
     <ContextProvider>
       <Router>
         <Header />
+        
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/productcategory" element={<ProductCategory />} />
@@ -70,9 +71,7 @@ function App() {
           <Route path="/orderpage/ordercomplete" element={<OrderComplete />} />
 
 
-          <Route path="/payment" element={<Payment />} />
-          <Route path="/ordercomplete" element={<OrderComplete />} />
-          <Route path="/orderpayment" element={<OrderPayment />} />
+     
 
           {/* 관리자 페이지 라우트 */}
           <Route
@@ -134,9 +133,9 @@ function App() {
 
           {/* OAuth2 리다이렉트  */}
           <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
-        </Routes>
+        </Routes>  
         <Footer />
-      </Router>
+      </Router> 
     </ContextProvider>
   );
 }
