@@ -30,6 +30,7 @@ import AdminDashboard from "./components/adminPage/AdminDashboard";
 import MyPage from "./components/myPage/MyPage";
 import Homepage from "./components/home/Homepage";
 import OAuth2RedirectHandler from "./components/Auth/OAuth2RedirectHandler";
+import MemberManagementDetails from "./components/adminPage/MemberManagementDetails";
 
 import OrderPage from "./components/order/OrderPage";
 import Payment from "./components/order/Payment";
@@ -103,6 +104,14 @@ function App() {
             element={
               <AdminRoute>
                 <MemberManagement />
+              </AdminRoute>
+            }
+          />
+         <Route
+            path="/admin/members/:userId"
+            element={
+              <AdminRoute>
+                <MemberManagementDetails />
               </AdminRoute>
             }
           />
