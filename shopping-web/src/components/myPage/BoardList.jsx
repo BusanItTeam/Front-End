@@ -12,11 +12,11 @@ function BoardList() {
   const inquiriesPerPage = 10; // 페이지당 문의 수
   const navigate = useNavigate();
 
-  const [expandedId, setExpandedId] = useState(null); // 🌟 추가: 펼쳐진 문의 ID 상태
+  const [expandedId, setExpandedId] = useState(null);
+  const [expandedInquiries, setExpandedInquiries] = useState({}); // ✅ 변경: 여러 개 관리
 
   useEffect(() => {
     // currentUser가 null일 경우에만 localStorage에서 불러오기
-
     if (!currentUser) {
       const storedUser = localStorage.getItem("USER");
       if (storedUser) {
@@ -51,7 +51,7 @@ function BoardList() {
         setInquiries(sortedInquiries);
 
         // totalCount를 계산하여 totalPages 설정
-        const totalCount = response.data.length || 0; // API에서 직접 length를 사용
+        const totalCount = response.data.length || 0;
         setTotalPages(Math.ceil(totalCount / inquiriesPerPage));
       } catch (error) {
         console.error("문의 목록을 불러오는 데 오류가 발생했습니다.", error);
@@ -67,16 +67,12 @@ function BoardList() {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    setExpandedId(null); // 페이지 변경 시 펼쳐진 문의 닫기
+    setExpandedInquiries({}); // ✅ 페이지 변경 시 전체 초기화
   };
 
-  // 🌟 페이지가 변경될 때 확장된 ID 초기화
-  useEffect(() => {
-    setExpandedId(null);
-  }, [currentPage]);
-
-  const toggleExpand = (id) => {
-    setExpandedId((prevId) => (prevId === id ? null : id));
+  // ✅ 펼침 상태를 개별적으로 관리하는 함수
+  const toggleExpand = (inquiryId) => {
+    setExpandedId((prevId) => (prevId === inquiryId ? null : inquiryId));
   };
 
   const startIndex = (currentPage - 1) * inquiriesPerPage;
@@ -109,17 +105,16 @@ function BoardList() {
             </tr>
           ) : (
             currentInquiries.map((inquiry, index) => (
-              <React.Fragment key={inquiry.id}>
-                <tr onClick={() => toggleExpand(inquiry.id)} className="cursor-pointer hover:bg-gray-100">
+              <React.Fragment key={`inquiry-${inquiry.inquiryId}`}>
+                <tr onClick={() => toggleExpand(inquiry.inquiryId)} className="cursor-pointer hover:bg-gray-100">
                   <td className="py-2">{(currentPage - 1) * inquiriesPerPage + index + 1}</td>
                   <td className="py-2">{inquiry.type}</td>
                   <td className="py-2">{inquiry.title}</td>
                   <td className="py-2">{new Date(inquiry.createdAt).toLocaleDateString()}</td>
                   <td className="py-2">{inquiry.answer ? <span className="text-green-500">답변 완료</span> : <span className="text-red-500">답변 대기 중</span>}</td>
                 </tr>
-
-                {expandedId === inquiry.id && (
-                  <tr key={`${inquiry.id}-content`}>
+                {expandedId === inquiry.inquiryId && (
+                  <tr key={`inquiry-content-${inquiry.inquiryId}`}>
                     <td colSpan="5" className="p-4 bg-gray-50 text-left">
                       <strong>문의 내용:</strong>
                       <p className="mt-2 text-gray-700">{inquiry.content}</p>
@@ -132,7 +127,6 @@ function BoardList() {
         </tbody>
       </table>
 
-      {/* 페이지네이션 */}
       <div className="pt-2 pb-2 flex justify-center mt-4">
         {Array.from({ length: totalPages }, (_, index) => (
           <button key={index} className={`mx-1 px-3 py-1 rounded ${currentPage === index + 1 ? "bg-pink-500 text-white" : "bg-gray-200"}`} onClick={() => handlePageChange(index + 1)}>
