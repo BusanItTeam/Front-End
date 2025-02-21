@@ -11,11 +11,7 @@ export const ContextProvider = ({ children }) => {
     : null;
   //로컬스토리지 유저가 관리자 인지 가져옴
   const isADmin = localStorage.getItem("IS_ADMIN")
-<<<<<<< HEAD
-    ? JSON.stringify(localStorage.getItem("IS_ADMIN"))
-=======
     ? JSON.parse(localStorage.getItem("IS_ADMIN")) // JSON.parse 추가
->>>>>>> origin/developer
     : false;
 
   //토큰 상태관리
