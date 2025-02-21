@@ -12,7 +12,7 @@ const MyPage = () => {
     // console.log("currentUser:", currentUser);
     // console.log("JWT_TOKEN:", localStorage.getItem("JWT_TOKEN"));
     // console.log("USER:", localStorage.getItem("USER"));
-
+    console.log("🔍 currentUser 데이터 확인:", currentUser);
     if (currentUser === null) {
       const storedUser = localStorage.getItem("USER");
       if (storedUser) {
@@ -38,7 +38,7 @@ const MyPage = () => {
       <div className="flex items-center space-x-4">
         <div className="w-16 h-16 bg-gray-300 rounded-full"></div>
         <div className="border-gray-300">
-          <p className="text-lg font-semibold">{currentUser?.username} 회원님 반감습니다.</p>
+          <p className="text-lg font-semibold">{currentUser?.name} 회원님 반갑습니다.</p>
           <p className="text-gray-700">저희 쇼핑몰을 이용해 주셔서 감사합니다.</p>
         </div>
       </div>

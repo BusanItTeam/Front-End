@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  Route,
-  Routes,
-  BrowserRouter as Router,
-  Navigate,
-} from "react-router-dom";
+import { Route, Routes, BrowserRouter as Router, Navigate } from "react-router-dom";
 import "./App.css";
 import { Header } from "./components/header/Header";
 import SignUp from "./components/signup/SignUp";
@@ -31,6 +26,7 @@ import AdminDashboard from "./components/adminPage/AdminDashboard";
 import MyPage from "./components/myPage/MyPage";
 import Homepage from "./components/home/Homepage";
 import OAuth2RedirectHandler from "./components/Auth/OAuth2RedirectHandler";
+import InquiryManagement from "./components/adminPage/InquiryManagement";
 
 // 관리자 권한 확인 컴포넌트
 const AdminRoute = ({ children }) => {
@@ -102,6 +98,15 @@ function App() {
               </AdminRoute>
             }
           />
+          <Route
+            path="/admin/inquiries"
+            element={
+              <AdminRoute>
+                <InquiryManagement />
+              </AdminRoute>
+            }
+          />
+
           {/* OAuth2 리다이렉트  */}
           <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
         </Routes>

@@ -6,9 +6,7 @@ const ContextApi = createContext();
 
 export const ContextProvider = ({ children }) => {
   //로컬스토리지에 있는 토큰을 가져온다
-  const getToken = localStorage.getItem("JWT_TOKEN")
-    ? JSON.stringify(localStorage.getItem("JWT_TOKEN"))
-    : null;
+  const getToken = localStorage.getItem("JWT_TOKEN") ? JSON.stringify(localStorage.getItem("JWT_TOKEN")) : null;
   //로컬스토리지 유저가 관리자 인지 가져옴
   const isADmin = localStorage.getItem("IS_ADMIN")
     ? JSON.parse(localStorage.getItem("IS_ADMIN")) // JSON.parse 추가
@@ -77,6 +75,8 @@ export const ContextProvider = ({ children }) => {
       try {
         //서버에 유저정보를 요청
         const { data } = await api.get(`/auths/user`);
+        console.log("서버에서 가져온 유저 데이터:", data);
+
         const roles = data.roles;
         console.log(data);
 
@@ -87,7 +87,11 @@ export const ContextProvider = ({ children }) => {
           localStorage.removeItem("IS_ADMIN");
           setIsAdmin(false); // 상태 업데이트
         }
-        setCurrentUser(data);
+
+        setCurrentUser({
+          ...data,
+          name: data.name, // 이 부분에서 name이 정확히 설정되었는지 확인
+        });
       } catch (error) {
         console.error("Error fetching current user", error);
         toast.error("Error fetching current user");
