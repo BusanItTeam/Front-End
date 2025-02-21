@@ -88,15 +88,14 @@ export const Header = () => {
               <button onClick={handleLogout} className="nav-link">
                 LogOut
               </button>
-         
-
-              {isAdmin && (
-                <Link to="/admin" className="nav-link">
-                  관리자
-                </Link>
+        
+          {isAdmin &&  (
+            <Link to="/admin" className="nav-link">
+              관리자
+            </Link> // admin으로 로그인했을때만 보임
+            
               )}
             </>
-
           )}
         </nav>
       </div>
