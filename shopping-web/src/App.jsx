@@ -16,9 +16,17 @@ import CartPage from "./components/cart/CartPage";
 import EditProfile from "./components/myPage/EditProfile";
 import OrderComplete from "./components/order/OrderComplete";
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 import OrderPayment from "./components/order/OrderPayment";
+>>>>>>> origin/developer
+=======
+
+
+
+
+
 >>>>>>> origin/developer
 import BoardList from "./components/myPage/BoardList";
 import InquiryForm from "./components/myPage/InquiryForm";
@@ -31,9 +39,16 @@ import MyPage from "./components/myPage/MyPage";
 import Homepage from "./components/home/Homepage";
 import OAuth2RedirectHandler from "./components/Auth/OAuth2RedirectHandler";
 <<<<<<< HEAD
+<<<<<<< HEAD
 import OrderPage from "./components/order/OrderPage";
 import Payment from "./components/order/Payment";
 =======
+=======
+
+import OrderPage from "./components/order/OrderPage";
+import Payment from "./components/order/Payment";
+
+>>>>>>> origin/developer
 import InquiryManagement from "./components/adminPage/InquiryManagement";
 
 // 관리자 권한 확인 컴포넌트
@@ -42,6 +57,10 @@ const AdminRoute = ({ children }) => {
   //사용자가 어드민이 아니라면 홈으로 리다이렉트
   return isAdmin ? children : <Navigate to="/" />;
 };
+<<<<<<< HEAD
+>>>>>>> origin/developer
+=======
+
 >>>>>>> origin/developer
 
 function App() {
@@ -64,14 +83,26 @@ function App() {
           <Route path="/myPage/inquiryForm" element={<InquiryForm />} />
           <Route path="/cart" element={<CartPage />} />
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/developer
           <Route path="/orderpage" element={<OrderPage />} />
           <Route path="/orderpage/payment" element={<Payment />} />
           <Route path="/orderpage/ordercomplete" element={<OrderComplete />} />
 
+<<<<<<< HEAD
 =======
           <Route path="/payment" element={<Payment />} />
           <Route path="/ordercomplete" element={<OrderComplete />} />
           <Route path="/orderpayment" element={<OrderPayment />} />
+>>>>>>> origin/developer
+=======
+
+          <Route path="/payment" element={<Payment />} />
+          <Route path="/ordercomplete" element={<OrderComplete />} />
+          <Route path="/orderpayment" element={<OrderPayment />} />
+
 >>>>>>> origin/developer
           {/* 관리자 페이지 라우트 */}
           <Route
