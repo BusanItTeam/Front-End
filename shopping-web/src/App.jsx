@@ -71,8 +71,6 @@ function App() {
           <Route path="/orderpage/ordercomplete" element={<OrderComplete />} />
 
 
-     
-
           {/* 관리자 페이지 라우트 */}
           <Route
             path="/admin"
