@@ -6,6 +6,7 @@ const Tops = () => {
   const { products } = useMyContext();
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 8;
+  const backendURL = "http://localhost:8080"; // backendURL 추가
 
   // 상의 카테고리(ID: 2)에 맞는 상품만 필터링
   const topsProducts = products.filter(
@@ -33,7 +34,7 @@ const Tops = () => {
               className="bg-white shadow-md rounded-lg overflow-hidden"
             >
               <img
-                src={product.imageUrl}
+                src={`${backendURL}${product.imageUrl}`} // backendURL 추가
                 alt={product.name}
                 className="w-full h-48 object-cover"
                 style={{ maxWidth: "100%", height: "auto" }}
