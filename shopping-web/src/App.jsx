@@ -21,8 +21,6 @@ import CartPage from "./components/cart/CartPage";
 import EditProfile from "./components/myPage/EditProfile";
 import OrderComplete from "./components/order/OrderComplete";
 
-import OrderPayment from "./components/order/OrderPayment";
-
 import BoardList from "./components/myPage/BoardList";
 import InquiryForm from "./components/myPage/InquiryForm";
 import CustomerSupport from "./components/adminPage/CustomerSupport";
@@ -33,9 +31,6 @@ import AdminDashboard from "./components/adminPage/AdminDashboard";
 import MyPage from "./components/myPage/MyPage";
 import Homepage from "./components/home/Homepage";
 import OAuth2RedirectHandler from "./components/Auth/OAuth2RedirectHandler";
-
-import OrderPage from "./components/order/OrderPage";
-import Payment from "./components/order/Payment";
 
 import OrderPage from "./components/order/OrderPage";
 import Payment from "./components/order/Payment";
