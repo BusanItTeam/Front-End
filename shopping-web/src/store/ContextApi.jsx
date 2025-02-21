@@ -6,9 +6,13 @@ const ContextApi = createContext();
 
 export const ContextProvider = ({ children }) => {
   //로컬스토리지에 있는 토큰을 가져온다
-  const getToken = localStorage.getItem("JWT_TOKEN") ? JSON.stringify(localStorage.getItem("JWT_TOKEN")) : null;
+  const getToken = localStorage.getItem("JWT_TOKEN")
+    ? JSON.stringify(localStorage.getItem("JWT_TOKEN"))
+    : null;
   //로컬스토리지 유저가 관리자 인지 가져옴
-  const isADmin = localStorage.getItem("IS_ADMIN") ? JSON.stringify(localStorage.getItem("IS_ADMIN")) : false;
+  const isADmin = localStorage.getItem("IS_ADMIN")
+    ? JSON.stringify(localStorage.getItem("IS_ADMIN"))
+    : false;
 
   //토큰 상태관리
   const [token, setToken] = useState(getToken);
@@ -58,7 +62,7 @@ export const ContextProvider = ({ children }) => {
   const fetchUser = async () => {
     const user = JSON.parse(localStorage.getItem("USER"));
 
-    if (user?.username) {
+    if (user?.email) {
       try {
         //서버에 유저정보를 요청
         const { data } = await api.get(`/auths/user`);

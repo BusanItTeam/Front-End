@@ -11,10 +11,9 @@ import Outerwear from "./components/productCategory/Outerwear";
 import Dresses from "./components/productCategory/Dresses";
 import Footer from "./components/footer/Footer";
 import CartPage from "./components/cart/CartPage";
-import Payment from "./components/cart/Payment";
+
 import EditProfile from "./components/myPage/EditProfile";
 import OrderComplete from "./components/order/OrderComplete";
-import OrderPayment from "./components/order/OrderPayment";
 
 import BoardList from "./components/myPage/BoardList";
 import InquiryForm from "./components/myPage/InquiryForm";
@@ -26,6 +25,8 @@ import AdminDashboard from "./components/adminPage/AdminDashboard";
 import MyPage from "./components/myPage/MyPage";
 import Homepage from "./components/home/Homepage";
 import OAuth2RedirectHandler from "./components/Auth/OAuth2RedirectHandler";
+import OrderPage from "./components/order/OrderPage";
+import Payment from "./components/order/Payment";
 
 function App() {
   return (
@@ -51,9 +52,9 @@ function App() {
           <Route path="/myPage/inquiryForm" element={<InquiryForm />} />
 
           <Route path="/cart" element={<CartPage />} />
-          <Route path="/payment" element={<Payment />} />
-          <Route path="/ordercomplete" element={<OrderComplete />} />
-          <Route path="/orderpayment" element={<OrderPayment />} />
+          <Route path="/orderpage" element={<OrderPage />} />
+          <Route path="/orderpage/payment" element={<Payment />} />
+          <Route path="/orderpage/ordercomplete" element={<OrderComplete />} />
 
           {/* 관리자 페이지 라우트 */}
           <Route path="/admin" element={<AdminDashboard />} />

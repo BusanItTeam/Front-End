@@ -220,14 +220,14 @@ const CartPage = () => {
             </h5>
             <div className="flex justify-center gap-3 mt-4">
               <Link
-                to="/orderpayment"
+                to="/orderpage"
                 onClick={handleSelectedOrder}
                 className="border border-gray-400 text-gray-700 font-medium py-2 px-4 rounded-lg shadow-md text-sm bg-white"
               >
                 선택상품 주문하기
               </Link>
               <Link
-                to="/orderpayment"
+                to="/orderpage"
                 onClick={handleAllOrder}
                 className="bg-gray-900 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg shadow-md text-sm"
               >
