@@ -20,6 +20,11 @@ function ProductManagement() {
   });
   const [editingProduct, setEditingProduct] = useState(null);
   const [stockThreshold, setStockThreshold] = useState(10);
+  const backendURL = "http://localhost:8080"; // backendURL 추가
+
+  useEffect(() => {
+    console.log("Products data:", products);
+  }, [products]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -85,11 +90,21 @@ function ProductManagement() {
   const handleUpdateProduct = async (e) => {
     e.preventDefault();
     try {
-      await api.put(`/api/products/${editingProduct.productId}`, {
-        ...editingProduct,
-        price: Number(editingProduct.price),
-        stock: Number(editingProduct.stock),
-      });
+      const token = localStorage.getItem("JWT_TOKEN");
+      await api.put(
+        `/products/${editingProduct.productId}`,
+        {
+          ...editingProduct,
+          price: Number(editingProduct.price),
+          stock: Number(editingProduct.stock),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
       fetchProducts();
       setEditingProduct(null);
       alert("상품 수정 완료!");
@@ -101,7 +116,12 @@ function ProductManagement() {
 
   const handleDeleteProduct = async (id) => {
     try {
-      await api.delete(`/products/${id}`);
+      const token = localStorage.getItem("JWT_TOKEN");
+      await api.delete(`/products/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       fetchProducts();
       alert("삭제 완료!");
     } catch (error) {
@@ -113,9 +133,11 @@ function ProductManagement() {
   const handleEditProduct = (product) => {
     setEditingProduct(product);
   };
+
   const handleStockThresholdChange = (e) => {
     setStockThreshold(Number(e.target.value));
   };
+
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">상품 관리</h2>
@@ -212,45 +234,48 @@ function ProductManagement() {
             </tr>
           </thead>
           <tbody>
-            {products.map((product) => (
-              <tr
-                key={product.productId}
-                className={product.stock <= stockThreshold ? "bg-red-100" : ""}
-              >
-                <td className="border p-2">
-                  <img
-                    src={product.imageUrl}
-                    alt={product.name}
-                    className="w-16 h-16 object-cover"
-                  />
-                </td>
-                <td className="border p-2">{product.name}</td>
-                <td className="border p-2">{product.price}</td>
-                <td className="border p-2">
-                  {
-                    categories.find(
-                      (category) =>
-                        category.categoryId === product.category.categoryId
-                    )?.name
+            {products &&
+              products.map((product) => (
+                <tr
+                  key={product.productId}
+                  className={
+                    product.stock <= stockThreshold ? "bg-red-100" : ""
                   }
-                </td>
-                <td className="border p-2">{product.stock}</td>
-                <td className="border p-2">
-                  <button
-                    onClick={() => handleEditProduct(product)}
-                    className="bg-yellow-500 text-white px-2 py-1 mr-2"
-                  >
-                    수정
-                  </button>
-                  <button
-                    onClick={() => handleDeleteProduct(product.productId)}
-                    className="bg-red-500 text-white px-2 py-1"
-                  >
-                    삭제
-                  </button>
-                </td>
-              </tr>
-            ))}
+                >
+                  <td className="border p-2">
+                    <img
+                      src={`${backendURL}${product.imageUrl}`}
+                      alt={product.name}
+                      className="w-16 h-16 object-cover"
+                    />
+                  </td>
+                  <td className="border p-2">{product.name}</td>
+                  <td className="border p-2">{product.price}</td>
+                  <td className="border p-2">
+                    {
+                      categories.find(
+                        (category) =>
+                          category.categoryId === product.category.categoryId
+                      )?.name
+                    }
+                  </td>
+                  <td className="border p-2">{product.stock}</td>
+                  <td className="border p-2">
+                    <button
+                      onClick={() => handleEditProduct(product)}
+                      className="bg-yellow-500 text-white px-2 py-1 mr-2"
+                    >
+                      수정
+                    </button>
+                    <button
+                      onClick={() => handleDeleteProduct(product.productId)}
+                      className="bg-red-500 text-white px-2 py-1"
+                    >
+                      삭제
+                    </button>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
