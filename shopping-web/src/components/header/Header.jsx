@@ -95,8 +95,6 @@ export const Header = () => {
               관리자
             </Link> // admin으로 로그인했을때만 보임
             
-
-             
               )}
             </>
           )}
