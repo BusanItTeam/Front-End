@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import api from "../../services/Api.jsx";
 import toast from "react-hot-toast";
 import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaRegCalendarAlt, FaUserShield } from "react-icons/fa";
@@ -23,6 +23,9 @@ const MemberManagementDetails = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const[filteredUsers,setFilteredUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     if (!userId) {
@@ -63,16 +66,46 @@ const MemberManagementDetails = () => {
     };
 
     fetchUserDetail();
-
+    
     return () => {
       isMounted = false;
     };
   }, [userId]);
 
+ 
+
+  
   if (loading)
     return <p className="text-center text-lg font-medium text-gray-600">🔄 로딩 중...</p>;
   if (error)
     return <p className="text-center text-red-500 font-medium">❌ {error}</p>;
+  
+  const handleDeleteUser = async () => {
+    if (!window.confirm("정말로 이 사용자를 삭제하시겠습니까?")) return;
+  
+    try {
+      const token = localStorage.getItem("JWT_TOKEN"); // ✅ JWT 토큰 가져오기
+      if (!token) {
+        toast.error("로그인이 필요합니다.");
+        return;
+      }
+  
+      console.log("📢 삭제 요청 토큰:", token); // ✅ 콘솔에서 확인
+  
+      await api.delete(`/admin/user/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // ✅ JWT 토큰 추가
+          "Content-Type": "application/json",
+        },
+      });
+  
+      toast.success("사용자가 삭제되었습니다.");
+      navigate("/admin/members"); // ✅ 삭제 후 사용자 목록으로 이동
+    } catch (error) {
+      console.error("❌ 사용자 삭제 실패:", error.response ? error.response.data : error);
+      toast.error("사용자를 삭제하는데 실패했습니다.");
+    }
+  };
   
   return user ? (
     <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md mt-10 border border-gray-200">
@@ -131,10 +164,13 @@ const MemberManagementDetails = () => {
             우편번호: <span className="text-gray-900">{user.addresses[0].postcode || "없음"}</span>
           </p>
           <p className="text-lg text-gray-700">
-            주소: <span className="text-gray-900">{user.addresses[0].address || "없음"}</span>
+            도로명 주소: <span className="text-gray-900">{user.addresses[0].address || "없음"}</span>
           </p>
           <p className="text-lg text-gray-700">
             상세 주소: <span className="text-gray-900">{user.addresses[0].detailAddress || "없음"}</span>
+          </p>
+          <p className="text-lg text-gray-700">
+            추가 도로명 주소: <span className="text-gray-900">{user.addresses[0].extraAddress || "없음"}</span>
           </p>
         </div>
       ) : (
@@ -143,7 +179,7 @@ const MemberManagementDetails = () => {
 
       {/* 관리 버튼 추가 (회원 수정, 삭제 등) */}
       <div className="flex justify-end mt-6">
-        <Button variant="outlined" color="secondary">삭제</Button>
+        <Button variant="outlined" color="secondary" onClick={handleDeleteUser}>삭제</Button>
       </div>
     </div>
   ) : (
