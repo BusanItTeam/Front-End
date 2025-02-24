@@ -1,5 +1,10 @@
 import React from "react";
-import { Route, Routes, BrowserRouter as Router, Navigate } from "react-router-dom";
+import {
+  Route,
+  Routes,
+  BrowserRouter as Router,
+  Navigate,
+} from "react-router-dom";
 import "./App.css";
 import { Header } from "./components/header/Header";
 import SignUp from "./components/signup/SignUp";
@@ -15,10 +20,6 @@ import CartPage from "./components/cart/CartPage";
 
 import EditProfile from "./components/myPage/EditProfile";
 import OrderComplete from "./components/order/OrderComplete";
-
-
-
-
 
 import BoardList from "./components/myPage/BoardList";
 import InquiryForm from "./components/myPage/InquiryForm";
@@ -44,13 +45,12 @@ const AdminRoute = ({ children }) => {
   return isAdmin ? children : <Navigate to="/" />;
 };
 
-
 function App() {
   return (
     <ContextProvider>
       <Router>
         <Header />
-        
+
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/productcategory" element={<ProductCategory />} />
@@ -69,7 +69,6 @@ function App() {
           <Route path="/orderpage" element={<OrderPage />} />
           <Route path="/orderpage/payment" element={<Payment />} />
           <Route path="/orderpage/ordercomplete" element={<OrderComplete />} />
-
 
           {/* 관리자 페이지 라우트 */}
           <Route
@@ -104,7 +103,7 @@ function App() {
               </AdminRoute>
             }
           />
-         <Route
+          <Route
             path="/admin/members/:userId"
             element={
               <AdminRoute>
@@ -131,9 +130,9 @@ function App() {
 
           {/* OAuth2 리다이렉트  */}
           <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
-        </Routes>  
+        </Routes>
         <Footer />
-      </Router> 
+      </Router>
     </ContextProvider>
   );
 }
