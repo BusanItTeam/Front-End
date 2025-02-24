@@ -1,5 +1,10 @@
 import React from "react";
-import { Route, Routes, BrowserRouter as Router, Navigate } from "react-router-dom";
+import {
+  Route,
+  Routes,
+  BrowserRouter as Router,
+  Navigate,
+} from "react-router-dom";
 import "./App.css";
 import { Header } from "./components/header/Header";
 import SignUp from "./components/signup/SignUp";
@@ -15,10 +20,6 @@ import CartPage from "./components/cart/CartPage";
 
 import EditProfile from "./components/myPage/EditProfile";
 import OrderComplete from "./components/order/OrderComplete";
-
-
-
-
 
 import BoardList from "./components/myPage/BoardList";
 import InquiryForm from "./components/myPage/InquiryForm";
@@ -43,7 +44,6 @@ const AdminRoute = ({ children }) => {
   //사용자가 어드민이 아니라면 홈으로 리다이렉트
   return isAdmin ? children : <Navigate to="/" />;
 };
-
 
 function App() {
   return (
