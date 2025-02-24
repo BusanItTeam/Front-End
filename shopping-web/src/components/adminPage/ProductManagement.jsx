@@ -20,11 +20,11 @@ function ProductManagement() {
   });
   const [editingProduct, setEditingProduct] = useState(null);
   const [stockThreshold, setStockThreshold] = useState(10);
-  const backendURL = "http://localhost:8080"; // backendURL 추가
-  const [expandedProductId, setExpandedProductId] = useState(null); // 드롭다운 상태 관리
-  const [showEditFormFor, setShowEditFormFor] = useState(null); // 수정 폼을 보여줄 상품 ID
+  const backendURL = "http://localhost:8080";
+  const [expandedProductId, setExpandedProductId] = useState(null);
+  const [showEditFormFor, setShowEditFormFor] = useState(null);
+  const [newImage, setNewImage] = useState(null); // New image state
 
-  // Pagination 관련 state 추가
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 10;
 
@@ -49,8 +49,8 @@ function ProductManagement() {
 
       const formData = new FormData();
       formData.append("name", newProduct.name);
-      formData.append("price", Number(newProduct.price)); // 숫자 타입으로 변환
-      formData.append("stock", Number(newProduct.stock)); // 숫자 타입으로 변환
+      formData.append("price", Number(newProduct.price));
+      formData.append("stock", Number(newProduct.stock));
       formData.append("description", newProduct.description);
       formData.append("categoryId", newProduct.categoryId);
 
@@ -69,13 +69,12 @@ function ProductManagement() {
         },
       });
 
-      // fetchProducts 함수가 제대로 호출되는지 확인
       if (fetchProducts) {
         fetchProducts();
       } else {
         console.error("fetchProducts is not a function!");
         alert("상품 목록 갱신 실패!");
-        return; // 함수 실행 중단
+        return;
       }
 
       setNewProduct({
@@ -98,34 +97,31 @@ function ProductManagement() {
     try {
       const token = localStorage.getItem("JWT_TOKEN");
 
-      // API 호출 전에 editingProduct 상태를 업데이트
-      setEditingProduct((prevEditingProduct) => {
-        const updatedProduct = {
-          ...prevEditingProduct,
-          price: Number(prevEditingProduct.price),
-          stock: Number(prevEditingProduct.stock),
-        };
-        console.log("수정된 상품 정보:", updatedProduct); // 로깅
-        return updatedProduct;
-      });
+      const formData = new FormData();
+      formData.append("name", editingProduct.name);
+      formData.append("price", Number(editingProduct.price));
+      formData.append("stock", Number(editingProduct.stock));
+      formData.append("description", editingProduct.description);
+      formData.append("categoryId", editingProduct.category.categoryId);
 
-      await api.put(
-        `/products/${editingProduct.productId}`,
-        {
-          ...editingProduct,
-          price: Number(editingProduct.price),
-          stock: Number(editingProduct.stock),
+      if (newImage) {
+        formData.append("imageUrl", newImage);
+      }
+
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+      }
+
+      await api.put(`/products/${editingProduct.productId}`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      });
       fetchProducts();
-      setShowEditFormFor(null); // 수정 폼 닫기
+      setShowEditFormFor(null);
       setEditingProduct(null);
+      setNewImage(null); // Clear the new image
       alert("상품 수정 완료!");
     } catch (error) {
       console.error("Error updating product:", error);
@@ -134,34 +130,34 @@ function ProductManagement() {
   };
 
   const handleDeleteProduct = async (id) => {
-    try {
-      const token = localStorage.getItem("JWT_TOKEN");
-      await api.delete(`/products/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      fetchProducts();
-      alert("삭제 완료!");
-    } catch (error) {
-      console.error("Error deleting product:", error);
-      alert("삭제 실패!");
+    if (window.confirm("정말로 삭제하시겠습니까?")) {
+      try {
+        const token = localStorage.getItem("JWT_TOKEN");
+        await api.delete(`/products/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        fetchProducts();
+        alert("삭제 완료!");
+      } catch (error) {
+        console.error("Error deleting product:", error);
+        alert("삭제 실패!");
+      }
     }
   };
 
   const handleEditProduct = (product) => {
     setEditingProduct(product);
-    setShowEditFormFor(product.productId); // 수정 폼을 보여줄 상품 ID 설정
+    setShowEditFormFor(product.productId);
   };
 
   const handleStockThresholdChange = (e) => {
     setStockThreshold(Number(e.target.value));
   };
 
-  // 페이지 변경 함수
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  // 현재 페이지에 해당하는 상품 목록 계산
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const currentProducts = products.slice(
@@ -169,15 +165,17 @@ function ProductManagement() {
     indexOfLastProduct
   );
 
-  // 상품 드롭다운 핸들러
   const handleProductClick = (productId) => {
     setExpandedProductId((prevId) => (prevId === productId ? null : productId));
+  };
+
+  const handleNewImageChange = (e) => {
+    setNewImage(e.target.files[0]);
   };
 
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">상품 관리</h2>
-      {/* 상품 등록 폼 */}
       <form onSubmit={handleAddProduct} className="mb-8">
         <h3 className="text-xl font-semibold mb-2">상품 등록</h3>
         <div className="grid grid-cols-2 gap-4">
@@ -241,7 +239,6 @@ function ProductManagement() {
           상품 등록
         </button>
       </form>
-      {/* 재고 알림 설정 */}
       <div className="mb-8">
         <h3 className="text-xl font-semibold mb-2">재고 알림 설정</h3>
         <label className="block">
@@ -255,7 +252,6 @@ function ProductManagement() {
           개 이하
         </label>
       </div>
-      {/* 상품 목록 및 관리 UI */}
       <div>
         <h3 className="text-xl font-semibold mb-2">상품 목록</h3>
         <table className="w-full border-collapse border">
@@ -300,7 +296,7 @@ function ProductManagement() {
                     <td className="border p-2">
                       <button
                         onClick={(e) => {
-                          e.stopPropagation(); // 이벤트 버블링 방지
+                          e.stopPropagation();
                           handleEditProduct(product);
                         }}
                         className="bg-yellow-500 text-white px-2 py-1 mr-2"
@@ -309,11 +305,8 @@ function ProductManagement() {
                       </button>
                       <button
                         onClick={(e) => {
-                          e.stopPropagation(); // 이벤트 버블링 방지
-                          // 삭제 확인 메시지 표시
-                          if (window.confirm("정말로 삭제하시겠습니까?")) {
-                            handleDeleteProduct(product.productId);
-                          }
+                          e.stopPropagation();
+                          handleDeleteProduct(product.productId);
                         }}
                         className="bg-red-500 text-white px-2 py-1"
                       >
@@ -321,7 +314,6 @@ function ProductManagement() {
                       </button>
                     </td>
                   </tr>
-                  {/* 드롭다운 형태의 상세 정보 */}
                   {expandedProductId === product.productId && (
                     <tr>
                       <td colSpan="6" className="border p-2">
@@ -329,12 +321,10 @@ function ProductManagement() {
                           <p>
                             <b>설명:</b> {product.description}
                           </p>
-                          {/* 다른 상세 정보들을 추가할 수 있습니다. */}
                         </div>
                       </td>
                     </tr>
                   )}
-                  {/* 수정 폼 */}
                   {showEditFormFor === product.productId && (
                     <tr>
                       <td colSpan="6" className="border p-2">
@@ -348,13 +338,12 @@ function ProductManagement() {
                               type="text"
                               name="name"
                               value={editingProduct.name || ""}
-                              onChange={(e) => {
-                                console.log("상품명 변경:", e.target.value); // 로깅
+                              onChange={(e) =>
                                 setEditingProduct({
                                   ...editingProduct,
                                   name: e.target.value,
-                                });
-                              }}
+                                })
+                              }
                               className="border p-2 mb-2 w-full"
                               required
                             />
@@ -363,13 +352,12 @@ function ProductManagement() {
                               type="number"
                               name="price"
                               value={editingProduct.price || ""}
-                              onChange={(e) => {
-                                console.log("가격 변경:", e.target.value); // 로깅
+                              onChange={(e) =>
                                 setEditingProduct({
                                   ...editingProduct,
                                   price: e.target.value,
-                                });
-                              }}
+                                })
+                              }
                               className="border p-2 mb-2 w-full"
                               required
                             />
@@ -377,13 +365,12 @@ function ProductManagement() {
                             <select
                               name="categoryId"
                               value={editingProduct.category?.categoryId || ""}
-                              onChange={(e) => {
-                                console.log("카테고리 변경:", e.target.value); // 로깅
+                              onChange={(e) =>
                                 setEditingProduct({
                                   ...editingProduct,
                                   category: { categoryId: e.target.value },
-                                });
-                              }}
+                                })
+                              }
                               className="border p-2 mb-2 w-full"
                               required
                             >
@@ -401,13 +388,12 @@ function ProductManagement() {
                               type="number"
                               name="stock"
                               value={editingProduct.stock || ""}
-                              onChange={(e) => {
-                                console.log("재고 변경:", e.target.value); // 로깅
+                              onChange={(e) =>
                                 setEditingProduct({
                                   ...editingProduct,
                                   stock: e.target.value,
-                                });
-                              }}
+                                })
+                              }
                               className="border p-2 mb-2 w-full"
                               required
                             />
@@ -415,16 +401,22 @@ function ProductManagement() {
                             <textarea
                               name="description"
                               value={editingProduct.description || ""}
-                              onChange={(e) => {
-                                console.log("상품 설명 변경:", e.target.value); // 로깅
+                              onChange={(e) =>
                                 setEditingProduct({
                                   ...editingProduct,
                                   description: e.target.value,
-                                });
-                              }}
+                                })
+                              }
                               className="border p-2 mb-2 w-full"
                               required
                             ></textarea>
+                            <p>이미지</p>
+                            <input
+                              type="file"
+                              name="imageUrl"
+                              onChange={handleNewImageChange}
+                              className="border p-2 mb-2 w-full"
+                            />
                             <div className="flex justify-end">
                               <button
                                 type="submit"
@@ -450,7 +442,6 @@ function ProductManagement() {
           </tbody>
         </table>
       </div>
-      {/* Pagination UI */}
       <div className="flex justify-center mt-4">
         {Array.from({
           length: Math.ceil(products.length / productsPerPage),
