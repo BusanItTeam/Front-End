@@ -3,10 +3,11 @@ import api from "../../services/Api.jsx";
 import { DataGrid } from "@mui/x-data-grid"; // 테이블 라이브러리
 import toast from "react-hot-toast";
 import moment from "moment";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { MdOutlineEmail, MdDateRange } from "react-icons/md";
 import { Blocks } from "react-loader-spinner";
-
+import { FaUser } from "react-icons/fa";
+import Search from "../search/Search.jsx";
 // 컬럼 정의 (DataGrid용)
 const userListsColumns = [
   {
@@ -47,12 +48,12 @@ const userListsColumns = [
     field: "email",
     headerName: "Email",
     headerAlign: "center",
-    width: 200,
+    width: 220,
     align: "center",
     renderHeader: () => <span>이메일</span>,
     renderCell: (params) => (
       <div className="flex items-center gap-1">
-        <MdOutlineEmail className="text-lg" />
+        <MdOutlineEmail className="text-lg flex-shrink-0" />
         <span>{params.row.email}</span>
       </div>
     ),
@@ -77,7 +78,7 @@ const userListsColumns = [
     headerAlign: "center",
     minWidth: 200,
     align: "center",
-    renderHeader: () => <span>주소</span>,
+    renderHeader: () => <span>우편 번호</span>,
   },
   {
     field: "address",
@@ -85,7 +86,7 @@ const userListsColumns = [
     headerAlign: "center",
     minWidth: 200,
     align: "center",
-    renderHeader: () => <span>주소</span>,
+    renderHeader: () => <span>도로명 주소</span>,
   },
   {
     field: "detailAddress",
@@ -93,7 +94,7 @@ const userListsColumns = [
     headerAlign: "center",
     minWidth: 200,
     align: "center",
-    renderHeader: () => <span>주소</span>,
+    renderHeader: () => <span>상세 주소</span>,
   },
   {
     field: "extraAddress",
@@ -101,7 +102,7 @@ const userListsColumns = [
     headerAlign: "center",
     minWidth: 200,
     align: "center",
-    renderHeader: () => <span>주소</span>,
+    renderHeader: () => <span>추가 도로명 주소</span>,
   },
   {
     field: "status",
@@ -127,10 +128,13 @@ const userListsColumns = [
 
 // 회원 관리 페이지 컴포넌트
 const MemberManagement = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   console.log(users)
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [filteredUsers, setFilteredUsers] = useState([]); 
+  const [searchTerm, setSearchTerm] = useState(""); 
 
   useEffect(() => {
     setLoading(true);
@@ -141,6 +145,7 @@ const MemberManagement = () => {
           throw new Error("Invalid response data");
         }
         setUsers(response.data);
+        setFilteredUsers(response.data); //초기값 설정
       } catch (err) {
         setError(err?.response?.data?.message || "Failed to fetch users");
         toast.error("Error fetching users");
@@ -151,7 +156,16 @@ const MemberManagement = () => {
     fetchUsers();
   }, []);
 
-  const rows = users.map((item) => ({
+  useEffect(() => {
+    const filtered = users.filter((user) =>
+      user.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredUsers(filtered);
+  }, [searchTerm, users]);
+
+  const rows = filteredUsers.map((item) => ({
     id: item.userId,
     username: item.userName,
     name: item.name,
@@ -167,7 +181,17 @@ const MemberManagement = () => {
 
   return (
     <div className="p-4">
-      <h1 className="text-center text-2xl font-bold">전체 사용자</h1>
+      <div className="relative flex items-center justify-center mb-6">
+        <h1 className="text-3xl font-bold flex items-center gap-2">
+          <FaUser className="text-primary" />
+          전체 사용자
+        </h1>
+      <div className="absolute right-0">
+        <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+     </div>
+    </div>
+
+
       <div className="overflow-x-auto w-full mx-auto mt-4">
         {loading ? (
           <div className="flex justify-center items-center h-72">
@@ -189,6 +213,10 @@ const MemberManagement = () => {
           disableRowSelectionOnClick
           pageSizeOptions={[10, 25, 50, 100]} 
           disableColumnResize
+          onRowClick={(params) => {
+            console.log("이동할 URL:", `/admin/members/${params.row.id}`); 
+            navigate(`/admin/members/${params.row.id}`);
+          }}
         />
         
         )}

@@ -31,6 +31,7 @@ import AdminDashboard from "./components/adminPage/AdminDashboard";
 import MyPage from "./components/myPage/MyPage";
 import Homepage from "./components/home/Homepage";
 import OAuth2RedirectHandler from "./components/Auth/OAuth2RedirectHandler";
+import MemberManagementDetails from "./components/adminPage/MemberManagementDetails";
 
 import OrderPage from "./components/order/OrderPage";
 import Payment from "./components/order/Payment";
@@ -49,6 +50,7 @@ function App() {
     <ContextProvider>
       <Router>
         <Header />
+        
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/productcategory" element={<ProductCategory />} />
@@ -68,6 +70,10 @@ function App() {
           <Route path="/orderpage/payment" element={<Payment />} />
           <Route path="/orderpage/ordercomplete" element={<OrderComplete />} />
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/developer
           {/* 관리자 페이지 라우트 */}
           <Route
             path="/admin"
@@ -101,6 +107,14 @@ function App() {
               </AdminRoute>
             }
           />
+         <Route
+            path="/admin/members/:userId"
+            element={
+              <AdminRoute>
+                <MemberManagementDetails />
+              </AdminRoute>
+            }
+          />
           <Route
             path="/admin/support"
             element={
@@ -120,9 +134,9 @@ function App() {
 
           {/* OAuth2 리다이렉트  */}
           <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
-        </Routes>
+        </Routes>  
         <Footer />
-      </Router>
+      </Router> 
     </ContextProvider>
   );
 }
