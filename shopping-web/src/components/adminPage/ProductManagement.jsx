@@ -22,6 +22,7 @@ function ProductManagement() {
   const [stockThreshold, setStockThreshold] = useState(10);
   const backendURL = "http://localhost:8080"; // backendURL 추가
   const [expandedProductId, setExpandedProductId] = useState(null); // 드롭다운 상태 관리
+  const [showEditModal, setShowEditModal] = useState(false); // 수정 모달 표시 상태
 
   // Pagination 관련 state 추가
   const [currentPage, setCurrentPage] = useState(1);
@@ -112,6 +113,7 @@ function ProductManagement() {
       );
       fetchProducts();
       setEditingProduct(null);
+      setShowEditModal(false); // 수정 완료 후 모달 닫기
       alert("상품 수정 완료!");
     } catch (error) {
       console.error("Error updating product:", error);
@@ -137,6 +139,7 @@ function ProductManagement() {
 
   const handleEditProduct = (product) => {
     setEditingProduct(product);
+    setShowEditModal(true); // 수정 모달 열기
   };
 
   const handleStockThresholdChange = (e) => {
@@ -339,7 +342,8 @@ function ProductManagement() {
           </button>
         ))}
       </div>
-      {editingProduct && (
+      {/* 수정 모달 */}
+      {showEditModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-4 rounded">
             <h3 className="text-xl font-semibold mb-2">상품 수정</h3>
@@ -424,7 +428,7 @@ function ProductManagement() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setEditingProduct(null)}
+                  onClick={() => setShowEditModal(false)}
                   className="bg-gray-500 text-white px-4 py-2"
                 >
                   취소
