@@ -43,6 +43,7 @@ function App() {
     <ContextProvider>
       <Router>
         <Header />
+
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/productcategory" element={<ProductCategory />} />
@@ -61,6 +62,11 @@ function App() {
           <Route path="/orderpage" element={<OrderPage />} />
           <Route path="/orderpage/payment" element={<Payment />} />
           <Route path="/orderpage/ordercomplete" element={<OrderComplete />} />
+
+
+          {/* 관리자 페이지 라우트 */}
+
+
           <Route
             path="/admin"
             element={

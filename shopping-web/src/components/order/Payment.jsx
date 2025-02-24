@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const Payment = () => {
   const [cardNumber, setCardNumber] = useState("");
@@ -8,13 +8,38 @@ const Payment = () => {
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
   const [paymentSuccess, setPaymentSuccess] = useState(false);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [loading, setLoading] = useState(false);
+  const [searchParams] = useSearchParams();
+  const price = searchParams.get("price") || "0";
+  const navigate = useNavigate();
 
-  const price = searchParams.get("price");
+  useEffect(() => {
+    if (paymentSuccess) {
+      setLoading(true);
+      setTimeout(() => {
+        setLoading(false);
+        navigate("/orderpage/ordercomplete");
+      }, 2000);
+    }
+  }, [paymentSuccess, navigate]);
+
+  const formatCardNumber = (value) => {
+    return value
+      .replace(/\D/g, "") // Remove non-digit characters
+      .replace(/(.{4})/g, "$1 ") // Add space every 4 digits
+      .trim();
+  };
+
+  const formatExpiryDate = (value) => {
+    return value
+      .replace(/\D/g, "") // Remove non-digit characters
+      .replace(/^(\d{2})(\d{0,2})/, "$1/$2") // Insert / after two digits
+      .slice(0, 5); // Max length of 5 (MM/YY)
+  };
 
   const handlePayment = (e) => {
     e.preventDefault();
-    if (cardNumber && expiryDate && cvv && name && amount) {
+    if (cardNumber && expiryDate && cvv && name) {
       setPaymentSuccess(true);
     } else {
       alert("내용을 입력해주세요");
@@ -31,8 +56,9 @@ const Payment = () => {
             <input
               type="text"
               value={cardNumber}
-              onChange={(e) => setCardNumber(e.target.value)}
+              onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
               placeholder="1234 5678 9012 3456"
+              maxLength={19}
               className="w-full p-2 border rounded-md"
             />
           </div>
@@ -42,8 +68,11 @@ const Payment = () => {
               <input
                 type="text"
                 value={expiryDate}
-                onChange={(e) => setExpiryDate(e.target.value)}
+                onChange={(e) =>
+                  setExpiryDate(formatExpiryDate(e.target.value))
+                }
                 placeholder="MM/YY"
+                maxLength={5}
                 className="w-full p-2 border rounded-md"
               />
             </div>
@@ -54,6 +83,7 @@ const Payment = () => {
                 value={cvv}
                 onChange={(e) => setCvv(e.target.value)}
                 placeholder="123"
+                maxLength={3}
                 className="w-full p-2 border rounded-md"
               />
             </div>
@@ -72,23 +102,19 @@ const Payment = () => {
             <label className="block font-medium">Amount</label>
             <input
               type="text"
-              value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              placeholder={`${price}원`}
+              value={`${parseInt(price).toLocaleString()}원`}
               className="w-full p-2 border rounded-md"
+              readOnly
             />
           </div>
-          <Link
-            to="/ordercomplete"
-            className="w-full block p-3 mt-4 bg-red-600 text-white text-center font-bold rounded-md hover:bg-red-700 text-lg"
+          <button
+            type="submit"
+            className="w-full block p-3 mt-4 bg-gray-900 text-white text-center font-bold rounded-md hover:bg-gray-800 text-lg"
+            disabled={loading}
           >
-            결제
-          </Link>
-          {paymentSuccess && (
-            <p className="text-black-600 text-center mt-3 font-medium">
-              결제중..
-            </p>
-          )}
+            {loading ? "결제 진행 중..." : "결제"}
+          </button>
         </form>
       </div>
     </div>
