@@ -22,7 +22,7 @@ function ProductManagement() {
   const [stockThreshold, setStockThreshold] = useState(10);
   const backendURL = "http://localhost:8080"; // backendURL 추가
   const [expandedProductId, setExpandedProductId] = useState(null); // 드롭다운 상태 관리
-  const [showEditModal, setShowEditModal] = useState(false); // 수정 모달 표시 상태
+  const [showEditFormFor, setShowEditFormFor] = useState(null); // 수정 폼을 보여줄 상품 ID
 
   // Pagination 관련 state 추가
   const [currentPage, setCurrentPage] = useState(1);
@@ -112,8 +112,8 @@ function ProductManagement() {
         }
       );
       fetchProducts();
+      setShowEditFormFor(null); // 수정 폼 닫기
       setEditingProduct(null);
-      setShowEditModal(false); // 수정 완료 후 모달 닫기
       alert("상품 수정 완료!");
     } catch (error) {
       console.error("Error updating product:", error);
@@ -139,7 +139,7 @@ function ProductManagement() {
 
   const handleEditProduct = (product) => {
     setEditingProduct(product);
-    setShowEditModal(true); // 수정 모달 열기
+    setShowEditFormFor(product.productId); // 수정 폼을 보여줄 상품 ID 설정
   };
 
   const handleStockThresholdChange = (e) => {
@@ -319,6 +319,112 @@ function ProductManagement() {
                       </td>
                     </tr>
                   )}
+                  {/* 수정 폼 */}
+                  {showEditFormFor === product.productId && (
+                    <tr>
+                      <td colSpan="6" className="border p-2">
+                        <div className="bg-white p-4 rounded">
+                          <h3 className="text-xl font-semibold mb-2">
+                            상품 수정
+                          </h3>
+                          <form onSubmit={handleUpdateProduct}>
+                            <p>상품명</p>
+                            <input
+                              type="text"
+                              name="name"
+                              value={editingProduct.name || ""}
+                              onChange={(e) =>
+                                setEditingProduct({
+                                  ...editingProduct,
+                                  name: e.target.value,
+                                })
+                              }
+                              className="border p-2 mb-2 w-full"
+                              required
+                            />
+                            <p>가격</p>
+                            <input
+                              type="number"
+                              name="price"
+                              value={editingProduct.price || ""}
+                              onChange={(e) =>
+                                setEditingProduct({
+                                  ...editingProduct,
+                                  price: e.target.value,
+                                })
+                              }
+                              className="border p-2 mb-2 w-full"
+                              required
+                            />
+                            <p>카테고리</p>
+                            <select
+                              name="categoryId"
+                              value={editingProduct.category?.categoryId || ""}
+                              onChange={(e) =>
+                                setEditingProduct({
+                                  ...editingProduct,
+                                  category: { categoryId: e.target.value },
+                                })
+                              }
+                              className="border p-2 mb-2 w-full"
+                              required
+                            >
+                              {categories.map((category) => (
+                                <option
+                                  key={category.categoryId}
+                                  value={category.categoryId}
+                                >
+                                  {category.name}
+                                </option>
+                              ))}
+                            </select>
+                            <p>재고</p>
+                            <input
+                              type="number"
+                              name="stock"
+                              value={editingProduct.stock || ""}
+                              onChange={(e) =>
+                                setEditingProduct({
+                                  ...editingProduct,
+                                  stock: e.target.value,
+                                })
+                              }
+                              className="border p-2 mb-2 w-full"
+                              required
+                            />
+                            <p>상품 설명</p>
+                            <textarea
+                              name="description"
+                              value={editingProduct.description || ""}
+                              onChange={(e) =>
+                                setEditingProduct({
+                                  ...editingProduct,
+                                  description: e.target.value,
+                                })
+                              }
+                              className="border p-2 mb-2 w-full"
+                              required
+                            ></textarea>
+                            <div className="flex justify-end">
+                              <button
+                                type="submit"
+                                className="bg-blue-500 text-white px-4 py-2 mr-2"
+                              >
+                                수정
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setShowEditFormFor(null)}
+                                className="bg-gray-500 text-white px-4 py-2"
+                              >
+                                취소
+                              </button>
+                            </div>
+                          </form>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
                 </React.Fragment>
               ))}
           </tbody>
@@ -342,102 +448,6 @@ function ProductManagement() {
           </button>
         ))}
       </div>
-      {/* 수정 모달 */}
-      {showEditModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-4 rounded">
-            <h3 className="text-xl font-semibold mb-2">상품 수정</h3>
-            <form onSubmit={handleUpdateProduct}>
-              <p>상품명</p>
-              <input
-                type="text"
-                name="name"
-                value={editingProduct.name}
-                onChange={(e) =>
-                  setEditingProduct({ ...editingProduct, name: e.target.value })
-                }
-                className="border p-2 mb-2 w-full"
-                required
-              />
-              <p>가격</p>
-              <input
-                type="number"
-                name="price"
-                value={editingProduct.price}
-                onChange={(e) =>
-                  setEditingProduct({
-                    ...editingProduct,
-                    price: e.target.value,
-                  })
-                }
-                className="border p-2 mb-2 w-full"
-                required
-              />
-              <p>카테고리</p>
-              <select
-                name="categoryId"
-                value={editingProduct.category.categoryId}
-                onChange={(e) =>
-                  setEditingProduct({
-                    ...editingProduct,
-                    category: { categoryId: e.target.value },
-                  })
-                }
-                className="border p-2 mb-2 w-full"
-                required
-              >
-                {categories.map((category) => (
-                  <option key={category.categoryId} value={category.categoryId}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-              <p>재고</p>
-              <input
-                type="number"
-                name="stock"
-                value={editingProduct.stock}
-                onChange={(e) =>
-                  setEditingProduct({
-                    ...editingProduct,
-                    stock: e.target.value,
-                  })
-                }
-                className="border p-2 mb-2 w-full"
-                required
-              />
-              <p>상품 설명</p>
-              <textarea
-                name="description"
-                value={editingProduct.description}
-                onChange={(e) =>
-                  setEditingProduct({
-                    ...editingProduct,
-                    description: e.target.value,
-                  })
-                }
-                className="border p-2 mb-2 w-full"
-                required
-              ></textarea>
-              <div className="flex justify-end">
-                <button
-                  type="submit"
-                  className="bg-blue-500 text-white px-4 py-2 mr-2"
-                >
-                  수정
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowEditModal(false)}
-                  className="bg-gray-500 text-white px-4 py-2"
-                >
-                  취소
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
