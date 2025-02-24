@@ -97,6 +97,18 @@ function ProductManagement() {
     e.preventDefault();
     try {
       const token = localStorage.getItem("JWT_TOKEN");
+
+      // API 호출 전에 editingProduct 상태를 업데이트
+      setEditingProduct((prevEditingProduct) => {
+        const updatedProduct = {
+          ...prevEditingProduct,
+          price: Number(prevEditingProduct.price),
+          stock: Number(prevEditingProduct.stock),
+        };
+        console.log("수정된 상품 정보:", updatedProduct); // 로깅
+        return updatedProduct;
+      });
+
       await api.put(
         `/products/${editingProduct.productId}`,
         {
@@ -336,12 +348,13 @@ function ProductManagement() {
                               type="text"
                               name="name"
                               value={editingProduct.name || ""}
-                              onChange={(e) =>
+                              onChange={(e) => {
+                                console.log("상품명 변경:", e.target.value); // 로깅
                                 setEditingProduct({
                                   ...editingProduct,
                                   name: e.target.value,
-                                })
-                              }
+                                });
+                              }}
                               className="border p-2 mb-2 w-full"
                               required
                             />
@@ -350,12 +363,13 @@ function ProductManagement() {
                               type="number"
                               name="price"
                               value={editingProduct.price || ""}
-                              onChange={(e) =>
+                              onChange={(e) => {
+                                console.log("가격 변경:", e.target.value); // 로깅
                                 setEditingProduct({
                                   ...editingProduct,
                                   price: e.target.value,
-                                })
-                              }
+                                });
+                              }}
                               className="border p-2 mb-2 w-full"
                               required
                             />
@@ -363,12 +377,13 @@ function ProductManagement() {
                             <select
                               name="categoryId"
                               value={editingProduct.category?.categoryId || ""}
-                              onChange={(e) =>
+                              onChange={(e) => {
+                                console.log("카테고리 변경:", e.target.value); // 로깅
                                 setEditingProduct({
                                   ...editingProduct,
                                   category: { categoryId: e.target.value },
-                                })
-                              }
+                                });
+                              }}
                               className="border p-2 mb-2 w-full"
                               required
                             >
@@ -386,12 +401,13 @@ function ProductManagement() {
                               type="number"
                               name="stock"
                               value={editingProduct.stock || ""}
-                              onChange={(e) =>
+                              onChange={(e) => {
+                                console.log("재고 변경:", e.target.value); // 로깅
                                 setEditingProduct({
                                   ...editingProduct,
                                   stock: e.target.value,
-                                })
-                              }
+                                });
+                              }}
                               className="border p-2 mb-2 w-full"
                               required
                             />
@@ -399,12 +415,13 @@ function ProductManagement() {
                             <textarea
                               name="description"
                               value={editingProduct.description || ""}
-                              onChange={(e) =>
+                              onChange={(e) => {
+                                console.log("상품 설명 변경:", e.target.value); // 로깅
                                 setEditingProduct({
                                   ...editingProduct,
                                   description: e.target.value,
-                                })
-                              }
+                                });
+                              }}
                               className="border p-2 mb-2 w-full"
                               required
                             ></textarea>
