@@ -298,7 +298,10 @@ function ProductManagement() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation(); // 이벤트 버블링 방지
-                          handleDeleteProduct(product.productId);
+                          // 삭제 확인 메시지 표시
+                          if (window.confirm("정말로 삭제하시겠습니까?")) {
+                            handleDeleteProduct(product.productId);
+                          }
                         }}
                         className="bg-red-500 text-white px-2 py-1"
                       >
