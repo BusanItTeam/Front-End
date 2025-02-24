@@ -1,37 +1,80 @@
 import { useEffect, useState } from "react";
 import { useMyContext } from "../../store/ContextApi";
+import Api from "../../services/Api";
 
-const OrderPaymentPage = () => {
+const OrderPage = () => {
   const { cartItems, currentUser, setCurrentUser } = useMyContext();
   console.log("커런트", currentUser);
-  // console.log(currentUser.points);
   const SHIPPING_COST = 3000;
+
   const [sameAsOrderer, setSameAsOrderer] = useState(false);
   const [selectedValue, setSelectedValue] = useState("적립금");
   const [selectedMethod, setSelectedMethod] = useState("credit");
   const [point, setPoint] = useState(0);
   const [deliveryMessage, setDeliveryMessage] = useState("");
 
-  //백엔드에서 사용자 정보 가져오기
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    phoneNumber: "",
+    postcode: "N/A",
+    address: "N/A",
+    detailAddress: "N/A",
+    extraAddress: "N/A",
+  });
+
+  useEffect(() => {
+    if (currentUser) {
+      setFormData({
+        username: currentUser.username || "",
+        email: currentUser.email || "",
+        phoneNumber: currentUser.phoneNumber || "",
+        postcode: currentUser.addresses?.[0]?.postcode || "N/A",
+        address: currentUser.addresses?.[0]?.address || "N/A",
+        detailAddress: currentUser.addresses?.[0]?.detailAddress || "N/A",
+        extraAddress: currentUser.addresses?.[0]?.extraAddress || "N/A",
+      });
+    }
+  }, [currentUser]); // `currentUser`가 변경될 때마다 `formData` 업데이트
+
+  const [formData2, setFormData2] = useState({
+    username: "",
+    email: "",
+    phoneNumber: "",
+    postcode: "",
+    address: "",
+    detailAddress: "",
+    extraAddress: "",
+  });
+
+  // ✅ 백엔드에서 사용자 정보 가져오기
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch("/api/auths/userdata");
-        console.log("리스판스", response);
-        if (!response.ok) throw new Error("User data fetch failed");
-
-        const data = await response.json();
+        const response = await Api.get("/auths/user");
+        console.log(response.data);
+        const data = response.data;
+        //const data = await response.json();
         setCurrentUser(data); // Context API에 저장
+
         setPoint(data.points || 0); // 포인트 설정
-        setFormData({
+
+        // ✅ UserInfoResponse에서 첫 번째 주소 정보 가져오기
+        const userAddress = currentUser?.addresses?.[0] || {};
+
+        // ✅ formData 상태 업데이트
+        const updatedFormData = {
           username: data.username || "",
           email: data.email || "",
           phoneNumber: data.phoneNumber || "",
-          postcode: data.postcode || "",
-          address: data.address || "",
-          detailAddress: data.detailAddress || "",
-          extraAddress: data.extraAddress || "",
-        });
+          postcode: userAddress.postcode || "",
+          address: userAddress.address || "",
+          detailAddress: userAddress.detailAddress || "",
+          extraAddress: userAddress.extraAddress || "",
+        };
+
+        setFormData(updatedFormData);
+        // setFormData2(updatedFormData); // 배송지 정보도 초기화
       } catch (error) {
         console.error("Failed to fetch user data:", error);
       }
@@ -39,71 +82,52 @@ const OrderPaymentPage = () => {
 
     fetchUser();
   }, []);
-  //포인트 적립
-  useEffect(() => {
-    if (currentUser?.points) {
-      setPoint(currentUser.points);
-    }
-  }, [currentUser]);
 
-  //포인트 전액사용 함수
+  // ✅ 주문자 정보와 배송지 정보 동기화
+  useEffect(() => {
+    if (sameAsOrderer) {
+      setFormData2({ ...formData });
+    }
+  }, [sameAsOrderer, formData]);
+
+  // ✅ 포인트 전액 사용 함수
   const handleFullUse = () => {
     setPoint(currentUser?.points || 0);
   };
 
-  //결제 메소드
-  const paymentMethods = [
-    { id: "bank", name: "무통장입금" },
-    { id: "credit", name: "신용카드" },
-    { id: "transfer", name: "실시간계좌 이체" },
-    { id: "mobile", name: "휴대폰 결제" },
-    { id: "samsung", name: "삼성PAY" },
-    { id: "payco", name: "PAYCO" },
-    { id: "kakaopay", name: "카카오PAY" },
-    { id: "smilepay", name: "스마일PAY" },
-  ];
-  // dkfjl
-
-  //전액이 보유 포인트를 넘지 않도록
-  const handlePointChange = (e) => {
-    const value = Number(e.target.value);
-    if (value > (currentUser?.points || 0)) {
-      setPoint(currentUser?.points || 0);
-    } else if (value < 0) {
+  // ✅ 포인트 입력 값 제한 함수 (onChange 이벤트 적용)
+  const handlePointChange = (event) => {
+    const value = Number(event.target.value);
+    if (value < 0) {
       setPoint(0);
-    } else {
-      setPoint(value);
     }
   };
 
-  //주문자 정보
-  const [formData, setFormData] = useState({
-    username: currentUser?.username || "",
-    email: currentUser?.email || "",
-    phoneNumber: currentUser?.phoneNumber || "",
-    postcode: currentUser?.postcode || "",
-    address: currentUser?.address || "",
-    detailAddress: currentUser?.detailAddress || "",
-    extraAddress: currentUser?.extraAddress || "",
-  });
+  // ✅ 주문자 정보 변경 핸들러
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
-  // // 주문자 정보 상태
-  // const [formData, setFormData] = useState({
-  //   username: "",
-  //   email: "",
-  //   phoneNumber: "",
-  //   postcode: "",
-  //   address: "",
-  //   detailAddress: "",
-  //   extraAddress: "",
-  // });
+  // ✅ 배송지 정보 변경 핸들러
+  const handleChange2 = (e) => {
+    const { name, value } = e.target;
+    setFormData2((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
-  //배송지 정보
-  const [formData2, setFormData2] = useState({ ...formData });
+  // ✅ "주문자 정보와 동일" 체크박스 핸들러
+  const handleSameOrderer = (event) => {
+    const checked = event.target.checked;
+    setSameAsOrderer(checked);
 
-  useEffect(() => {
-    if (sameAsOrderer) {
-      setFormData2({ ...formData });
+    if (checked) {
+      setFormData2({ ...formData }); // ✅ Immediately copy orderer info
     } else {
       setFormData2({
         username: "",
@@ -115,37 +139,35 @@ const OrderPaymentPage = () => {
         extraAddress: "",
       });
     }
-  }, [sameAsOrderer, formData]);
+  };
+  // ✅ 결제 방법 리스트
+  const paymentMethods = [
+    { id: "bank", name: "무통장입금" },
+    { id: "credit", name: "신용카드" },
+    { id: "transfer", name: "실시간계좌 이체" },
+    { id: "mobile", name: "휴대폰 결제" },
+    { id: "samsung", name: "삼성PAY" },
+    { id: "payco", name: "PAYCO" },
+    { id: "kakaopay", name: "카카오PAY" },
+    { id: "smilepay", name: "스마일PAY" },
+  ];
 
-  //주문자 정보 저장
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  // ✅ 전체 상품 가격 계산
+  const getTotalPrice = () => {
+    return (
+      cartItems?.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0
+      ) || 0
+    );
   };
 
-  //배송지 정보 저장
-  const handleChange2 = (e) => {
-    const { name, value } = e.target;
-    setFormData2({ ...formData2, [name]: value });
-  };
-
-  // 체크박스 핸들러: 주문자 정보와 동일하게 설정
-  const handleSameOrderer = (event) => {
-    setSameAsOrderer(event.target.checked);
-    if (event.target.checked) {
-      setFormData2({ ...formData }); // 주문자 정보 복사
-    } else {
-      setFormData2({
-        username: "",
-        email: "",
-        phoneNumber: "",
-        postcode: "",
-        address: "",
-        detailAddress: "",
-        extraAddress: "",
-      }); // 체크 해제 시 초기화
+  //포인트 적립
+  useEffect(() => {
+    if (currentUser?.points) {
+      setPoint(currentUser.points);
     }
-  };
+  }, [currentUser]);
 
   //우편번호 검색
   useEffect(() => {
@@ -156,6 +178,8 @@ const OrderPaymentPage = () => {
     document.body.appendChild(script);
   }, []);
 
+  //주소 검색 기능
+
   const handleAddressSearch = () => {
     if (!window.daum) {
       alert("주소 검색 기능을 불러오는 중입니다. 잠시 후 다시 시도해주세요.");
@@ -163,8 +187,9 @@ const OrderPaymentPage = () => {
     }
 
     new window.daum.Postcode({
-      oncomplete: function (data) {
+      oncomplete: async function (data) {
         let addr = data.roadAddress || data.jibunAddress;
+        let detailAddr = "";
         let extraAddr = "";
 
         if (data.userSelectedType === "R") {
@@ -180,28 +205,64 @@ const OrderPaymentPage = () => {
           }
         }
 
-        setFormData2((prevState) => ({
-          ...prevState,
+        const newAddress = {
           postcode: data.zonecode,
           address: addr,
           extraAddress: extraAddr,
-          detailAddress: "",
-        }));
+          detailAddress: detailAddr,
+        };
+
+        console.log("새로운 주소 추가됨:", newAddress);
+
+        try {
+          if (!currentUser?.id) {
+            alert("사용자 정보가 없습니다. 다시 로그인해 주세요.");
+            return;
+          }
+
+          const response = await Api.put(
+            `/auths/updateaddress/${currentUser.id}`,
+            {
+              address: [...(currentUser?.addresses || []), newAddress],
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${currentUser?.token}`, // 토큰 포함
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (response.status === 200) {
+            alert("주소가 성공적으로 추가되었습니다.");
+
+            // 현재 사용자 정보 업데이트
+            setCurrentUser((prev) => ({
+              ...prev,
+              addresses: [...(prev.addresses || []), newAddress],
+            }));
+
+            // 폼 데이터 업데이트
+            setFormData2((prevState) => ({
+              ...prevState,
+              postcode: newAddress.postcode || "",
+              address: newAddress.address || "",
+              detailAddress: newAddress.detailAddress || "",
+              extraAddress: newAddress.extraAddress || "",
+            }));
+          } else {
+            alert("주소 추가에 실패했습니다.");
+          }
+        } catch (error) {
+          console.error("주소 추가 오류:", error);
+          alert("주소 추가 중 오류가 발생했습니다.");
+        }
       },
     }).open();
   };
-
+  //환불방법
   const handleChange3 = (event) => {
     setSelectedValue(event.target.value);
-  };
-
-  const getTotalPrice = () => {
-    return (
-      cartItems?.reduce(
-        (total, item) => total + item.price * item.quantity,
-        0
-      ) || 0
-    );
   };
 
   return (
@@ -285,7 +346,7 @@ const OrderPaymentPage = () => {
                   type="text"
                   name="postcode"
                   placeholder=""
-                  value={currentUser?.postcode}
+                  value={formData.postcode}
                   onChange={handleChange}
                   required
                   className="w- p-1 border rounded border-gray-200 text-xs"
@@ -303,7 +364,7 @@ const OrderPaymentPage = () => {
                   type="text"
                   name="address"
                   placeholder="기본주소"
-                  value={currentUser?.address}
+                  value={formData.address}
                   onChange={handleChange}
                   required
                   className="w-full p-1 border rounded border-gray-200 text-xs"
@@ -312,7 +373,7 @@ const OrderPaymentPage = () => {
                   type="text"
                   name="detailAddress"
                   placeholder="상세주소"
-                  value={currentUser?.detailAddress}
+                  value={formData.detailAddress}
                   onChange={handleChange}
                   className="w-full p-1 border rounded border-gray-200 text-xs"
                 />
@@ -321,7 +382,7 @@ const OrderPaymentPage = () => {
                     type="text"
                     name="extraAddress"
                     placeholder="추가주소"
-                    value={currentUser?.extraAddress}
+                    value={formData.extraAddress}
                     onChange={handleChange}
                     className="w-full p-1 border rounded border-gray-200 text-xs"
                   />
@@ -489,10 +550,10 @@ const OrderPaymentPage = () => {
             <span>전액 사용</span>
           </button>
         </div>
-        <div className="flex border rounded p-2 items-center">
+        <div className="flex border rounded p-2 items-centesr">
           <input
             type="number"
-            value={point}
+            value={currentUser?.points || 0}
             onChange={handlePointChange}
             className="flex-grow outline-none"
             placeholder="0"
@@ -500,7 +561,7 @@ const OrderPaymentPage = () => {
           <span className="text-gray-500">원</span>
         </div>
         <p className="text-gray-500 text-sm mt-1">
-          보유 잔액 {currentUser?.points?.toLocaleString()}원
+          보유 잔액 {currentUser?.points?.toLocaleString() || 0}원
         </p>
         <div className="mt-4 p-2 bg-gray-100 rounded">
           <p className="text-gray-700 text-sm">
@@ -669,4 +730,4 @@ const OrderPaymentPage = () => {
   );
 };
 
-export default OrderPaymentPage;
+export default OrderPage;

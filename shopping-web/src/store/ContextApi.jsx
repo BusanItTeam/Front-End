@@ -77,6 +77,8 @@ export const ContextProvider = ({ children }) => {
       try {
         //서버에 유저정보를 요청
         const { data } = await api.get(`/auths/user`);
+        console.log("서버에서 가져온 유저 데이터:", data);
+
         const roles = data.roles;
         console.log(data);
 
@@ -87,7 +89,11 @@ export const ContextProvider = ({ children }) => {
           localStorage.removeItem("IS_ADMIN");
           setIsAdmin(false); // 상태 업데이트
         }
-        setCurrentUser(data);
+
+        setCurrentUser({
+          ...data,
+          name: data.name, // 이 부분에서 name이 정확히 설정되었는지 확인
+        });
       } catch (error) {
         console.error("Error fetching current user", error);
         toast.error("Error fetching current user");
