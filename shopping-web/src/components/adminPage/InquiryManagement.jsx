@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import api from "../../services/api"; // API 호출을 위한 axios 인스턴스
+import api from "../../services/Api"; // API 호출을 위한 axios 인스턴스
 
 function InquiryManagement() {
   const [inquiries, setInquiries] = useState([]); // 문의 리스트 상태
@@ -89,21 +89,45 @@ function InquiryManagement() {
           ) : (
             currentInquiries.map((inquiry, index) => (
               <React.Fragment key={inquiry.inquiryId}>
-                <tr onClick={() => toggleExpand(inquiry.inquiryId)} className="cursor-pointer hover:bg-gray-100">
+                <tr
+                  onClick={() => toggleExpand(inquiry.inquiryId)}
+                  className="cursor-pointer hover:bg-gray-100"
+                >
                   <td className="py-2">{startIndex + index + 1}</td>
-                  <td className="py-2">{inquiry.user ? inquiry.user.name : "알 수 없음"}</td>
+                  <td className="py-2">
+                    {inquiry.user ? inquiry.user.name : "알 수 없음"}
+                  </td>
                   <td className="py-2">{inquiry.type}</td>
                   <td className="py-2">{inquiry.title}</td>
-                  <td className="py-2">{new Date(inquiry.createdAt).toLocaleDateString()}</td>
-                  <td className="py-2">{inquiry.answer ? <span className="text-green-500">답변 완료</span> : <span className="text-red-500">답변 대기 중</span>}</td>
+                  <td className="py-2">
+                    {new Date(inquiry.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="py-2">
+                    {inquiry.answer ? (
+                      <span className="text-green-500">답변 완료</span>
+                    ) : (
+                      <span className="text-red-500">답변 대기 중</span>
+                    )}
+                  </td>
                 </tr>
                 {expandedId === inquiry.inquiryId && (
                   <tr>
                     <td colSpan="7" className="p-4 bg-gray-50 text-left">
                       <strong>문의 내용:</strong>
                       <p className="mt-2 text-gray-700">{inquiry.content}</p>
-                      <textarea className="w-full border p-2 mt-2 text-sm" rows="3" placeholder="답변을 입력하세요" value={answers[inquiry.inquiryId] || ""} onChange={(e) => handleAnswerChange(inquiry.inquiryId, e.target.value)} />
-                      <button className="bg-green-500 text-white px-4 py-1 mt-2 rounded" onClick={() => submitAnswer(inquiry.inquiryId)}>
+                      <textarea
+                        className="w-full border p-2 mt-2 text-sm"
+                        rows="3"
+                        placeholder="답변을 입력하세요"
+                        value={answers[inquiry.inquiryId] || ""}
+                        onChange={(e) =>
+                          handleAnswerChange(inquiry.inquiryId, e.target.value)
+                        }
+                      />
+                      <button
+                        className="bg-green-500 text-white px-4 py-1 mt-2 rounded"
+                        onClick={() => submitAnswer(inquiry.inquiryId)}
+                      >
                         답변 등록
                       </button>
                     </td>
@@ -116,7 +140,15 @@ function InquiryManagement() {
       </table>
       <div className="flex justify-center mt-4">
         {Array.from({ length: totalPages }, (_, index) => (
-          <button key={index} className={`mx-1 px-3 py-1 rounded ${currentPage === index + 1 ? "bg-pink-500 text-white" : "bg-gray-200"}`} onClick={() => handlePageChange(index + 1)}>
+          <button
+            key={index}
+            className={`mx-1 px-3 py-1 rounded ${
+              currentPage === index + 1
+                ? "bg-pink-500 text-white"
+                : "bg-gray-200"
+            }`}
+            onClick={() => handlePageChange(index + 1)}
+          >
             {index + 1}
           </button>
         ))}
