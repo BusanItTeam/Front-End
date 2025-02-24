@@ -41,7 +41,7 @@ const Dresses = () => {
               />
               <div className="p-4">
                 <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
-                <p className="text-gray-700 font-bold">${product.price}</p>
+                <p className="text-gray-700 font-bold">{product.price}원</p>
               </div>
             </div>
           ))}

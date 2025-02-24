@@ -21,6 +21,7 @@ function ProductManagement() {
   const [editingProduct, setEditingProduct] = useState(null);
   const [stockThreshold, setStockThreshold] = useState(10);
   const backendURL = "http://localhost:8080"; // backendURL 추가
+  const [expandedProductId, setExpandedProductId] = useState(null); // 드롭다운 상태 관리
 
   // Pagination 관련 state 추가
   const [currentPage, setCurrentPage] = useState(1);
@@ -153,6 +154,11 @@ function ProductManagement() {
     indexOfLastProduct
   );
 
+  // 상품 드롭다운 핸들러
+  const handleProductClick = (productId) => {
+    setExpandedProductId((prevId) => (prevId === productId ? null : productId));
+  };
+
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">상품 관리</h2>
@@ -251,45 +257,66 @@ function ProductManagement() {
           <tbody>
             {currentProducts &&
               currentProducts.map((product) => (
-                <tr
-                  key={product.productId}
-                  className={
-                    product.stock <= stockThreshold ? "bg-red-100" : ""
-                  }
-                >
-                  <td className="border p-2">
-                    <img
-                      src={`${backendURL}${product.imageUrl}`}
-                      alt={product.name}
-                      className="w-16 h-16 object-cover"
-                    />
-                  </td>
-                  <td className="border p-2">{product.name}</td>
-                  <td className="border p-2">{product.price}</td>
-                  <td className="border p-2">
-                    {
-                      categories.find(
-                        (category) =>
-                          category.categoryId === product.category.categoryId
-                      )?.name
-                    }
-                  </td>
-                  <td className="border p-2">{product.stock}</td>
-                  <td className="border p-2">
-                    <button
-                      onClick={() => handleEditProduct(product)}
-                      className="bg-yellow-500 text-white px-2 py-1 mr-2"
-                    >
-                      수정
-                    </button>
-                    <button
-                      onClick={() => handleDeleteProduct(product.productId)}
-                      className="bg-red-500 text-white px-2 py-1"
-                    >
-                      삭제
-                    </button>
-                  </td>
-                </tr>
+                <React.Fragment key={product.productId}>
+                  <tr
+                    onClick={() => handleProductClick(product.productId)}
+                    className={`cursor-pointer ${
+                      product.stock <= stockThreshold ? "bg-red-100" : ""
+                    }`}
+                  >
+                    <td className="border p-2">
+                      <img
+                        src={`${backendURL}${product.imageUrl}`}
+                        alt={product.name}
+                        className="w-16 h-16 object-cover"
+                      />
+                    </td>
+                    <td className="border p-2">{product.name}</td>
+                    <td className="border p-2">{product.price}</td>
+                    <td className="border p-2">
+                      {
+                        categories.find(
+                          (category) =>
+                            category.categoryId === product.category.categoryId
+                        )?.name
+                      }
+                    </td>
+                    <td className="border p-2">{product.stock}</td>
+                    <td className="border p-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation(); // 이벤트 버블링 방지
+                          handleEditProduct(product);
+                        }}
+                        className="bg-yellow-500 text-white px-2 py-1 mr-2"
+                      >
+                        수정
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation(); // 이벤트 버블링 방지
+                          handleDeleteProduct(product.productId);
+                        }}
+                        className="bg-red-500 text-white px-2 py-1"
+                      >
+                        삭제
+                      </button>
+                    </td>
+                  </tr>
+                  {/* 드롭다운 형태의 상세 정보 */}
+                  {expandedProductId === product.productId && (
+                    <tr>
+                      <td colSpan="6" className="border p-2">
+                        <div className="flex flex-col">
+                          <p>
+                            <b>설명:</b> {product.description}
+                          </p>
+                          {/* 다른 상세 정보들을 추가할 수 있습니다. */}
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               ))}
           </tbody>
         </table>
