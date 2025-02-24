@@ -4,12 +4,8 @@ import api from "../../services/Api";
 
 function ProductManagement() {
   const { products, setProducts, fetchProducts } = useMyContext();
-  const [categories, setCategories] = useState([
-    { categoryId: "1", name: "바지" },
-    { categoryId: "2", name: "상의" },
-    { categoryId: "3", name: "아우터" },
-    { categoryId: "4", name: "원피스" },
-  ]);
+  const [categories, setCategories] = useState([]);
+  const [newCategory, setNewCategory] = useState("");
   const [newProduct, setNewProduct] = useState({
     name: "",
     price: "",
@@ -23,7 +19,7 @@ function ProductManagement() {
   const backendURL = "http://localhost:8080";
   const [expandedProductId, setExpandedProductId] = useState(null);
   const [showEditFormFor, setShowEditFormFor] = useState(null);
-  const [newImage, setNewImage] = useState(null); // New image state
+  const [newImage, setNewImage] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 10;
@@ -31,6 +27,19 @@ function ProductManagement() {
   useEffect(() => {
     console.log("Products data:", products);
   }, [products]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await api.get("/categories");
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -121,7 +130,7 @@ function ProductManagement() {
       fetchProducts();
       setShowEditFormFor(null);
       setEditingProduct(null);
-      setNewImage(null); // Clear the new image
+      setNewImage(null);
       alert("상품 수정 완료!");
     } catch (error) {
       console.error("Error updating product:", error);
@@ -173,9 +182,84 @@ function ProductManagement() {
     setNewImage(e.target.files[0]);
   };
 
+  const handleAddCategory = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("JWT_TOKEN");
+      const response = await api.post(
+        "/categories",
+        { name: newCategory },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      setCategories([...categories, response.data]);
+      fetchProducts();
+      setNewCategory("");
+    } catch (error) {
+      console.error("Error adding category:", error);
+    }
+  };
+
+  const handleDeleteCategory = async (id) => {
+    if (window.confirm("정말로 이 카테고리를 삭제하시겠습니까?")) {
+      try {
+        const token = localStorage.getItem("JWT_TOKEN");
+        await api.delete(`/categories/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setCategories(
+          categories.filter((category) => category.categoryId !== id)
+        );
+        fetchProducts();
+      } catch (error) {
+        console.error("Error deleting category:", error);
+      }
+    }
+  };
+
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">상품 관리</h2>
+      {/* 카테고리 관리 섹션 */}
+      <div className="mb-8">
+        <h3 className="text-xl font-semibold mb-2">카테고리 관리</h3>
+        <form onSubmit={handleAddCategory} className="mb-4">
+          <input
+            type="text"
+            value={newCategory}
+            onChange={(e) => setNewCategory(e.target.value)}
+            placeholder="새 카테고리 이름"
+            className="border p-2 mr-2"
+            required
+          />
+          <button type="submit" className="bg-blue-500 text-white px-4 py-2">
+            카테고리 추가
+          </button>
+        </form>
+        <ul>
+          {categories.map((category) => (
+            <li
+              key={category.categoryId}
+              className="flex justify-between items-center mb-2"
+            >
+              {category.name}
+              <button
+                onClick={() => handleDeleteCategory(category.categoryId)}
+                className="bg-red-500 text-white px-2 py-1 text-sm"
+              >
+                삭제
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+      {/* 상품 등록 폼 */}
       <form onSubmit={handleAddProduct} className="mb-8">
         <h3 className="text-xl font-semibold mb-2">상품 등록</h3>
         <div className="grid grid-cols-2 gap-4">
