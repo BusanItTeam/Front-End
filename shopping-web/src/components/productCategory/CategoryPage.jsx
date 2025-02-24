@@ -1,32 +1,57 @@
-import React, { useState } from "react";
-import OuterSidebar from "../siderbar/OuterSidebar";
+// CategoryPage.js
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { useMyContext } from "../../store/ContextApi";
+import DressesSidebar from "../../components/siderbar/DressesSidebar";
+import OuterSidebar from "../../components/siderbar/OuterSidebar";
+import Sidebar from "../../components/siderbar/Sidebar";
+import TopsSidebar from "../../components/siderbar/TopsSidebar";
 
-const Outerwere = () => {
+const CategoryPage = () => {
   const { products } = useMyContext();
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 8;
   const backendURL = "http://localhost:8080"; // backendURL 추가
+  const { categoryName } = useParams(); // Get categoryName from URL
 
-  // 아우터 카테고리(ID: 3)에 맞는 상품만 필터링
-  const outerwearProducts = products.filter(
-    (product) => product.category?.categoryId === 3
+  // categoryName과 일치하는 상품만 필터링
+  const filteredProducts = products.filter(
+    (product) => product.category?.name?.toLowerCase() === categoryName
   );
 
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = outerwearProducts.slice(
+  const currentProducts = filteredProducts.slice(
     indexOfFirstProduct,
     indexOfLastProduct
   );
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  useEffect(() => {
+    // 페이지 변경 시 상품 목록 재계산
+  }, [currentPage, products, categoryName]);
+
+  const renderSidebar = () => {
+    switch (categoryName) {
+      case "pants":
+        return <Sidebar />;
+      case "tops":
+        return <TopsSidebar />;
+      case "outerwear":
+        return <OuterSidebar />;
+      case "dresses":
+        return <DressesSidebar />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="flex">
-      <OuterSidebar />
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <h2 className="text-3xl font-bold mb-6">아우터</h2>
+      {renderSidebar()}
+      <div className="flex-1 max-w-6xl mx-auto px-4 py-8">
+        <h2 className="text-3xl font-bold mb-6">{categoryName}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {currentProducts.map((product) => (
             <div
@@ -41,14 +66,14 @@ const Outerwere = () => {
               />
               <div className="p-4">
                 <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
-                <p className="text-gray-700 font-bold">${product.price}</p>
+                <p className="text-gray-700 font-bold">{product.price}원</p>
               </div>
             </div>
           ))}
         </div>
         <div className="flex justify-center mt-8">
           {Array.from(
-            { length: Math.ceil(outerwearProducts.length / productsPerPage) },
+            { length: Math.ceil(filteredProducts.length / productsPerPage) },
             (_, i) => (
               <button
                 key={i}
@@ -69,4 +94,4 @@ const Outerwere = () => {
   );
 };
 
-export default Outerwere;
+export default CategoryPage;
