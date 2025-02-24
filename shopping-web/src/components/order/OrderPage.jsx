@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMyContext } from "../../store/ContextApi";
 import Api from "../../services/Api";
+import { Link } from "react-router-dom";
 
 const OrderPage = () => {
   const { cartItems, currentUser, setCurrentUser } = useMyContext();
@@ -82,6 +83,28 @@ const OrderPage = () => {
 
     fetchUser();
   }, []);
+
+  // ✅ 결제하기 버튼 클릭 시 주문저장
+  const handleOrderSubmit = async () => {
+    if (!currentUser?.id || cartItems.length === 0) {
+      alert("유효한 사용자 또는 장바구니 상품이 없습니다.");
+      return;
+    }
+
+    const orderData = {
+      userId: currentUser.id,
+      totalPrice: getTotalPrice() + SHIPPING_COST - point,
+      status: "배송준비중",
+    };
+
+    try {
+      const response = await Api.post("/orders/create", orderData);
+      console.log("Order Created:", response.data);
+    } catch (error) {
+      console.error("주문 생성 실패:", error);
+      alert("주문을 생성하는 중 오류가 발생했습니다.");
+    }
+  };
 
   // ✅ 주문자 정보와 배송지 정보 동기화
   useEffect(() => {
@@ -694,23 +717,23 @@ const OrderPage = () => {
           </div>
         </div>
         <div className="mt-6 flex space-x-2">
-          {/* <div className="mt-4 text-center">
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-500 text-white rounded"
-          >
-            Submit
-          </button>
-        </div> */}
-          <button
-            type="submit"
-            className="w-1/2 bg-gray-900 text-white py-3 rounded-lg font-medium hover:bg-gray-800"
+          {/* 버튼클릭시 order 데이터베이스 */}
+          <Link
+            to={`/orderpage/payment?price=${
+              getTotalPrice() + SHIPPING_COST - point
+            }`}
+            onClick={handleOrderSubmit}
+            className="w-1/2 bg-gray-900 text-white py-3 rounded-lg font-medium hover:bg-gray-800 text-center"
           >
             결제하기
-          </button>
-          <button className="w-1/2  text-gray-800 py-3 rounded-lg font-medium hover:bg-gray-900 border-1">
+          </Link>
+
+          <Link
+            to="/cart"
+            className="w-1/2  text-gray-800 py-3 rounded-lg font-medium hover:bg-gray-900 border-1 text-center"
+          >
             취소하기
-          </button>
+          </Link>
         </div>
       </div>
     </div>

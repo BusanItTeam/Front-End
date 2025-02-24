@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import api from "../../services/api";
+import api from "../../services/Api";
 import toast from "react-hot-toast";
 
 const InquiryForm = () => {
@@ -40,12 +40,29 @@ const InquiryForm = () => {
       <h2 className="text-center text-2xl font-semibold mb-4">Q/A</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">제목</label>
-          <input type="text" name="title" value={formData.title} onChange={handleChange} className="w-full mt-1 p-2 border rounded" placeholder="제목을 입력하세요" required />
+          <label className="block text-sm font-medium text-gray-700">
+            제목
+          </label>
+          <input
+            type="text"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            className="w-full mt-1 p-2 border rounded"
+            placeholder="제목을 입력하세요"
+            required
+          />
         </div>
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">문의 유형</label>
-          <select name="type" value={formData.type} onChange={handleChange} className="w-full mt-1 p-2 border rounded">
+          <label className="block text-sm font-medium text-gray-700">
+            문의 유형
+          </label>
+          <select
+            name="type"
+            value={formData.type}
+            onChange={handleChange}
+            className="w-full mt-1 p-2 border rounded"
+          >
             <option value="상품문의">상품문의</option>
             <option value="배송문의">배송문의</option>
             <option value="반품 및 교환문의">반품 및 교환문의</option>
@@ -53,15 +70,29 @@ const InquiryForm = () => {
           </select>
         </div>
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">내용</label>
-          <textarea name="content" value={formData.content} onChange={handleChange} className="w-full p-3 border rounded h-40" placeholder="내용을 입력하세요" required></textarea>
+          <label className="block text-sm font-medium text-gray-700">
+            내용
+          </label>
+          <textarea
+            name="content"
+            value={formData.content}
+            onChange={handleChange}
+            className="w-full p-3 border rounded h-40"
+            placeholder="내용을 입력하세요"
+            required
+          ></textarea>
         </div>
 
         <div className="flex justify-end space-x-2">
           <Link to="/myPage/boardList">
-            <button className="px-4 py-2 bg-gray-400 text-white rounded">취소</button>
+            <button className="px-4 py-2 bg-gray-400 text-white rounded">
+              취소
+            </button>
           </Link>
-          <button type="submit" className="px-4 py-2 bg-gray-400 text-white rounded">
+          <button
+            type="submit"
+            className="px-4 py-2 bg-gray-400 text-white rounded"
+          >
             등록
           </button>
         </div>
