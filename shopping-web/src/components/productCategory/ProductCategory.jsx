@@ -161,7 +161,7 @@ const ProductCategory = () => {
         />
         <div className="p-4 flex-grow flex flex-col">
           <h3 className="text-lg mb-2">{product.name}</h3>
-          <p className="font-bold text-base mt-auto">${product.price}</p>
+          <p className="font-bold text-base mt-auto">{product.price}원</p>
         </div>
       </div>
     ));
