@@ -32,7 +32,7 @@ import MemberManagementDetails from "./components/adminPage/MemberManagementDeta
 import OrderPage from "./components/order/OrderPage";
 import Payment from "./components/order/Payment";
 import InquiryManagement from "./components/adminPage/InquiryManagement";
-
+import { Toaster } from "react-hot-toast";
 const AdminRoute = ({ children }) => {
   const { isAdmin } = useMyContext();
   return isAdmin ? children : <Navigate to="/" />;
@@ -41,6 +41,7 @@ const AdminRoute = ({ children }) => {
 function App() {
   return (
     <ContextProvider>
+      <Toaster position="bottom-right" />
       <Router>
         <Header />
 

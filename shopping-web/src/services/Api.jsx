@@ -34,11 +34,12 @@ Api.interceptors.request.use(
     }else{
       console.warn("jwt 토큰이 없습니다. 인증이 필요합니다.");
     }
+ 
 
     // 로컬스토리지에서 CSRF 토큰 가져오기
     const csrfToken = localStorage.getItem("CSRF_TOKEN");
     if (csrfToken) {
-      config.headers["X-CSRF-Token"] = csrfToken; // ✅ 필요하면 백엔드에서 요구하는 키 확인
+      config.headers["X-CSRF-Token"] = csrfToken; // 필요하면 백엔드에서 요구하는 키 확인
     }
 
     return config;

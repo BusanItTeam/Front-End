@@ -75,12 +75,19 @@ const SignUp = () => {
       const response = await api.post("/auths/public/signup", sendData);
       toast.success("회원가입 성공! 로그인해주세요.");
       reset();
-      if (response.data) navigate("/");
+      if (response.data) navigate("/login");
+
     } catch (error) {
-      if (error?.response?.data?.message === "Error: Username is already taken!") {
+      console.log("Error Response:", error?.response);  // 오류 응답 출력
+      const errorMessage = error?.response?.data?.message;
+      console.log("Error Message:", errorMessage);  // 오류 메시지 출력
+
+      if (errorMessage === "Username already exists") {
         setError("username", { message: "이미 사용 중인 아이디입니다." });
-      } else if (error?.response?.data?.message === "Error: Email is already in use!") {
+        toast.error("이미 사용 중인 아이디입니다.");
+      } else if (errorMessage === "Email already exists") {
         setError("email", { message: "이미 가입된 이메일입니다." });
+        toast.error("이미 사용 중인 이메일입니다.");
       } else {
         toast.error("회원가입 실패! 다시 시도해주세요.");
       }

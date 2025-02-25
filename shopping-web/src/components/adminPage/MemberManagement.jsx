@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
-import api from "../../services/Api.jsx";
 import { DataGrid } from "@mui/x-data-grid"; // 테이블 라이브러리
 import toast from "react-hot-toast";
 import moment from "moment";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate,  } from "react-router-dom";
 import { MdOutlineEmail, MdDateRange } from "react-icons/md";
 import { Blocks } from "react-loader-spinner";
 import { FaUser } from "react-icons/fa";
 import Search from "../search/Search.jsx";
+import { useMyContext } from "../../store/ContextApi.jsx";
+
 // 컬럼 정의 (DataGrid용)
 const userListsColumns = [
   {
@@ -18,7 +19,6 @@ const userListsColumns = [
     align: "center",
     renderHeader: () => <span>유저 번호</span>,
   },
-  
   {
     field: "username",
     headerName: "userName",
@@ -27,7 +27,6 @@ const userListsColumns = [
     align: "center",
     renderHeader: () => <span>유저 아이디</span>,
   },
-
   {
     field: "name",
     headerName: "userName",
@@ -115,7 +114,7 @@ const userListsColumns = [
   {
     field: "action",
     headerName: "Action",
-      headerAlign: "center",
+    headerAlign: "center",
     width: 200,
     renderHeader: () => <span>Action</span>,
     renderCell: (params) => (
@@ -128,39 +127,37 @@ const userListsColumns = [
 
 // 회원 관리 페이지 컴포넌트
 const MemberManagement = () => {
+  
   const navigate = useNavigate();
-  const [users, setUsers] = useState([]);
-  console.log(users)
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [filteredUsers, setFilteredUsers] = useState([]); 
+  
+  const handleRowClick = (params) => {
+    console.log("이동할 URL:", `/admin/members/${params.row.id}`); 
+    navigate(`/admin/members/${params.row.id}`);
+  };
+
+  // Context에서 필요한 데이터와 함수 가져오기
+  const {
+    users,
+    filteredUsers,
+    setFilteredUsers,
+    loading,
+    error,
+    setError,
+    fetchUsers,
+  } = useMyContext(); 
+
   const [searchTerm, setSearchTerm] = useState(""); 
 
+  // 페이지 로드 시 유저 데이터 가져오기
   useEffect(() => {
-    setLoading(true);
-    const fetchUsers = async () => {
-      try {
-        const response = await api.get("/admin/getusers");
-        if (!response.data || !Array.isArray(response.data)) {
-          throw new Error("Invalid response data");
-        }
-        setUsers(response.data);
-        setFilteredUsers(response.data); //초기값 설정
-      } catch (err) {
-        setError(err?.response?.data?.message || "Failed to fetch users");
-        toast.error("Error fetching users");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUsers();
-  }, []);
+    fetchUsers(); // Context에서 제공하는 fetchUsers 호출
+  }, [fetchUsers]);
 
   useEffect(() => {
-    const filtered = users.filter((user) =>
-      user.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    const filtered = (users || []).filter((user) =>
+      user.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredUsers(filtered);
   }, [searchTerm, users]);
@@ -186,11 +183,10 @@ const MemberManagement = () => {
           <FaUser className="text-primary" />
           전체 사용자
         </h1>
-      <div className="absolute right-0">
-        <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-     </div>
-    </div>
-
+        <div className="absolute right-0">
+          <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+        </div>
+      </div>
 
       <div className="overflow-x-auto w-full mx-auto mt-4">
         {loading ? (
@@ -200,25 +196,21 @@ const MemberManagement = () => {
           </div>
         ) : (
           <DataGrid
-          className="w-fit mx-auto"
-          rows={rows}
-          columns={userListsColumns}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 10,  // 기본 사이즈 페이지 10개씩
+            className="w-fit mx-auto"
+            rows={rows}
+            columns={userListsColumns}
+            initialState={{
+              pagination: {
+                paginationModel: {
+                  pageSize: 10,  // 기본 사이즈 페이지 10개씩
+                },
               },
-            },
-          }}
-          disableRowSelectionOnClick
-          pageSizeOptions={[10, 25, 50, 100]} 
-          disableColumnResize
-          onRowClick={(params) => {
-            console.log("이동할 URL:", `/admin/members/${params.row.id}`); 
-            navigate(`/admin/members/${params.row.id}`);
-          }}
-        />
-        
+            }}
+            disableRowSelectionOnClick
+            pageSizeOptions={[10, 25, 50, 100]} 
+            disableColumnResize
+            onRowClick={handleRowClick}
+          />
         )}
       </div>
     </div>
