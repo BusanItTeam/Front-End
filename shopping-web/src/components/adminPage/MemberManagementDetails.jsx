@@ -5,6 +5,8 @@ import toast from "react-hot-toast";
 import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaRegCalendarAlt, FaUserShield } from "react-icons/fa";
 import { Button } from "@mui/material";
 import { MdDateRange, MdOutlineEmail } from "react-icons/md";
+import { useMyContext } from "../../store/ContextApi.jsx";
+
 
 // 역할명을 한글로 변환
 const getRoleDisplayName = (roleName) => {
@@ -24,8 +26,7 @@ const MemberManagementDetails = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const[filteredUsers,setFilteredUsers] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const { token, setCurrentUser } = useMyContext();  // Get context values
 
   useEffect(() => {
     if (!userId) {
@@ -38,9 +39,8 @@ const MemberManagementDetails = () => {
 
     const fetchUserDetail = async () => {
       try {
-        const token = localStorage.getItem("JWT_TOKEN");
         if (!token) {
-          console.error("❌ 토큰이 없습니다.");
+          console.error("토큰이 없습니다.");
           toast.error("세션이 만료되었습니다. 다시 로그인해주세요.");
           return;
         }
@@ -70,11 +70,8 @@ const MemberManagementDetails = () => {
     return () => {
       isMounted = false;
     };
-  }, [userId]);
+  }, [userId, token]);  // Re-fetch when token changes
 
- 
-
-  
   if (loading)
     return <p className="text-center text-lg font-medium text-gray-600">🔄 로딩 중...</p>;
   if (error)
@@ -84,23 +81,22 @@ const MemberManagementDetails = () => {
     if (!window.confirm("정말로 이 사용자를 삭제하시겠습니까?")) return;
   
     try {
-      const token = localStorage.getItem("JWT_TOKEN"); // ✅ JWT 토큰 가져오기
       if (!token) {
         toast.error("로그인이 필요합니다.");
         return;
       }
   
-      console.log("📢 삭제 요청 토큰:", token); // ✅ 콘솔에서 확인
+      console.log("📢 삭제 요청 토큰:", token); 
   
       await api.delete(`/admin/user/${userId}`, {
         headers: {
-          Authorization: `Bearer ${token}`, // ✅ JWT 토큰 추가
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
   
       toast.success("사용자가 삭제되었습니다.");
-      navigate("/admin/members"); // ✅ 삭제 후 사용자 목록으로 이동
+      navigate("/admin/members");
     } catch (error) {
       console.error("❌ 사용자 삭제 실패:", error.response ? error.response.data : error);
       toast.error("사용자를 삭제하는데 실패했습니다.");
@@ -110,7 +106,6 @@ const MemberManagementDetails = () => {
   return user ? (
     <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md mt-10 border border-gray-200">
       {/* 헤더 */}
-    
       <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">{user.name} 님의 정보</h2>
 
       {/* 기본 정보 */}
@@ -152,7 +147,7 @@ const MemberManagementDetails = () => {
       {/* 계정 상태 */}
       <div className="text-lg text-center mb-4">
         <span className={`px-4 py-2 rounded-md font-semibold ${user.enabled ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-          {user.enabled ? "✅ 활성화됨" : "❌ 비활성화됨"}
+          {user.enabled ? " 활성화됨" : " 비활성화됨"}
         </span>
       </div>
 
@@ -179,7 +174,7 @@ const MemberManagementDetails = () => {
 
       {/* 관리 버튼 추가 (회원 수정, 삭제 등) */}
       <div className="flex justify-end mt-6">
-        <Button variant="outlined" color="secondary" onClick={handleDeleteUser}>삭제</Button>
+        <Button variant="outlined" color="secondary" onClick={handleDeleteUser}>회원 삭제</Button>
       </div>
     </div>
   ) : (
