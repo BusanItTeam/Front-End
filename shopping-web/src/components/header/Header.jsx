@@ -1,3 +1,4 @@
+// Header.js
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Header.css";
@@ -11,8 +12,9 @@ export const Header = () => {
   const location = useLocation();
   const isMyPageActive = location.pathname.startsWith("/myPage");
   const navigate = useNavigate();
-  const { token, setToken, setCurrentUser, isAdmin, setIsAdmin } =
+  const { token, setToken, setCurrentUser, isAdmin, setIsAdmin, products } =
     useMyContext();
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     const storedIsAdmin = localStorage.getItem("IS_ADMIN");
@@ -30,6 +32,23 @@ export const Header = () => {
     setIsAdmin(false);
     //navigate("/login");
   };
+
+  // products 상태가 변경될 때마다 categories를 업데이트합니다.
+  useEffect(() => {
+    // products가 존재하고 비어있지 않은지 확인
+    if (products && products.length > 0) {
+      // products에서 category 정보만 추출하여 중복을 제거합니다.
+      const uniqueCategories = [
+        ...new Map(
+          products.map((product) => [
+            product.category.categoryId,
+            product.category,
+          ])
+        ).values(),
+      ];
+      setCategories(uniqueCategories);
+    }
+  }, [products]);
 
   return (
     <header className="header-wrapper">
@@ -52,18 +71,13 @@ export const Header = () => {
             </Link>
             {showDropdown && (
               <ul className="dropdown-menu">
-                <li>
-                  <Link to="/category/pants">바지</Link>
-                </li>
-                <li>
-                  <Link to="/category/tops">상의</Link>
-                </li>
-                <li>
-                  <Link to="/category/outerwear">아우터</Link>
-                </li>
-                <li>
-                  <Link to="/category/dresses">원피스</Link>
-                </li>
+                {categories.map((category) => (
+                  <li key={category.categoryId}>
+                    <Link to={`/category/${category.name?.toLowerCase()}`}>
+                      {category.name}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             )}
           </div>
@@ -87,12 +101,10 @@ export const Header = () => {
               <button onClick={handleLogout} className="nav-link">
                 LogOut
               </button>
-        
-          {isAdmin &&  (
-            <Link to="/admin" className="nav-link">
-              관리자
-            </Link> // admin으로 로그인했을때만 보임
-            
+              {isAdmin && (
+                <Link to="/admin" className="nav-link">
+                  관리자
+                </Link>
               )}
             </>
           )}

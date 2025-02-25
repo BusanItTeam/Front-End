@@ -1,14 +1,53 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useMyContext } from "../../store/ContextApi";
+import Api from "../../services/Api";
 
 const CartPage = () => {
   // const [cartItems, setCartItems] = useState([]); // 장바구니 아이템 상태
   const [selectedItems, setSelectedItems] = useState([]); // 선택된 아이템 상태
-  const { token, currentUser, cartItems, setCartItems } = useMyContext(); // 현재 로그인한 유저 정보 가져오기
-
+  const { token, currentUser, cartItems, setCartItems, products, setProducts } =
+    useMyContext(); // 현재 로그인한 유저 정보 가져오기
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
   const SHIPPING_COST = 3000; //배송비
+  const userId = currentUser?.id; // Ensure userId is correctly retrieved
+  // const productId = (productName) => {
+  //   const product = products.find((p) => p.name === productName);
+  //   return product ? product.id : null;
+  // };
+
+  // // 🔹 장바구니 데이터 가져오기 함수
+  // const fetchCart = async () => {
+  //   if (!userId) return; // 로그인된 유저가 없으면 실행 안 함
+  //   try {
+  //     setLoading(true);
+  //     setError(null); // 기존 에러 초기화
+  //     const response = await Api.get(`/carts/${userId}`);
+  //     setCartItems(response.data);
+  //   } catch (err) {
+  //     setError("Failed to load cart");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  // // 🔹 1. 로그인되지 않은 경우 로그인 페이지로 이동
+  // useEffect(() => {
+  //   if (!token) {
+  //     navigate("/login");
+  //   } else {
+  //     fetchCart();
+  //   }
+  // }, [token, navigate]); // token 변경 시 실행
+
+  // // 🔹 2. 로그인한 유저가 변경될 때 장바구니 데이터 다시 불러오기
+  // useEffect(() => {
+  //   if (userId) {
+  //     fetchCart();
+  //   }
+  // }, [userId]); // userId 변경 시 실행
 
   // 1. 로그인 여부 확인 -> 로그인 안 했으면 로그인 페이지로 이동
   useEffect(() => {
@@ -44,41 +83,20 @@ const CartPage = () => {
 
   // 🚀 3. 장바구니 아이템 삭제
   const removeItem = async (id) => {
-    try {
-      await fetch(`/api/cart/remove/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${currentUser.token}`,
-        },
-      });
-      setCartItems(cartItems.filter((item) => item.id !== id));
-      setSelectedItems(selectedItems.filter((itemId) => itemId !== id));
-    } catch (error) {
-      console.error("아이템 삭제 오류:", error);
-    }
+    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
+    setSelectedItems((prevSelected) =>
+      prevSelected.filter((itemId) => itemId !== id)
+    );
   };
-
   // 🚀 4. 장바구니 수량 변경
   const updateQuantity = async (id, quantity) => {
     const newQuantity = Math.max(1, quantity);
-    try {
-      await fetch(`/api/cart/update/${id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${currentUser.token}`,
-        },
-        body: JSON.stringify({ quantity: newQuantity }),
-      });
 
-      setCartItems(
-        cartItems.map((item) =>
-          item.id === id ? { ...item, quantity: newQuantity } : item
-        )
-      );
-    } catch (error) {
-      console.error("수량 변경 오류:", error);
-    }
+    setCartItems(
+      cartItems.map((item) =>
+        item.id === id ? { ...item, quantity: newQuantity } : item
+      )
+    );
   };
 
   //체크박스 토글

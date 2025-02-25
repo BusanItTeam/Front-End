@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMyContext } from "../../store/ContextApi";
 import Api from "../../services/Api";
+import { Link } from "react-router-dom";
 
 const OrderPage = () => {
   const { cartItems, currentUser, setCurrentUser } = useMyContext();
@@ -82,6 +83,28 @@ const OrderPage = () => {
 
     fetchUser();
   }, []);
+
+  // ✅ 결제하기 버튼 클릭 시 주문저장
+  const handleOrderSubmit = async () => {
+    if (!currentUser?.id || cartItems.length === 0) {
+      alert("유효한 사용자 또는 장바구니 상품이 없습니다.");
+      return;
+    }
+
+    const orderData = {
+      userId: currentUser.id,
+      totalPrice: getTotalPrice() + SHIPPING_COST - point,
+      status: "배송준비중",
+    };
+
+    try {
+      const response = await Api.post("/orders/create", orderData);
+      console.log("Order Created:", response.data);
+    } catch (error) {
+      console.error("주문 생성 실패:", error);
+      alert("주문을 생성하는 중 오류가 발생했습니다.");
+    }
+  };
 
   // ✅ 주문자 정보와 배송지 정보 동기화
   useEffect(() => {
@@ -180,6 +203,37 @@ const OrderPage = () => {
 
   //주소 검색 기능
 
+  // const handleAddressSearch = () => {
+  //   if (!window.daum) {
+  //     alert("주소 검색 기능을 불러오는 중입니다. 잠시 후 다시 시도해주세요.");
+  //     return;
+  //   }
+
+  //   new window.daum.Postcode({
+  //     oncomplete: function (data) {
+  //       let addr = data.roadAddress || data.jibunAddress; // 도로명 주소 또는 지번 주소
+  //       let extraAddr = "";
+
+  //       if (data.userSelectedType === "R") {
+  //         if (data.bname !== "" && /[동|로|가]$/g.test(data.bname)) {
+  //           extraAddr += data.bname;
+  //         }
+  //         if (data.buildingName !== "" && data.apartment === "Y") {
+  //           extraAddr +=
+  //             extraAddr !== "" ? `, ${data.buildingName}` : data.buildingName;
+  //         }
+  //         if (extraAddr !== "") {
+  //           extraAddr = `(${extraAddr})`;
+  //         }
+  //       }
+
+  //       setValue("postcode", data.zonecode); // 우편번호
+  //       setValue("address", addr); // 주소
+  //       setValue("extraAddress", extraAddr); // 참고 항목
+  //       setValue("detailAddress", ""); // 상세 주소 초기화
+  //     },
+  //   }).open();
+  // };
   const handleAddressSearch = () => {
     if (!window.daum) {
       alert("주소 검색 기능을 불러오는 중입니다. 잠시 후 다시 시도해주세요.");
@@ -187,9 +241,8 @@ const OrderPage = () => {
     }
 
     new window.daum.Postcode({
-      oncomplete: async function (data) {
-        let addr = data.roadAddress || data.jibunAddress;
-        let detailAddr = "";
+      oncomplete: function (data) {
+        let addr = data.roadAddress || data.jibunAddress; // 도로명 주소 또는 지번 주소
         let extraAddr = "";
 
         if (data.userSelectedType === "R") {
@@ -205,61 +258,18 @@ const OrderPage = () => {
           }
         }
 
-        const newAddress = {
-          postcode: data.zonecode,
-          address: addr,
-          extraAddress: extraAddr,
-          detailAddress: detailAddr,
-        };
-
-        console.log("새로운 주소 추가됨:", newAddress);
-
-        try {
-          if (!currentUser?.id) {
-            alert("사용자 정보가 없습니다. 다시 로그인해 주세요.");
-            return;
-          }
-
-          const response = await Api.put(
-            `/auths/updateaddress/${currentUser.id}`,
-            {
-              address: [...(currentUser?.addresses || []), newAddress],
-            },
-            {
-              headers: {
-                Authorization: `Bearer ${currentUser?.token}`, // 토큰 포함
-                "Content-Type": "application/json",
-              },
-            }
-          );
-
-          if (response.status === 200) {
-            alert("주소가 성공적으로 추가되었습니다.");
-
-            // 현재 사용자 정보 업데이트
-            setCurrentUser((prev) => ({
-              ...prev,
-              addresses: [...(prev.addresses || []), newAddress],
-            }));
-
-            // 폼 데이터 업데이트
-            setFormData2((prevState) => ({
-              ...prevState,
-              postcode: newAddress.postcode || "",
-              address: newAddress.address || "",
-              detailAddress: newAddress.detailAddress || "",
-              extraAddress: newAddress.extraAddress || "",
-            }));
-          } else {
-            alert("주소 추가에 실패했습니다.");
-          }
-        } catch (error) {
-          console.error("주소 추가 오류:", error);
-          alert("주소 추가 중 오류가 발생했습니다.");
-        }
+        // 배송지 정보 상태 업데이트
+        setFormData2((prevState) => ({
+          ...prevState,
+          postcode: data.zonecode, // 우편번호
+          address: addr, // 기본 주소
+          extraAddress: extraAddr, // 참고 주소
+          detailAddress: "", // 상세 주소는 빈칸으로 두기
+        }));
       },
     }).open();
   };
+
   //환불방법
   const handleChange3 = (event) => {
     setSelectedValue(event.target.value);
@@ -707,23 +717,23 @@ const OrderPage = () => {
           </div>
         </div>
         <div className="mt-6 flex space-x-2">
-          {/* <div className="mt-4 text-center">
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-500 text-white rounded"
-          >
-            Submit
-          </button>
-        </div> */}
-          <button
-            type="submit"
-            className="w-1/2 bg-gray-900 text-white py-3 rounded-lg font-medium hover:bg-gray-800"
+          {/* 버튼클릭시 order 데이터베이스 */}
+          <Link
+            to={`/orderpage/payment?price=${
+              getTotalPrice() + SHIPPING_COST - point
+            }`}
+            onClick={handleOrderSubmit}
+            className="w-1/2 bg-gray-900 text-white py-3 rounded-lg font-medium hover:bg-gray-800 text-center"
           >
             결제하기
-          </button>
-          <button className="w-1/2  text-gray-800 py-3 rounded-lg font-medium hover:bg-gray-900 border-1">
+          </Link>
+
+          <Link
+            to="/cart"
+            className="w-1/2  text-gray-800 py-3 rounded-lg font-medium hover:bg-gray-900 border-1 text-center"
+          >
             취소하기
-          </button>
+          </Link>
         </div>
       </div>
     </div>
