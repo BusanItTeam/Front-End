@@ -84,23 +84,23 @@ const MemberManagementDetails = () => {
     if (!window.confirm("정말로 이 사용자를 삭제하시겠습니까?")) return;
   
     try {
-      const token = localStorage.getItem("JWT_TOKEN"); // ✅ JWT 토큰 가져오기
+      const token = localStorage.getItem("JWT_TOKEN"); // JWT 토큰 가져오기
       if (!token) {
         toast.error("로그인이 필요합니다.");
         return;
       }
   
-      console.log("📢 삭제 요청 토큰:", token); // ✅ 콘솔에서 확인
+      console.log("📢 삭제 요청 토큰:", token); //  콘솔에서 확인
   
       await api.delete(`/admin/user/${userId}`, {
         headers: {
-          Authorization: `Bearer ${token}`, // ✅ JWT 토큰 추가
+          Authorization: `Bearer ${token}`, //  JWT 토큰 추가
           "Content-Type": "application/json",
         },
       });
   
       toast.success("사용자가 삭제되었습니다.");
-      navigate("/admin/members"); // ✅ 삭제 후 사용자 목록으로 이동
+      navigate("/admin/members"); // 삭제 후 사용자 목록으로 이동
     } catch (error) {
       console.error("❌ 사용자 삭제 실패:", error.response ? error.response.data : error);
       toast.error("사용자를 삭제하는데 실패했습니다.");
@@ -152,7 +152,7 @@ const MemberManagementDetails = () => {
       {/* 계정 상태 */}
       <div className="text-lg text-center mb-4">
         <span className={`px-4 py-2 rounded-md font-semibold ${user.enabled ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-          {user.enabled ? "✅ 활성화됨" : "❌ 비활성화됨"}
+          {user.enabled ? " 활성화됨" : " 비활성화됨"}
         </span>
       </div>
 
