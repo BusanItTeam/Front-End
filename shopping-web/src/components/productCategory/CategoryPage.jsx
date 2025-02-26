@@ -1,4 +1,3 @@
-// CategoryPage.js
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useMyContext } from "../../store/ContextApi";
@@ -13,6 +12,7 @@ const CategoryPage = () => {
   const productsPerPage = 8;
   const backendURL = "http://localhost:8080"; // backendURL 추가
   const { categoryName } = useParams(); // Get categoryName from URL
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // categoryName과 일치하는 상품만 필터링
   const filteredProducts = products.filter(
@@ -27,6 +27,18 @@ const CategoryPage = () => {
   );
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  useEffect(() => {
+    // 1초마다 이미지 변경
+    const intervalId = setInterval(() => {
+      setCurrentImageIndex(
+        (prevIndex) =>
+          (prevIndex + 1) % (currentProducts[0]?.images?.length || 1)
+      );
+    }, 1000);
+
+    return () => clearInterval(intervalId); // 컴포넌트 언마운트 시 clearInterval
+  }, [currentProducts]);
 
   useEffect(() => {
     // 페이지 변경 시 상품 목록 재계산
@@ -58,12 +70,24 @@ const CategoryPage = () => {
               key={product.productId}
               className="bg-white shadow-md rounded-lg overflow-hidden"
             >
-              <img
-                src={`${backendURL}${product.imageUrl}`} // backendURL 추가
-                alt={product.name}
-                className="w-full h-48 object-cover"
-                style={{ maxWidth: "100%", height: "auto" }}
-              />
+              {product.images && product.images.length > 0 ? (
+                <img
+                  src={`${backendURL}${
+                    product.images[currentImageIndex % product.images.length]
+                      .imageUrl
+                  }`}
+                  alt={product.name}
+                  className="w-full h-48 object-cover"
+                  style={{ maxWidth: "100%", height: "auto" }}
+                />
+              ) : (
+                <img
+                  src="https://via.placeholder.com/400x300" // 이미지 없을 경우 대체 이미지
+                  alt="No Image"
+                  className="w-full h-48 object-cover"
+                  style={{ maxWidth: "100%", height: "auto" }}
+                />
+              )}
               <div className="p-4">
                 <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
                 <p className="text-gray-700 font-bold">{product.price}원</p>
