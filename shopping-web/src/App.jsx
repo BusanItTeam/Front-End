@@ -1,4 +1,3 @@
-// App.js
 import React from "react";
 import {
   Route,
@@ -33,6 +32,7 @@ import OrderPage from "./components/order/OrderPage";
 import Payment from "./components/order/Payment";
 import InquiryManagement from "./components/adminPage/InquiryManagement";
 import { Toaster } from "react-hot-toast";
+import ProductDetailPage from "./components/productCategory/ProductDetailPage";
 const AdminRoute = ({ children }) => {
   const { isAdmin } = useMyContext();
   return isAdmin ? children : <Navigate to="/" />;
@@ -44,7 +44,6 @@ function App() {
       <Toaster position="bottom-right" />
       <Router>
         <Header />
-
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/productcategory" element={<ProductCategory />} />
@@ -53,6 +52,7 @@ function App() {
             element={<CategoryPage />}
           />{" "}
           {/* CategoryPage 라우트 */}
+          <Route path="/product/:productId" element={<ProductDetailPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/myPage" element={<MyPage />} />
@@ -63,11 +63,6 @@ function App() {
           <Route path="/orderpage" element={<OrderPage />} />
           <Route path="/orderpage/payment" element={<Payment />} />
           <Route path="/orderpage/ordercomplete" element={<OrderComplete />} />
-
-
-          {/* 관리자 페이지 라우트 */}
-
-
           <Route
             path="/admin"
             element={

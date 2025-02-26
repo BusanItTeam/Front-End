@@ -12,14 +12,14 @@ function ProductManagement() {
     categoryId: "",
     stock: "",
     description: "",
-    imageUrl: null,
+    imageFiles: [], // multiple image upload
   });
   const [editingProduct, setEditingProduct] = useState(null);
   const [stockThreshold, setStockThreshold] = useState(10);
   const backendURL = "http://localhost:8080";
   const [expandedProductId, setExpandedProductId] = useState(null);
   const [showEditFormFor, setShowEditFormFor] = useState(null);
-  const [newImage, setNewImage] = useState(null);
+  const [newImageFiles, setNewImageFiles] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 10;
@@ -47,7 +47,7 @@ function ProductManagement() {
   };
 
   const handleImageChange = (e) => {
-    setNewProduct({ ...newProduct, imageUrl: e.target.files[0] });
+    setNewProduct({ ...newProduct, imageFiles: e.target.files });
   };
 
   const handleAddProduct = async (e) => {
@@ -63,8 +63,10 @@ function ProductManagement() {
       formData.append("description", newProduct.description);
       formData.append("categoryId", newProduct.categoryId);
 
-      if (newProduct.imageUrl) {
-        formData.append("imageUrl", newProduct.imageUrl);
+      if (newProduct.imageFiles) {
+        for (let i = 0; i < newProduct.imageFiles.length; i++) {
+          formData.append("imageFiles", newProduct.imageFiles[i]);
+        }
       }
 
       for (let [key, value] of formData.entries()) {
@@ -91,7 +93,7 @@ function ProductManagement() {
         price: "",
         stock: "",
         description: "",
-        imageUrl: null,
+        imageFiles: [],
         categoryId: "",
       });
       alert("상품 추가 완료!");
@@ -113,8 +115,10 @@ function ProductManagement() {
       formData.append("description", editingProduct.description);
       formData.append("categoryId", editingProduct.category.categoryId);
 
-      if (newImage) {
-        formData.append("imageUrl", newImage);
+      if (newImageFiles) {
+        for (let i = 0; i < newImageFiles.length; i++) {
+          formData.append("imageFiles", newImageFiles[i]);
+        }
       }
 
       for (let [key, value] of formData.entries()) {
@@ -130,7 +134,7 @@ function ProductManagement() {
       fetchProducts();
       setShowEditFormFor(null);
       setEditingProduct(null);
-      setNewImage(null);
+      setNewImageFiles(null);
       alert("상품 수정 완료!");
     } catch (error) {
       console.error("Error updating product:", error);
@@ -179,7 +183,7 @@ function ProductManagement() {
   };
 
   const handleNewImageChange = (e) => {
-    setNewImage(e.target.files[0]);
+    setNewImageFiles(e.target.files);
   };
 
   const handleAddCategory = async (e) => {
@@ -314,9 +318,10 @@ function ProductManagement() {
           ></textarea>
           <input
             type="file"
-            name="imageUrl"
+            name="imageFiles"
             onChange={handleImageChange}
             className="border p-2"
+            multiple
           />
         </div>
         <button type="submit" className="bg-blue-500 text-white px-4 py-2 mt-2">
@@ -360,11 +365,17 @@ function ProductManagement() {
                     }`}
                   >
                     <td className="border p-2">
-                      <img
-                        src={`${backendURL}${product.imageUrl}`}
-                        alt={product.name}
-                        className="w-16 h-16 object-cover"
-                      />
+                      <div className="flex flex-wrap">
+                        {product.images &&
+                          product.images.map((image, index) => (
+                            <img
+                              key={index}
+                              src={`${backendURL}${image.imageUrl}`}
+                              alt={product.name}
+                              className="w-16 h-16 object-cover m-1"
+                            />
+                          ))}
+                      </div>
                     </td>
                     <td className="border p-2">{product.name}</td>
                     <td className="border p-2">{product.price}</td>
@@ -497,9 +508,10 @@ function ProductManagement() {
                             <p>이미지</p>
                             <input
                               type="file"
-                              name="imageUrl"
+                              name="imageFiles"
                               onChange={handleNewImageChange}
                               className="border p-2 mb-2 w-full"
+                              multiple
                             />
                             <div className="flex justify-end">
                               <button
