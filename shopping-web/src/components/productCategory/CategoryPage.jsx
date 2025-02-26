@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useMyContext } from "../../store/ContextApi";
 import DressesSidebar from "../../components/siderbar/DressesSidebar";
 import OuterSidebar from "../../components/siderbar/OuterSidebar";
@@ -95,6 +95,7 @@ const CategoryPage = () => {
             </div>
           ))}
         </div>
+
         <div className="flex justify-center mt-8">
           {Array.from(
             { length: Math.ceil(filteredProducts.length / productsPerPage) },
