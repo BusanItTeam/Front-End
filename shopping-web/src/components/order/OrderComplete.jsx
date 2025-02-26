@@ -99,8 +99,10 @@ const OrderComplete = () => {
             <span>{currentUser?.email}</span>
           </div>
           <div className="flex items-center mb-2">
-            <span className="font-semibold w-32">📞 휴대폰 번호:</span>
-            <span>{currentUser?.phoneNumber}</span>
+            <span className="font-semibold w-32 whitespace-nowrap">
+              📞 전화번호:
+            </span>
+            <span className="truncate">{currentUser?.phoneNumber}</span>
           </div>
           <div className="flex items-start">
             <span className="font-semibold w-32">🏠 주소:</span>
@@ -109,18 +111,12 @@ const OrderComplete = () => {
         </div>
       </div>
 
-      <div className="mt-10 flex space-x-4">
+      <div className="mt-10 flex justify-center">
         <Link
           to="/"
-          className="w-1/2 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-500 text-center text-lg"
+          className="w-1/2 bg-gray-900 text-white py-3 rounded-lg font-medium hover:bg-gray-800 text-center text-lg"
         >
-          🏠 홈으로 이동
-        </Link>
-        <Link
-          to="/orders"
-          className="w-1/2 border border-blue-600 text-blue-600 py-3 rounded-lg font-medium hover:bg-blue-600 hover:text-white text-center text-lg"
-        >
-          📦 주문내역 확인
+          홈으로 이동
         </Link>
       </div>
     </div>
