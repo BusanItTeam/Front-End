@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import api from "../../services/api"; // API 호출을 위한 axios 인스턴스
+import api from "../../services/Api"; // API 호출을 위한 axios 인스턴스
 import { useMyContext } from "../../store/ContextApi"; // 사용자 상태를 가져오기 위한 Context
 
 function BoardList() {
