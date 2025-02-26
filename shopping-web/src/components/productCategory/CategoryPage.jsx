@@ -78,15 +78,20 @@ const CategoryPage = () => {
                         .imageUrl
                     }`}
                     alt={product.name}
-                    className="w-full h-48 object-cover transition-transform duration-300 hover:scale-105"
-                    style={{ maxWidth: "100%", height: "auto" }}
+                    className="object-contain transition-transform duration-300 hover:scale-105"
+                    style={{
+                      width: "400px",
+                      height: "400px",
+                      maxWidth: "100%",
+                      maxHeight: "100%",
+                    }}
                   />
                 ) : (
                   <img
                     src="https://via.placeholder.com/400x300"
                     alt="No Image"
-                    className="w-full h-48 object-cover"
-                    style={{ maxWidth: "100%", height: "auto" }}
+                    className="object-contain"
+                    style={{ width: "400px", height: "400px" }}
                   />
                 )}
                 <div className="p-4">

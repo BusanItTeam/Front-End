@@ -8,6 +8,7 @@ const ProductDetailPage = () => {
   const [product, setProduct] = useState(null);
   const backendURL = "http://localhost:8080";
   const [selectedImage, setSelectedImage] = useState(null);
+  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     const selectedProduct = products.find(
@@ -31,6 +32,39 @@ const ProductDetailPage = () => {
     setSelectedImage(imageUrl);
   };
 
+  const handleQuantityChange = (e) => {
+    setQuantity(parseInt(e.target.value, 10));
+  };
+
+  const handleAddToCart = () => {
+    // 장바구니 로직
+    alert("장바구니에 추가되었습니다!");
+  };
+
+  const handleAddToWishlist = () => {
+    // 찜 로직
+    alert("찜 목록에 추가되었습니다!");
+  };
+
+  // 더미 데이터
+  const productSpecifications = [
+    { name: "사이즈", value: "Free" },
+    { name: "재질", value: "면 100%" },
+  ];
+
+  const deliveryInfo = "평균 2~3일 소요 (주말/공휴일 제외)";
+  const refundPolicy = "수령 후 7일 이내 (단, 상품 훼손 시 불가)";
+
+  const dummyReviews = [
+    { id: 1, author: "홍길동", rating: 5, comment: "아주 좋아요!" },
+    { id: 2, author: "김철수", rating: 4, comment: "배송이 조금 느려요." },
+  ];
+
+  const dummyFaqs = [
+    { id: 1, question: "배송은 얼마나 걸리나요?", answer: deliveryInfo },
+    { id: 2, question: "반품 정책은 어떻게 되나요?", answer: refundPolicy },
+  ];
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* 메인 이미지 */}
@@ -39,14 +73,14 @@ const ProductDetailPage = () => {
           <img
             src={`${backendURL}${selectedImage}`}
             alt={product.name}
-            className="w-full h-auto object-cover rounded-lg shadow-md"
+            className="object-contain rounded-lg shadow-md"
             style={{ width: "400px", height: "400px" }}
           />
         ) : (
           <img
             src="https://via.placeholder.com/400x300"
             alt="No Image"
-            className="w-full h-auto object-cover rounded-lg shadow-md"
+            className="object-contain rounded-lg shadow-md"
             style={{ width: "400px", height: "400px" }}
           />
         )}
@@ -76,22 +110,26 @@ const ProductDetailPage = () => {
         <h1 className="text-2xl font-bold">{product.name}</h1>
         <p className="text-gray-700 mt-2">{product.description}</p>
         <p className="text-xl font-semibold mt-4">{product.price}원</p>
+        {/* 할인 정보 (더미 데이터) */}
         <p className="text-red-500">할인: 10%</p>
 
         {/* 상품 사양 */}
         <h3 className="text-lg font-semibold mt-4">상품 사양</h3>
         <ul>
-          <li>사이즈: Free</li>
-          <li>재질: 면 100%</li>
+          {productSpecifications.map((spec, index) => (
+            <li key={index}>
+              {spec.name}: {spec.value}
+            </li>
+          ))}
         </ul>
 
         {/* 배송 정보 */}
         <h3 className="text-lg font-semibold mt-4">배송 정보</h3>
-        <p>평균 2~3일 소요 (주말/공휴일 제외)</p>
+        <p>{deliveryInfo}</p>
 
         {/* 반품 및 교환 정책 */}
         <h3 className="text-lg font-semibold mt-4">반품 및 교환 정책</h3>
-        <p>수령 후 7일 이내 (단, 상품 훼손 시 불가)</p>
+        <p>{refundPolicy}</p>
 
         {/* 재고 상태 */}
         <p
@@ -102,12 +140,34 @@ const ProductDetailPage = () => {
           재고 상태: {product.stock > 0 ? "재고 있음" : "재고 없음"}
         </p>
 
+        {/* 수량 선택 */}
+        <div className="mt-4">
+          <label htmlFor="quantity" className="mr-2 font-semibold">
+            수량:
+          </label>
+          <input
+            type="number"
+            id="quantity"
+            value={quantity}
+            onChange={handleQuantityChange}
+            min="1"
+            max={product.stock}
+            className="border rounded w-20 px-2 py-1"
+          />
+        </div>
+
         {/* 구매 버튼 */}
         <div className="mt-6">
-          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
+          <button
+            onClick={handleAddToCart}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
+          >
             장바구니
           </button>
-          <button className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+          <button
+            onClick={handleAddToWishlist}
+            className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+          >
             찜하기
           </button>
           <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
@@ -120,14 +180,21 @@ const ProductDetailPage = () => {
       <div className="mt-8">
         <h2 className="text-xl font-semibold">리뷰</h2>
         <ul>
-          <li>
-            <p className="font-semibold">홍길동</p>
-            <p>아주 좋아요!</p>
-          </li>
-          <li>
-            <p className="font-semibold">김철수</p>
-            <p>배송이 조금 느려요.</p>
-          </li>
+          {dummyReviews.map((review) => (
+            <div key={review.id} className="border rounded p-4 mt-2">
+              <div className="flex items-center">
+                <p className="font-semibold">{review.author}</p>
+                <div className="ml-2">
+                  {Array.from({ length: review.rating }).map((_, i) => (
+                    <span key={i} className="text-yellow-500">
+                      ★
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <p className="mt-2">{review.comment}</p>
+            </div>
+          ))}
         </ul>
       </div>
 
@@ -135,14 +202,12 @@ const ProductDetailPage = () => {
       <div className="mt-8">
         <h2 className="text-xl font-semibold">FAQ</h2>
         <ul>
-          <li>
-            <p className="font-semibold">배송은 얼마나 걸리나요?</p>
-            <p>평균 2~3일 소요 (주말/공휴일 제외)</p>
-          </li>
-          <li>
-            <p className="font-semibold">반품 정책은 어떻게 되나요?</p>
-            <p>수령 후 7일 이내 (단, 상품 훼손 시 불가)</p>
-          </li>
+          {dummyFaqs.map((faq) => (
+            <div key={faq.id} className="border rounded p-4 mt-2">
+              <p className="font-semibold">{faq.question}</p>
+              <p className="mt-2">{faq.answer}</p>
+            </div>
+          ))}
         </ul>
       </div>
     </div>
