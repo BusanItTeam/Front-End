@@ -12,6 +12,7 @@ const ProductDetailPage = () => {
   const backendURL = "http://localhost:8080";
   const [selectedImage, setSelectedImage] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [selectedOption, setSelectedOption] = useState(null);
 
   const [selectedProductId, setSelectedProductId] = useState(null);
 
@@ -36,6 +37,12 @@ const ProductDetailPage = () => {
       setSelectedImage(selectedProduct.images[0].imageUrl);
     }
   }, [productId, products]);
+
+  useEffect(() => {
+    if (product && product.options && product.options.length > 0) {
+      setSelectedOption(product.options[0]); // Default to first option
+    }
+  }, [product]);
 
   if (!product) {
     return <div className="text-center py-4">Loading...</div>;
@@ -114,6 +121,12 @@ const ProductDetailPage = () => {
   const handleAddToWishlist = () => {
     // 찜 로직
     alert("찜 목록에 추가되었습니다!");
+  };
+
+  const handleOptionChange = (e) => {
+    const optionId = parseInt(e.target.value, 10);
+    const selected = product.options.find((opt) => opt.optionId === optionId);
+    setSelectedOption(selected);
   };
 
   // 더미 데이터
@@ -201,13 +214,43 @@ const ProductDetailPage = () => {
         <h3 className="text-lg font-semibold mt-4">반품 및 교환 정책</h3>
         <p>{refundPolicy}</p>
 
+        {/* 옵션 선택 */}
+        {product.options && product.options.length > 0 && (
+          <div className="mt-4">
+            <label htmlFor="option" className="mr-2 font-semibold">
+              옵션 선택:
+            </label>
+            <select
+              id="option"
+              onChange={handleOptionChange}
+              className="border rounded w-auto px-2 py-1"
+              value={selectedOption ? selectedOption.optionId : ""}
+            >
+              {product.options.map((option) => (
+                <option key={option.optionId} value={option.optionId}>
+                  {option.color ? `[ 색상: ${option.color} ] , ` : ""}
+                  {option.size ? `[ 사이즈: ${option.size} ] ` : ""}
+                  {/* 재고: {option.inventory.stock} */}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         {/* 재고 상태 */}
         <p
           className={`mt-4 font-semibold ${
-            product.stock > 0 ? "text-green-500" : "text-red-500"
+            selectedOption && selectedOption.inventory.stock > 0
+              ? "text-green-500"
+              : "text-red-500"
           }`}
         >
-          재고 상태: {product.stock > 0 ? "재고 있음" : "재고 없음"}
+          재고 상태:{" "}
+          {selectedOption
+            ? selectedOption.inventory.stock > 0
+              ? "재고 있음"
+              : "재고 없음"
+            : "옵션을 선택하세요"}
         </p>
 
         {/* 수량 선택 */}
@@ -221,8 +264,9 @@ const ProductDetailPage = () => {
             value={quantity}
             onChange={handleQuantityChange}
             min="1"
-            max={product.stock}
+            max={selectedOption ? selectedOption.inventory.stock : 0}
             className="border rounded w-20 px-2 py-1"
+            disabled={!selectedOption}
           />
         </div>
 
@@ -231,16 +275,21 @@ const ProductDetailPage = () => {
           <button
             onClick={() => handleAddToCart(selectedProductId, selectedImage)}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
+            disabled={!selectedOption || selectedOption.inventory.stock <= 0}
           >
             장바구니
           </button>
           <button
             onClick={handleAddToWishlist}
             className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+            disabled={!selectedOption || selectedOption.inventory.stock <= 0}
           >
             찜하기
           </button>
-          <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+          <button
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+            disabled={!selectedOption || selectedOption.inventory.stock <= 0}
+          >
             바로 구매
           </button>
         </div>

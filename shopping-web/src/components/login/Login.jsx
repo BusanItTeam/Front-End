@@ -116,7 +116,7 @@ const Login = () => {
               >
                 {loading ? "로그인 중..." : "Log In"}
               </button>
-              <Link to="/" className="text-red-500 text-sm hover:underline">
+              <Link to="/forgot-password" className="text-red-500 text-sm hover:underline">
                 Forgot Password?
               </Link>
             </div>
