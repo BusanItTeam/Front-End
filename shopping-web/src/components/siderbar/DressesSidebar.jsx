@@ -16,7 +16,7 @@ const DressesSidebar = () => {
           원피스
           <img className="w-4 h-4" src="/dropdown.png" alt="dropdown" />
         </button>
-
+        {/* 아아 테스트 */}
         {manDropdown && (
           <ul className="mt-2 bg-white shadow rounded-md">
             <li>
