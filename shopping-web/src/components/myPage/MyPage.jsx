@@ -81,7 +81,7 @@ const MyPage = () => {
           <span className="text-gray-500">&rarr;</span>
         </div>
         <div className="p-4 px-8 bg-gray-50 rounded-lg flex justify-between items-center">
-          <Link to="/myPage/editProfile">
+          <Link to="/wishlist">
             <span className="text-lg font-semibold">wishlist </span>
             <span className="text-gray-600 ">관심 상품</span>
             <p className="pt-1 text-xs text-gray-400">관심상품으로 등록하신 상품의 목록을 보여드립니다.</p>

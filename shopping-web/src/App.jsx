@@ -33,6 +33,7 @@ import Payment from "./components/order/Payment";
 import InquiryManagement from "./components/adminPage/InquiryManagement";
 import { Toaster } from "react-hot-toast";
 import ProductDetailPage from "./components/productCategory/ProductDetailPage";
+import Wishlist from "./components/wishlist/wishlist";
 const AdminRoute = ({ children }) => {
   const { isAdmin } = useMyContext();
   return isAdmin ? children : <Navigate to="/" />;
@@ -47,11 +48,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/productcategory" element={<ProductCategory />} />
-          <Route
-            path="/category/:categoryName"
-            element={<CategoryPage />}
-          />{" "}
-          {/* CategoryPage 라우트 */}
+          <Route path="/category/:categoryName" element={<CategoryPage />} /> {/* CategoryPage 라우트 */}
           <Route path="/product/:productId" element={<ProductDetailPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
@@ -63,6 +60,7 @@ function App() {
           <Route path="/orderpage" element={<OrderPage />} />
           <Route path="/orderpage/payment" element={<Payment />} />
           <Route path="/orderpage/ordercomplete" element={<OrderComplete />} />
+          <Route path="/wishlist" element={<Wishlist />} />
           <Route
             path="/admin"
             element={
