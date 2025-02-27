@@ -95,10 +95,17 @@ function ProductManagement() {
         name: "",
         price: "",
         description: "",
-        imageFiles: [],
+        imageFiles: [], // 이미지 파일 리셋
         categoryId: "",
       });
       setOptions([{ color: "", size: "", stock: "" }]); // Reset options
+
+      // 이미지 파일 선택 창 리셋
+      const imageInput = document.querySelector('input[name="imageFiles"]');
+      if (imageInput) {
+        imageInput.value = null; // 파일 input의 값을 null로 설정하여 리셋
+      }
+
       alert("상품 추가 완료!");
     } catch (error) {
       console.error("Error adding product:", error);
