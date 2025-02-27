@@ -8,7 +8,7 @@ import { toast } from "react-hot-toast";
 const EditProfile = () => {
   const { currentUser } = useMyContext();
   const navigate = useNavigate();
-  //useState로 관리
+  //useState로 관리 
   const [name, setName] = useState("");
   const [postcode, setPostcode] = useState("");
   const [address, setAddress] = useState("");
@@ -17,6 +17,7 @@ const EditProfile = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
 
   console.log("데이타", currentUser);
+
   useEffect(() => {
     if (currentUser) {
       setName(currentUser.name || "");
@@ -43,6 +44,7 @@ const EditProfile = () => {
     return isValid(date) ? format(date, "yyyy-MM-dd HH시 mm분") : "입력되지 않음";
   };
 
+  
   const handleUpdate = async () => {
     try {
       const token = localStorage.getItem("JWT_TOKEN"); 

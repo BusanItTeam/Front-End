@@ -14,7 +14,10 @@ const Api = axios.create({
 // 애플리케이션 시작 시 CSRF 토큰을 미리 가져오기
 export const fetchCsrfToken = async () => {
   try {
-    const response = await axios.get(`${import.meta.env.VITE_APP_API_URL}/api/csrf-token`, { withCredentials: true });
+    const response = await axios.get(
+      `${import.meta.env.VITE_APP_API_URL}/api/csrf-token`, 
+      { withCredentials: true }
+    );
     const csrfToken = response.data.token;
     localStorage.setItem("CSRF_TOKEN", csrfToken);
     console.log("Fetched CSRF Token:", csrfToken);
