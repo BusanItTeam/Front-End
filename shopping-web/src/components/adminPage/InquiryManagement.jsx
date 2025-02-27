@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import api from "../../services/api"; // API 호출을 위한 axios 인스턴스
+import api from "../../services/Api"; // API 호출을 위한 axios 인스턴스
 
 function InquiryManagement() {
   const [inquiries, setInquiries] = useState([]); // 문의 리스트 상태

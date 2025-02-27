@@ -13,6 +13,7 @@ const ProductDetailPage = () => {
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(null); // null로 초기화 (로딩 상태)
   const [loading, setLoading] = useState(true);
+  const [selectedOption, setSelectedOption] = useState(null);
 
   useEffect(() => {
     const selectedProduct = products.find((p) => p.productId === Number(productId));
@@ -91,6 +92,12 @@ const ProductDetailPage = () => {
       toast.error("찜하기에 실패했습니다.");
     }
   };
+
+  useEffect(() => {
+    if (product && product.options && product.options.length > 0) {
+      setSelectedOption(product.options[0]); // Default to first option
+    }
+  }, [product]);
 
   if (!product) {
     return <div className="text-center py-4">Loading...</div>;
@@ -176,20 +183,39 @@ const ProductDetailPage = () => {
         <h3 className="text-lg font-semibold mt-4">반품 및 교환 정책</h3>
         <p>{refundPolicy}</p>
 
+        {/* 옵션 선택 */}
+        {product.options && product.options.length > 0 && (
+          <div className="mt-4">
+            <label htmlFor="option" className="mr-2 font-semibold">
+              옵션 선택:
+            </label>
+            <select id="option" onChange={handleOptionChange} className="border rounded w-auto px-2 py-1" value={selectedOption ? selectedOption.optionId : ""}>
+              {product.options.map((option) => (
+                <option key={option.optionId} value={option.optionId}>
+                  {option.color ? `[ 색상: ${option.color} ] , ` : ""}
+                  {option.size ? `[ 사이즈: ${option.size} ] ` : ""}
+                  {/* 재고: {option.inventory.stock} */}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         {/* 재고 상태 */}
-        <p className={`mt-4 font-semibold ${product.stock > 0 ? "text-green-500" : "text-red-500"}`}>재고 상태: {product.stock > 0 ? "재고 있음" : "재고 없음"}</p>
+
+        <p className={`mt-4 font-semibold ${selectedOption && selectedOption.inventory.stock > 0 ? "text-green-500" : "text-red-500"}`}>재고 상태: {selectedOption ? (selectedOption.inventory.stock > 0 ? "재고 있음" : "재고 없음") : "옵션을 선택하세요"}</p>
 
         {/* 수량 선택 */}
         <div className="mt-4">
           <label htmlFor="quantity" className="mr-2 font-semibold">
             수량:
           </label>
-          <input type="number" id="quantity" value={quantity} onChange={handleQuantityChange} min="1" max={product.stock} className="border rounded w-20 px-2 py-1" />
+          <input type="number" id="quantity" value={quantity} onChange={handleQuantityChange} min="1" max={selectedOption ? selectedOption.inventory.stock : 0} className="border rounded w-20 px-2 py-1" disabled={!selectedOption} />
         </div>
 
         {/* 구매 버튼 */}
         <div className="mt-6">
-          <button onClick={handleAddToCart} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
+          <button onClick={handleAddToCart} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2" disabled={!selectedOption || selectedOption.inventory.stock <= 0}>
             장바구니
           </button>
           <button
@@ -207,6 +233,9 @@ const ProductDetailPage = () => {
           >
             {console.log("🛠 렌더링된 isWishlisted 상태:", isWishlisted)}
             {loading ? "로딩..." : isWishlisted === null ? "찜하기" : isWishlisted ? "찜 취소" : "찜하기"}
+          </button>
+          <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" disabled={!selectedOption || selectedOption.inventory.stock <= 0}>
+            바로 구매
           </button>
           <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">바로 구매</button>
         </div>

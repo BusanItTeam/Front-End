@@ -10,7 +10,6 @@ function ProductManagement() {
     name: "",
     price: "",
     categoryId: "",
-    stock: "",
     description: "",
     imageFiles: [], // multiple image upload
   });
@@ -23,6 +22,8 @@ function ProductManagement() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 10;
+
+  const [options, setOptions] = useState([{ color: "", size: "", stock: "" }]);
 
   useEffect(() => {
     console.log("Products data:", products);
@@ -59,7 +60,6 @@ function ProductManagement() {
       const formData = new FormData();
       formData.append("name", newProduct.name);
       formData.append("price", Number(newProduct.price));
-      formData.append("stock", Number(newProduct.stock));
       formData.append("description", newProduct.description);
       formData.append("categoryId", newProduct.categoryId);
 
@@ -68,6 +68,9 @@ function ProductManagement() {
           formData.append("imageFiles", newProduct.imageFiles[i]);
         }
       }
+
+      // Add options as JSON
+      formData.append("options", JSON.stringify(options));
 
       for (let [key, value] of formData.entries()) {
         console.log(`${key}: ${value}`);
@@ -91,11 +94,18 @@ function ProductManagement() {
       setNewProduct({
         name: "",
         price: "",
-        stock: "",
         description: "",
-        imageFiles: [],
+        imageFiles: [], // 이미지 파일 리셋
         categoryId: "",
       });
+      setOptions([{ color: "", size: "", stock: "" }]); // Reset options
+
+      // 이미지 파일 선택 창 리셋
+      const imageInput = document.querySelector('input[name="imageFiles"]');
+      if (imageInput) {
+        imageInput.value = null; // 파일 input의 값을 null로 설정하여 리셋
+      }
+
       alert("상품 추가 완료!");
     } catch (error) {
       console.error("Error adding product:", error);
@@ -111,7 +121,6 @@ function ProductManagement() {
       const formData = new FormData();
       formData.append("name", editingProduct.name);
       formData.append("price", Number(editingProduct.price));
-      formData.append("stock", Number(editingProduct.stock));
       formData.append("description", editingProduct.description);
       formData.append("categoryId", editingProduct.category.categoryId);
 
@@ -120,6 +129,9 @@ function ProductManagement() {
           formData.append("imageFiles", newImageFiles[i]);
         }
       }
+
+      // Add options as JSON
+      formData.append("options", JSON.stringify(options));
 
       for (let [key, value] of formData.entries()) {
         console.log(`${key}: ${value}`);
@@ -163,6 +175,13 @@ function ProductManagement() {
   const handleEditProduct = (product) => {
     setEditingProduct(product);
     setShowEditFormFor(product.productId);
+    setOptions(
+      product.options.map((option) => ({
+        color: option.color,
+        size: option.size,
+        stock: option.inventory.stock,
+      }))
+    );
   };
 
   const handleStockThresholdChange = (e) => {
@@ -225,6 +244,23 @@ function ProductManagement() {
         console.error("Error deleting category:", error);
       }
     }
+  };
+
+  const handleOptionChange = (index, e) => {
+    const { name, value } = e.target;
+    const list = [...options];
+    list[index][name] = value;
+    setOptions(list);
+  };
+
+  const handleAddOption = () => {
+    setOptions([...options, { color: "", size: "", stock: "" }]);
+  };
+
+  const handleRemoveOption = (index) => {
+    const list = [...options];
+    list.splice(index, 1);
+    setOptions(list);
   };
 
   return (
@@ -299,15 +335,6 @@ function ProductManagement() {
               </option>
             ))}
           </select>
-          <input
-            type="number"
-            name="stock"
-            value={newProduct.stock}
-            onChange={handleInputChange}
-            placeholder="재고"
-            className="border p-2"
-            required
-          />
           <textarea
             name="description"
             value={newProduct.description}
@@ -324,6 +351,51 @@ function ProductManagement() {
             multiple
           />
         </div>
+
+        {/* Options Input */}
+        <h4 className="text-lg font-semibold mt-4">상품 옵션</h4>
+        {options.map((option, index) => (
+          <div key={index} className="grid grid-cols-4 gap-2 mb-2">
+            <input
+              type="text"
+              name="color"
+              value={option.color}
+              onChange={(e) => handleOptionChange(index, e)}
+              placeholder="색상"
+              className="border p-2"
+            />
+            <input
+              type="text"
+              name="size"
+              value={option.size}
+              onChange={(e) => handleOptionChange(index, e)}
+              placeholder="사이즈"
+              className="border p-2"
+            />
+            <input
+              type="number"
+              name="stock"
+              value={option.stock}
+              onChange={(e) => handleOptionChange(index, e)}
+              placeholder="재고"
+              className="border p-2"
+            />
+            <button
+              type="button"
+              onClick={() => handleRemoveOption(index)}
+              className="bg-red-500 text-white px-2 py-1"
+            >
+              삭제
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={handleAddOption}
+          className="bg-green-500 text-white px-4 py-2 mt-2"
+        >
+          옵션 추가
+        </button>
         <button type="submit" className="bg-blue-500 text-white px-4 py-2 mt-2">
           상품 등록
         </button>
@@ -350,7 +422,7 @@ function ProductManagement() {
               <th className="border p-2">상품명</th>
               <th className="border p-2">가격</th>
               <th className="border p-2">카테고리</th>
-              <th className="border p-2">재고</th>
+              <th className="border p-2">옵션</th>
               <th className="border p-2">관리</th>
             </tr>
           </thead>
@@ -361,7 +433,12 @@ function ProductManagement() {
                   <tr
                     onClick={() => handleProductClick(product.productId)}
                     className={`cursor-pointer ${
-                      product.stock <= stockThreshold ? "bg-red-100" : ""
+                      product.options?.reduce(
+                        (acc, option) => acc + option.inventory.stock,
+                        0
+                      ) <= stockThreshold
+                        ? "bg-red-100"
+                        : ""
                     }`}
                   >
                     <td className="border p-2">
@@ -387,7 +464,14 @@ function ProductManagement() {
                         )?.name
                       }
                     </td>
-                    <td className="border p-2">{product.stock}</td>
+                    <td className="border p-2">
+                      {product.options?.map((option, index) => (
+                        <div key={index}>
+                          색상: {option.color}, 사이즈: {option.size}, 재고:{" "}
+                          {option.inventory.stock}
+                        </div>
+                      ))}
+                    </td>
                     <td className="border p-2">
                       <button
                         onClick={(e) => {
@@ -416,6 +500,18 @@ function ProductManagement() {
                           <p>
                             <b>설명:</b> {product.description}
                           </p>
+                          {/* Display Options */}
+                          <h4 className="text-lg font-semibold mt-2">
+                            상품 옵션:
+                          </h4>
+                          <ul>
+                            {product.options?.map((option, index) => (
+                              <li key={index}>
+                                색상: {option.color}, 사이즈: {option.size},
+                                재고: {option.inventory.stock}
+                              </li>
+                            ))}
+                          </ul>
                         </div>
                       </td>
                     </tr>
@@ -478,20 +574,6 @@ function ProductManagement() {
                                 </option>
                               ))}
                             </select>
-                            <p>재고</p>
-                            <input
-                              type="number"
-                              name="stock"
-                              value={editingProduct.stock || ""}
-                              onChange={(e) =>
-                                setEditingProduct({
-                                  ...editingProduct,
-                                  stock: e.target.value,
-                                })
-                              }
-                              className="border p-2 mb-2 w-full"
-                              required
-                            />
                             <p>상품 설명</p>
                             <textarea
                               name="description"
@@ -513,6 +595,55 @@ function ProductManagement() {
                               className="border p-2 mb-2 w-full"
                               multiple
                             />
+                            <h4 className="text-lg font-semibold mt-4">
+                              상품 옵션
+                            </h4>
+                            {options.map((option, index) => (
+                              <div
+                                key={index}
+                                className="grid grid-cols-4 gap-2 mb-2"
+                              >
+                                <input
+                                  type="text"
+                                  name="color"
+                                  value={option.color}
+                                  onChange={(e) => handleOptionChange(index, e)}
+                                  placeholder="색상"
+                                  className="border p-2"
+                                />
+                                <input
+                                  type="text"
+                                  name="size"
+                                  value={option.size}
+                                  onChange={(e) => handleOptionChange(index, e)}
+                                  placeholder="사이즈"
+                                  className="border p-2"
+                                />
+                                <input
+                                  type="number"
+                                  name="stock"
+                                  value={option.stock}
+                                  onChange={(e) => handleOptionChange(index, e)}
+                                  placeholder="재고"
+                                  className="border p-2"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveOption(index)}
+                                  className="bg-red-500 text-white px-2 py-1"
+                                >
+                                  삭제
+                                </button>
+                              </div>
+                            ))}
+                            <button
+                              type="button"
+                              onClick={handleAddOption}
+                              className="bg-green-500 text-white px-4 py-2 mt-2"
+                            >
+                              옵션 추가
+                            </button>
+
                             <div className="flex justify-end">
                               <button
                                 type="submit"

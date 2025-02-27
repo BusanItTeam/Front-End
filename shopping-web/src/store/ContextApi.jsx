@@ -175,7 +175,6 @@ export const ContextProvider = ({ children }) => {
         setLoading,
         filteredUsers,
         setFilteredUsers,
-        setLoading,
       }}
     >
       {children}
