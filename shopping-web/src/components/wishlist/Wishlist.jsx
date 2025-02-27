@@ -73,8 +73,7 @@ const Wishlist = () => {
               <td className="py-2">{item.option}</td>
               <td className="py-2">KRW {item.price.toLocaleString()}</td>
               <td className="flex flex-col space-y-2">
-                <button className="bg-gray-500 text-white border border-gray-600 py-0.5 mt-2">주문하기</button>
-                <button className="border border-gray-400 py-0.5 ">장바구니 담기</button>
+                <button className="bg-gray-500 text-white border border-gray-600 py-0.5 mt-2">장바구니담기</button>
                 <button className="border border-gray-400 py-0.5 mb-2">삭제</button>
               </td>
             </tr>
@@ -85,8 +84,7 @@ const Wishlist = () => {
         <div>
           <span>선택상품 </span>
           <button className="border border-gray-400 py-1 px-2 mx-2 ">삭제하기</button>
-          <button className="border border-gray-400 py-1 px-2 ">장바구니담기</button>
-          <button className="bg-gray-500 text-white border border-gray-600 px-2 mx-2 py-1">주문하기</button>
+          <button className="bg-gray-500 text-white border border-gray-600 px-2 mx-2 py-1">장바구니담기</button>
         </div>
       </div>
     </div>
