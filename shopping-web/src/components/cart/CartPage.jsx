@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMyContext } from "../../store/ContextApi";
 import Api from "../../services/Api";
 
@@ -12,82 +12,65 @@ const CartPage = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const SHIPPING_COST = 3000; //배송비
-  const userId = currentUser?.id; // Ensure userId is correctly retrieved
-  // const productId = (productName) => {
-  //   const product = products.find((p) => p.name === productName);
-  //   return product ? product.id : null;
-  // };
+  const { userId } = useParams();
 
-  // // 🔹 장바구니 데이터 가져오기 함수
-  // const fetchCart = async () => {
-  //   if (!userId) return; // 로그인된 유저가 없으면 실행 안 함
-  //   try {
-  //     setLoading(true);
-  //     setError(null); // 기존 에러 초기화
-  //     const response = await Api.get(`/carts/${userId}`);
-  //     setCartItems(response.data);
-  //   } catch (err) {
-  //     setError("Failed to load cart");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  // 🔹 장바구니 데이터 가져오기 함수
+  const fetchCart = async () => {
+    if (!userId) return; // 로그인된 유저가 없으면 실행 안 함
+    try {
+      setLoading(true);
+      setError(null); // 기존 에러 초기화
+      const response = await Api.get(`/carts/${userId}`);
+      setCartItems(response.data);
+    } catch (err) {
+      setError("Failed to load cart");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // // 🔹 1. 로그인되지 않은 경우 로그인 페이지로 이동
-  // useEffect(() => {
-  //   if (!token) {
-  //     navigate("/login");
-  //   } else {
-  //     fetchCart();
-  //   }
-  // }, [token, navigate]); // token 변경 시 실행
-
-  // // 🔹 2. 로그인한 유저가 변경될 때 장바구니 데이터 다시 불러오기
-  // useEffect(() => {
-  //   if (userId) {
-  //     fetchCart();
-  //   }
-  // }, [userId]); // userId 변경 시 실행
-
-  // 1. 로그인 여부 확인 -> 로그인 안 했으면 로그인 페이지로 이동
+  // 🔹 1. 로그인되지 않은 경우 로그인 페이지로 이동
   useEffect(() => {
-    console.log(token);
     if (!token) {
       navigate("/login");
     } else {
       fetchCart();
     }
-  }, [currentUser]);
+  }, [token, navigate]); // token 변경 시 실행
 
-  // 🚀 2. 로그인한 유저의 장바구니 데이터 불러오기
-  const fetchCart = async () => {
+  // 🔹 2. 로그인한 유저가 변경될 때 장바구니 데이터 다시 불러오기
+  useEffect(() => {
+    if (userId) {
+      fetchCart();
+    }
+  }, [userId]); // userId 변경 시 실행
+
+  // 🚀 3. 장바구니 아이템 삭제
+  // const removeItem = async (id) => {
+  //   setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
+  //   setSelectedItems((prevSelected) =>
+  //     prevSelected.filter((itemId) => itemId !== id)
+  //   );
+  // };
+  const removeItem = async (id) => {
+    if (!userId) return;
+
     try {
-      const response = await fetch("/api/cart", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${currentUser.token}`, // JWT 토큰으로 인증
-        },
+      await Api.delete(`/removeOne`, {
+        params: { userId, productId: id },
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setCartItems(data);
-      } else {
-        console.error("장바구니 데이터를 불러오지 못했습니다.");
-      }
+      // 성공적으로 삭제되면 상태 업데이트
+      setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
+      setSelectedItems((prevSelected) =>
+        prevSelected.filter((itemId) => itemId !== id)
+      );
     } catch (error) {
-      console.error("장바구니 불러오기 오류:", error);
+      console.error("Failed to remove item from cart", error);
+      alert("삭제에 실패했습니다. 다시 시도해주세요.");
     }
   };
 
-  // 🚀 3. 장바구니 아이템 삭제
-  const removeItem = async (id) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
-    setSelectedItems((prevSelected) =>
-      prevSelected.filter((itemId) => itemId !== id)
-    );
-  };
   // 🚀 4. 장바구니 수량 변경
   const updateQuantity = async (id, quantity) => {
     const newQuantity = Math.max(1, quantity);
@@ -155,7 +138,7 @@ const CartPage = () => {
               </thead>
               <tbody>
                 <tr></tr>
-                {cartItems.map((item) => (
+                {cartItems?.map((item) => (
                   <tr
                     key={item.id}
                     className="border-b text-center text-gray-800"

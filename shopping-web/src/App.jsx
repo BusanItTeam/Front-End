@@ -33,6 +33,8 @@ import Payment from "./components/order/Payment";
 import InquiryManagement from "./components/adminPage/InquiryManagement";
 import { Toaster } from "react-hot-toast";
 import ProductDetailPage from "./components/productCategory/ProductDetailPage";
+import ForgotPassword from "./components/Auth/ForgotPassword";
+import ResetPassword from "./components/Auth/ResetPassword";
 const AdminRoute = ({ children }) => {
   const { isAdmin } = useMyContext();
   return isAdmin ? children : <Navigate to="/" />;
@@ -63,6 +65,9 @@ function App() {
           <Route path="/orderpage" element={<OrderPage />} />
           <Route path="/orderpage/payment" element={<Payment />} />
           <Route path="/orderpage/ordercomplete" element={<OrderComplete />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+
           <Route
             path="/admin"
             element={
