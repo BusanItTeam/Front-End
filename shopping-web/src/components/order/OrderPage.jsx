@@ -85,6 +85,26 @@ const OrderPage = () => {
   }, []);
 
   // ✅ 결제하기 버튼 클릭 시 주문저장
+  // const handleOrderSubmit = async () => {
+  //   if (!currentUser?.id || cartItems.length === 0) {
+  //     alert("유효한 사용자 또는 장바구니 상품이 없습니다.");
+  //     return;
+  //   }
+
+  //   const orderData = {
+  //     userId: currentUser.id,
+  //     totalPrice: getTotalPrice() + SHIPPING_COST - point,
+  //     status: "배송준비중",
+  //   };
+
+  //   try {
+  //     const response = await Api.post("/orders/create", orderData);
+  //     console.log("Order Created:", response.data);
+  //   } catch (error) {
+  //     console.error("주문 생성 실패:", error);
+  //     alert("주문을 생성하는 중 오류가 발생했습니다.");
+  //   }
+  // };
   const handleOrderSubmit = async () => {
     if (!currentUser?.id || cartItems.length === 0) {
       alert("유효한 사용자 또는 장바구니 상품이 없습니다.");
@@ -93,6 +113,11 @@ const OrderPage = () => {
 
     const orderData = {
       userId: currentUser.id,
+      items: cartItems.map((item) => ({
+        productId: item.id,
+        quantity: item.quantity,
+        price: item.productPrice,
+      })),
       totalPrice: getTotalPrice() + SHIPPING_COST - point,
       status: "배송준비중",
     };
@@ -100,6 +125,7 @@ const OrderPage = () => {
     try {
       const response = await Api.post("/orders/create", orderData);
       console.log("Order Created:", response.data);
+      alert("주문이 성공적으로 완료되었습니다.");
     } catch (error) {
       console.error("주문 생성 실패:", error);
       alert("주문을 생성하는 중 오류가 발생했습니다.");
@@ -311,7 +337,10 @@ const OrderPage = () => {
                   </td>
                   <td className="p-4 font-medium">{item.name}</td>
                   <td className="p-4 text-gray-700">
-                    {item.price.toLocaleString("ko-KR")}원
+                    {(item.productPrice * item.quantity).toLocaleString(
+                      "ko-KR"
+                    )}
+                    원
                   </td>
                   <td className="p-4 flex justify-center items-center mt-4">
                     <span className="mx-2 text-sm text-gray-900">
