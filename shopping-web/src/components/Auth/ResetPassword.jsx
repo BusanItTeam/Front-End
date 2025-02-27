@@ -13,7 +13,6 @@ const ResetPassword = () => {
     register,
     handleSubmit,
     reset,
-    watch,
     formState: { errors },
   } = useForm({
     defaultValues: {
