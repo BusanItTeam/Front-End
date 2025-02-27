@@ -1,28 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useMyContext } from "../../store/ContextApi";
-import api from "../../services/Api";
-import axios from "axios";
-import toast from "react-hot-toast";
 
 const ProductDetailPage = () => {
   const { productId } = useParams();
-  const { products, currentUser } = useMyContext();
+  const { products } = useMyContext();
   const [product, setProduct] = useState(null);
   const backendURL = "http://localhost:8080";
   const [selectedImage, setSelectedImage] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [selectedOption, setSelectedOption] = useState(null);
-
-  const [selectedProductId, setSelectedProductId] = useState(null);
-
-  useEffect(() => {
-    if (productId) {
-      setSelectedProductId(productId);
-    }
-  }, [productId]);
-
-  console.log("Selected Product ID:", selectedProductId);
 
   useEffect(() => {
     const selectedProduct = products.find(
@@ -56,66 +43,9 @@ const ProductDetailPage = () => {
     setQuantity(parseInt(e.target.value, 10));
   };
 
-  // const handleAddToCart = async (productId) => {
-  //   if (!productId) {
-  //     console.error("Product ID is missing.");
-  //     return;
-  //   }
-
-  //   try {
-  //     const token = localStorage.getItem("JWT_TOKEN");
-
-  //     if (!token) {
-  //       console.error("No token found, user is not authenticated.");
-  //       return;
-  //     }
-
-  //     const response = await api.post(
-  //       `${import.meta.env.VITE_APP_API_URL}/api/cart/add`,
-  //       { productId, quantity: 1 },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //           "Content-Type": "application/json",
-  //         },
-  //         withCredentials: true,
-  //       }
-  //     );
-  //     toast.success("성공적으로 등록 완료", response.data);
-  //   } catch (error) {
-  //     console.error("Cart add error:", error.response?.data || error.message);
-  //   }
-  // };
-  //카트에 담기(이미지포함)
-  const handleAddToCart = async (productId, imageUrl) => {
-    if (!productId) {
-      console.error("Product ID is missing.");
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem("JWT_TOKEN");
-
-      if (!token) {
-        console.error("No token found, user is not authenticated.");
-        return;
-      }
-
-      const response = await api.post(
-        `${import.meta.env.VITE_APP_API_URL}/api/cart/add`,
-        { productId, quantity: 1, productImageUrl: imageUrl }, // 이미지 추가
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      );
-      toast.success("성공적으로 등록 완료", response.data);
-    } catch (error) {
-      console.error("Cart add error:", error.response?.data || error.message);
-    }
+  const handleAddToCart = () => {
+    // 장바구니 로직
+    alert("장바구니에 추가되었습니다!");
   };
 
   const handleAddToWishlist = () => {
@@ -273,7 +203,7 @@ const ProductDetailPage = () => {
         {/* 구매 버튼 */}
         <div className="mt-6">
           <button
-            onClick={() => handleAddToCart(selectedProductId, selectedImage)}
+            onClick={handleAddToCart}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
             disabled={!selectedOption || selectedOption.inventory.stock <= 0}
           >
