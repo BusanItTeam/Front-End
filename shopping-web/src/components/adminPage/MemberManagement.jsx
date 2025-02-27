@@ -151,7 +151,7 @@ const MemberManagement = () => {
   // 페이지 로드 시 유저 데이터 가져오기
   useEffect(() => {
     fetchUsers(); // Context에서 제공하는 fetchUsers 호출
-  }, [fetchUsers]);
+  }, [searchTerm]);
 
   useEffect(() => {
     const filtered = (users || []).filter((user) =>
@@ -161,6 +161,7 @@ const MemberManagement = () => {
     );
     setFilteredUsers(filtered);
   }, [searchTerm, users]);
+
 
   const rows = filteredUsers.map((item) => ({
     id: item.userId,
@@ -176,6 +177,12 @@ const MemberManagement = () => {
     status: item?.enabled ? "Active" : "Inactive",
   }));
 
+  useEffect(() => {
+    console.log("🔍 검색어:", searchTerm);
+    console.log("🧐 users 데이터 예시:", users); 
+  }, [searchTerm, users]);
+  
+  
   return (
     <div className="p-4">
       <div className="relative flex items-center justify-center mb-6">

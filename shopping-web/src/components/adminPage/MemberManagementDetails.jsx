@@ -172,7 +172,7 @@ const MemberManagementDetails = () => {
         <p className="text-lg text-gray-600 text-center mt-4">🏠 주소 정보 없음</p>
       )}
 
-      {/* 관리 버튼 추가 (회원 수정, 삭제 등) */}
+      {/* 관리 버튼 추가 (삭제 등) */}
       <div className="flex justify-end mt-6">
         <Button variant="outlined" color="secondary" onClick={handleDeleteUser}>회원 삭제</Button>
       </div>
