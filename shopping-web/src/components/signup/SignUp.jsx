@@ -7,12 +7,17 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useMyContext } from "../../store/ContextApi";
 import AddressInput from "../Auth/AddressInput";
+import EmailVerification from "../Auth/EmailValidate";
+import EmailValidate from "../Auth/EmailValidate";
+
+
 const SignUp = () => {
   const apiUrl = import.meta.env.VITE_APP_API_URL;
   const [role, setRole] = useState();
   const [loading, setLoading] = useState(false);
   const { token } = useMyContext();
   const navigate = useNavigate();
+  const[isEmailVerified, setIsEmailVerified] = useState(false);
   
   const {
     register,
@@ -47,10 +52,12 @@ const SignUp = () => {
 
 
 
-  
 
-  const onSubmitHandler = async (data) => {
-    console.log("회원가입 요청 데이터:", data); // 로그 확인
+    const onSubmitHandler = async (data) => {
+      if (!isEmailVerified) {
+        toast.error("이메일 인증을 완료해주세요.");
+        return;
+      }
   
     const { username, name, email, phoneNumber,  password , postcode, address, detailAddress, extraAddress} = data;
     const sendData = { 
@@ -157,17 +164,11 @@ const SignUp = () => {
             {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
 
             {/* 이메일 */}
-            <input
-              type="email"
-              className="w-full pb-2 border-b border-gray-300 focus:outline-none focus:border-gray-600"
-              placeholder="이메일"
-              {...register("email", {
-                required: "이메일을 입력해주세요",
-                pattern: { value: /^\S+@\S+\.\S+$/, message: "올바른 이메일 형식을 입력해주세요" },
-              })}
-            />
+  
             {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
               
+            <EmailValidate email={watch("email") || ""} setIsEmailVerified={setIsEmailVerified} />
+          
             <AddressInput register={register} setValue={setValue}/>
       
             {/* 핸드폰 번호 */}

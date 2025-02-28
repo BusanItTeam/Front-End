@@ -29,7 +29,7 @@ const userListsColumns = [
   },
   {
     field: "name",
-    headerName: "userName",
+    headerName: "name",
     headerAlign: "center",
     minWidth: 200,
     align: "center",
@@ -141,8 +141,7 @@ const MemberManagement = () => {
     filteredUsers,
     setFilteredUsers,
     loading,
-    error,
-    setError,
+
     fetchUsers,
   } = useMyContext(); 
 
@@ -165,8 +164,8 @@ const MemberManagement = () => {
       
     );
     setFilteredUsers(filtered);
-     
-  }, [searchTerm,users]);
+     console.log("필터유저",filtered);
+  }, [searchTerm]);
 
 
   const rows = (filteredUsers ?? []).map((item) => ({
@@ -184,10 +183,7 @@ const MemberManagement = () => {
   }));
   
 
-  useEffect(() => {
-    console.log("🔍 검색어:", searchTerm);
-    console.log("🧐 users 데이터 예시:", users); 
-  }, [searchTerm, users]);
+  
   
   
   return (
