@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useMyContext } from "../../store/ContextApi";
 import api from "../../services/Api";
+import { formatCurrency } from "../utils/Formatting";
 
 function ProductManagement() {
   const { products, setProducts, fetchProducts } = useMyContext();
@@ -12,6 +13,7 @@ function ProductManagement() {
     categoryId: "",
     description: "",
     imageFiles: [], // multiple image upload
+    discountRate: "", // 할인율 추가
   });
   const [editingProduct, setEditingProduct] = useState(null);
   const [stockThreshold, setStockThreshold] = useState(10);
@@ -62,6 +64,7 @@ function ProductManagement() {
       formData.append("price", Number(newProduct.price));
       formData.append("description", newProduct.description);
       formData.append("categoryId", newProduct.categoryId);
+      formData.append("discountRate", newProduct.discountRate); // 할인율 추가
 
       if (newProduct.imageFiles) {
         for (let i = 0; i < newProduct.imageFiles.length; i++) {
@@ -97,6 +100,7 @@ function ProductManagement() {
         description: "",
         imageFiles: [], // 이미지 파일 리셋
         categoryId: "",
+        discountRate: "", // 할인율 초기화
       });
       setOptions([{ color: "", size: "", stock: "" }]); // Reset options
 
@@ -123,6 +127,7 @@ function ProductManagement() {
       formData.append("price", Number(editingProduct.price));
       formData.append("description", editingProduct.description);
       formData.append("categoryId", editingProduct.category.categoryId);
+      formData.append("discountRate", editingProduct.discountRate); // 할인율 추가
 
       if (newImageFiles) {
         for (let i = 0; i < newImageFiles.length; i++) {
@@ -263,6 +268,14 @@ function ProductManagement() {
     setOptions(list);
   };
 
+  const calculateDiscountedPrice = (price, discountRate) => {
+    if (discountRate && discountRate > 0) {
+      const discountAmount = (price * discountRate) / 100;
+      return price - discountAmount;
+    }
+    return price;
+  };
+
   return (
     <div className="container mx-auto p-4">
       <h2 className="text-2xl font-bold mb-4">상품 관리</h2>
@@ -320,6 +333,14 @@ function ProductManagement() {
             placeholder="가격"
             className="border p-2"
             required
+          />
+          <input
+            type="number"
+            name="discountRate"
+            value={newProduct.discountRate}
+            onChange={handleInputChange}
+            placeholder="할인율"
+            className="border p-2"
           />
           <select
             name="categoryId"
@@ -420,6 +441,7 @@ function ProductManagement() {
               <th className="border p-2">이미지</th>
               <th className="border p-2">상품명</th>
               <th className="border p-2">가격</th>
+              <th className="border p-2">할인율</th>
               <th className="border p-2">카테고리</th>
               <th className="border p-2">옵션</th>
               <th className="border p-2">관리</th>
@@ -456,7 +478,32 @@ function ProductManagement() {
                       </div>
                     </td>
                     <td className="border p-2">{product.name}</td>
-                    <td className="border p-2">{product.price}</td>
+                    <td className="border p-2">
+                      {product.discountRate && product.discountRate > 0 ? (
+                        <>
+                          <span
+                            style={{
+                              textDecoration: "line-through",
+                              color: "red",
+                            }}
+                          >
+                            {formatCurrency(product.price)}
+                          </span>
+                          <br />
+                          {formatCurrency(
+                            calculateDiscountedPrice(
+                              product.price,
+                              product.discountRate
+                            )
+                          )}
+                        </>
+                      ) : (
+                        formatCurrency(product.price)
+                      )}
+                    </td>
+                    <td className="border p-2">
+                      {product.discountRate ? `${product.discountRate}%` : "-"}
+                    </td>
                     <td className="border p-2">
                       {
                         categories.find(
@@ -555,6 +602,19 @@ function ProductManagement() {
                               }
                               className="border p-2 mb-2 w-full"
                               required
+                            />
+                            <p>할인율</p>
+                            <input
+                              type="number"
+                              name="discountRate"
+                              value={editingProduct.discountRate || ""}
+                              onChange={(e) =>
+                                setEditingProduct({
+                                  ...editingProduct,
+                                  discountRate: e.target.value,
+                                })
+                              }
+                              className="border p-2 mb-2 w-full"
                             />
                             <p>카테고리</p>
                             <select
