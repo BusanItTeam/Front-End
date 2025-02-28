@@ -351,7 +351,6 @@ function ProductManagement() {
             multiple
           />
         </div>
-
         {/* Options Input */}
         <h4 className="text-lg font-semibold mt-4">상품 옵션</h4>
         {options.map((option, index) => (
@@ -433,10 +432,12 @@ function ProductManagement() {
                   <tr
                     onClick={() => handleProductClick(product.productId)}
                     className={`cursor-pointer ${
-                      product.options?.reduce(
-                        (acc, option) => acc + option.inventory.stock,
-                        0
-                      ) <= stockThreshold
+                      product.options &&
+                      product.options.some(
+                        (option) =>
+                          option.inventory &&
+                          option.inventory.stock <= stockThreshold
+                      )
                         ? "bg-red-100"
                         : ""
                     }`}
@@ -469,6 +470,9 @@ function ProductManagement() {
                         <div key={index}>
                           색상: {option.color}, 사이즈: {option.size}, 재고:{" "}
                           {option.inventory.stock}
+                          {option.inventory.stock <= stockThreshold && (
+                            <span className="text-red-500"> (재고 부족)</span>
+                          )}
                         </div>
                       ))}
                     </td>
@@ -643,7 +647,6 @@ function ProductManagement() {
                             >
                               옵션 추가
                             </button>
-
                             <div className="flex justify-end">
                               <button
                                 type="submit"
