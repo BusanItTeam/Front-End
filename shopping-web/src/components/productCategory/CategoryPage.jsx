@@ -5,6 +5,7 @@ import DressesSidebar from "../../components/siderbar/DressesSidebar";
 import OuterSidebar from "../../components/siderbar/OuterSidebar";
 import Sidebar from "../../components/siderbar/Sidebar";
 import TopsSidebar from "../../components/siderbar/TopsSidebar";
+import { formatCurrency } from "../utils/Formatting"; // Helper function
 
 const CategoryPage = () => {
   const { products } = useMyContext();
@@ -59,6 +60,14 @@ const CategoryPage = () => {
     }
   };
 
+  const calculateDiscountedPrice = (price, discountRate) => {
+    if (discountRate && discountRate > 0) {
+      const discountAmount = (price * discountRate) / 100;
+      return price - discountAmount;
+    }
+    return price;
+  };
+
   return (
     <div className="flex">
       {renderSidebar()}
@@ -96,7 +105,27 @@ const CategoryPage = () => {
                 )}
                 <div className="p-4">
                   <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
-                  <p className="text-gray-700 font-bold">{product.price}원</p>
+                  {product.discountRate && product.discountRate > 0 ? (
+                    <>
+                      <span
+                        style={{
+                          textDecoration: "line-through",
+                          color: "red",
+                          marginRight: "10px",
+                        }}
+                      >
+                        {formatCurrency(product.price)}
+                      </span>
+                      {formatCurrency(
+                        calculateDiscountedPrice(
+                          product.price,
+                          product.discountRate
+                        )
+                      )}
+                    </>
+                  ) : (
+                    formatCurrency(product.price)
+                  )}
                 </div>
               </Link>
             </div>
