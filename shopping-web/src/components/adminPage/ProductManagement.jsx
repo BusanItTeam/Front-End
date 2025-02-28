@@ -339,7 +339,7 @@ function ProductManagement() {
             name="discountRate"
             value={newProduct.discountRate}
             onChange={handleInputChange}
-            placeholder="할인율"
+            placeholder="할인율 예:10 (10%)"
             className="border p-2"
           />
           <select
