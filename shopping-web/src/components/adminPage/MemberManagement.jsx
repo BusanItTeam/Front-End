@@ -150,20 +150,26 @@ const MemberManagement = () => {
 
   // 페이지 로드 시 유저 데이터 가져오기
   useEffect(() => {
-    fetchUsers(); // Context에서 제공하는 fetchUsers 호출
+    if(!searchTerm){
+      fetchUsers();
+    }
   }, [searchTerm]);
 
   useEffect(() => {
-    const filtered = (users || []).filter((user) =>
+ 
+    const filtered = (filteredUsers || []).filter((user) =>
       user.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email?.toLowerCase().includes(searchTerm.toLowerCase())
+      user.phoneNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchTerm.toLowerCase()) 
+      
     );
     setFilteredUsers(filtered);
-  }, [searchTerm, users]);
+     
+  }, [searchTerm,users]);
 
 
-  const rows = filteredUsers.map((item) => ({
+  const rows = (filteredUsers ?? []).map((item) => ({
     id: item.userId,
     username: item.userName,
     name: item.name,
@@ -176,6 +182,7 @@ const MemberManagement = () => {
     created: moment(item.createdDate).format("YYYY/MM/DD hh:mm:ss a"),
     status: item?.enabled ? "Active" : "Inactive",
   }));
+  
 
   useEffect(() => {
     console.log("🔍 검색어:", searchTerm);

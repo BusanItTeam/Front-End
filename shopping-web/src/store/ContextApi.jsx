@@ -120,6 +120,7 @@ export const ContextProvider = ({ children }) => {
         }
         setUsers(response.data);
         setFilteredUsers(response.data);
+        console.log(response.data);
       } catch (error) {
         console.error("Error fetching users:", error);
         if (error.response) {
