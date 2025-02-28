@@ -133,15 +133,23 @@ function BoardList() {
                     <td colSpan="7" className="p-4 bg-gray-50 text-left">
                       <div className="mt-4 p-3 bg-white">
                         <div className="flex items-start">
-                          <strong className="mr-2 mt-1 w-24 flex-shrink-0">문의 내용:</strong>
-                          <p className="mt-1 flex-1 text-gray-700">{inquiry.content}</p>
+                          <strong className="mr-2 mt-1 w-24 flex-shrink-0">
+                            문의 내용:
+                          </strong>
+                          <p className="mt-1 flex-1 text-gray-700">
+                            {inquiry.content}
+                          </p>
                         </div>
                       </div>
                       {inquiry.answer && (
                         <div className="mt-4 p-3 bg-white">
                           <div className="flex items-start">
-                            <strong className="mr-2 mt-1 w-24 flex-shrink-0">답변:</strong>
-                            <p className="mt-1 text-gray-700">{inquiry.answer}</p>
+                            <strong className="mr-2 mt-1 w-24 flex-shrink-0">
+                              답변:
+                            </strong>
+                            <p className="mt-1 text-gray-700">
+                              {inquiry.answer}
+                            </p>
                           </div>
                         </div>
                       )}
