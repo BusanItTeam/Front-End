@@ -1,32 +1,72 @@
 import React from "react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const Wishlist = () => {
-  const [wishlistItems, setWishlistItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
+  const [wishlist, setWishlist] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const backendURL = "http://localhost:8080";
 
   useEffect(() => {
     const fetchWishlist = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
-        const token = localStorage.getItem("token"); // 로컬 스토리지에서 토큰 가져오기
-        const response = await axios.get("http://localhost:8080/api/wishlist", {
-          headers: {
-            Authorization: `Bearer ${token}`, // 토큰을 Authorization 헤더에 추가
-          },
+        const token = localStorage.getItem("JWT_TOKEN");
+
+        if (!token) {
+          console.warn("JWT 토큰이 없습니다. 로그인 페이지로 이동합니다.");
+          alert("로그인이 필요합니다.");
+          navigate("/login");
+          return;
+        }
+
+        const response = await axios.get(`${backendURL}/api/wishlist`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
-        setWishlistItems(response.data);
+
+        console.log("✅ 위시리스트 데이터:", response.data);
+        setWishlist(response.data || []); // 데이터가 없으면 빈 배열 설정
       } catch (error) {
-        console.error("위시리스트를 불러오는 데 실패했습니다:", error);
+        console.error("🚨 위시리스트 불러오기 오류:", error);
+        setError("위시리스트를 불러오는 중 오류가 발생했습니다.");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchWishlist();
-  }, []);
+  }, [navigate]);
+
+  const removeFromWishlist = async (productId) => {
+    try {
+      const token = localStorage.getItem("JWT_TOKEN");
+      if (!token) return;
+
+      await axios.delete(`${backendURL}/api/wishlist/product/${productId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // UI에서 즉시 제거
+      setWishlist((prev) => prev.filter((item) => item.productId !== productId));
+    } catch (error) {
+      console.error("🚨 위시리스트 삭제 오류:", error);
+    }
+  };
+
+  if (loading) return <p>로딩 중...</p>;
+  if (error) return <p>{error}</p>;
+  if (wishlist.length === 0) return <p>위시리스트가 비어 있습니다.</p>;
 
   const handleSelectAll = (e) => {
     if (e.target.checked) {
-      const allItemIds = wishlistItems.map((item) => item.productId);
+      const allItemIds = wishlist.map((item) => item.productId);
       setSelectedItems(allItemIds);
     } else {
       setSelectedItems([]);
@@ -51,7 +91,7 @@ const Wishlist = () => {
         <thead>
           <tr className="border-b border-gray-400">
             <th className="py-2">
-              <input type="checkbox" onChange={handleSelectAll} checked={selectedItems.length === wishlistItems.length} className="cursor-pointer" />
+              <input type="checkbox" onChange={handleSelectAll} checked={selectedItems.length === wishlist.length} className="cursor-pointer" />
             </th>
             <th className="py-2">이미지</th>
             <th className="py-2">상품정보</th>
@@ -61,20 +101,22 @@ const Wishlist = () => {
           </tr>
         </thead>
         <tbody>
-          {wishlistItems.map((item) => (
+          {wishlist.map((item) => (
             <tr key={item.productId} className="text-center border-b border-gray-400">
               <td className="py-2">
                 <input type="checkbox" checked={selectedItems.includes(item.productId)} onChange={() => handleSelectItem(item.productId)} className="cursor-pointer" />
               </td>
               <td className="py-2">
-                <img src={item.image} alt={item.name} className="w-16 h-16 object-cover mx-auto" />
+                <img src={`${backendURL}${item.productImage}`} alt={item.productName} className="w-16 h-16 object-cover mx-auto" />
               </td>
-              <td className="py-2">{item.name}</td>
+              <td className="py-2">{item.productName}</td>
               <td className="py-2">{item.option}</td>
               <td className="py-2">KRW {item.price.toLocaleString()}</td>
               <td className="flex flex-col space-y-2">
                 <button className="bg-gray-500 text-white border border-gray-600 py-0.5 mt-2">장바구니담기</button>
-                <button className="border border-gray-400 py-0.5 mb-2">삭제</button>
+                <button onClick={() => removeFromWishlist(item.productId)} className="border border-gray-400 py-0.5 mb-2">
+                  삭제
+                </button>
               </td>
             </tr>
           ))}
@@ -83,7 +125,7 @@ const Wishlist = () => {
       <div className="flex justify-end mt-4">
         <div>
           <span>선택상품 </span>
-          <button className="border border-gray-400 py-1 px-2 mx-2 ">삭제하기</button>
+          <button className="border border-gray-400 py-1 px-2 mx-2">삭제하기</button>
           <button className="bg-gray-500 text-white border border-gray-600 px-2 mx-2 py-1">장바구니담기</button>
         </div>
       </div>

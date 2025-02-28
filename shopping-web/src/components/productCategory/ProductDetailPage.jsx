@@ -116,6 +116,12 @@ const ProductDetailPage = () => {
     alert("장바구니에 추가되었습니다!");
   };
 
+  const handleOptionChange = (e) => {
+    const optionId = parseInt(e.target.value, 10);
+    const selected = product.options.find((opt) => opt.optionId === optionId);
+    setSelectedOption(selected);
+  };
+
   // 더미 데이터
   const productSpecifications = [
     { name: "사이즈", value: "Free" },
@@ -237,7 +243,6 @@ const ProductDetailPage = () => {
           <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" disabled={!selectedOption || selectedOption.inventory.stock <= 0}>
             바로 구매
           </button>
-          <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">바로 구매</button>
         </div>
       </div>
 
