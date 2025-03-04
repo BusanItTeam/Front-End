@@ -3,7 +3,7 @@ import api from "../../services/Api";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
-const EmailValidate = ({ setIsEmailVerified }) => {
+const EmailValidate = ({ setIsEmailVerified,setEmail }) => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm({
     defaultValues: { email: "", verificationCode: "" },
     mode: "onTouched",
@@ -13,70 +13,58 @@ const EmailValidate = ({ setIsEmailVerified }) => {
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
 
-  // ✅ 이메일 인증번호 요청
+  //이메일 인증번호 요청
   const onEmailSendHandler = async (data) => {
     const { email } = data;
 
     try {
+    
       setLoading(true);
       const formData = new URLSearchParams();
       formData.append("email", email);
       await api.post("/auths/public/send-email", formData, {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       });
-
+      setEmail(email)
       toast.success("이메일 인증번호가 발송되었습니다!");
       setIsCodeSent(true); // 인증번호 입력란 보이도록 설정
     } catch (error) {
-      toast.error("이메일 전송 실패! 다시 시도해주세요.");
+      if(error.response && error.response.status === 400){
+        toast.error("이미 가입된 이메일입니다.");
+        return;
+      }else{
+        toast.error("이메일 전송 실패! 다시 시도해주세요.");
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // ✅ 인증번호 검증
+
   const onVerifyCodeHandler = async (data) => {
-    const email = watch("email"); // 현재 입력된 이메일 가져오기
-    const verificationCode = data.verificationCode;
-  
-    if (!email) {
-      toast.error("이메일을 입력해주세요.");
-      return;
-    }
-  
-    if (!verificationCode) {
-      toast.error("인증번호를 입력해주세요.");
-      return;
-    }
-  
     try {
-      setLoading(true);
-      const formData = new URLSearchParams();
-      formData.append("email", email);
-      formData.append("code", verificationCode);
-  
-      const response = await api.post("/auths/public/verify-email-code", formData, {
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      });
-  
-      if (response.data.success) {
-        toast.success("이메일 인증 성공!");
-        setIsVerified(true);
-        setIsEmailVerified(true); // 회원가입 활성화
-      } else {
-        toast.error("잘못된 인증번호입니다.");
-      }
+        setLoading(true);
+        const response = await api.get(`/auths/public/verify-email?email=${watch("email")}&code=${data.verificationCode}`);
+
+        if (response.status === 200) {
+            toast.success("이메일 인증 성공!");
+            setIsVerified(true);
+            setIsEmailVerified(true);
+        } else {
+            toast.error("잘못된 인증번호입니다.");
+        }
     } catch (error) {
-      toast.error("인증번호 확인 실패! 다시 시도해주세요.");
+        toast.error("인증번호 확인 실패! 다시 시도해주세요.");
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
+
   
 
   return (
     <div>
-      {/* ✅ 이메일 입력 + 인증 요청 버튼 */}
+      {/* 이메일 입력 + 인증 요청 버튼 */}
       <div className="flex gap-2">
         <input
           type="email"
@@ -98,7 +86,7 @@ const EmailValidate = ({ setIsEmailVerified }) => {
       </div>
       {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
 
-      {/* ✅ 인증번호 입력 + 확인 버튼 */}
+      {/* 인증번호 입력 + 확인 버튼 */}
       {isCodeSent && !isVerified && (
         <div className="mt-4 flex gap-2">
           <input
@@ -112,7 +100,7 @@ const EmailValidate = ({ setIsEmailVerified }) => {
             })}
           />
           <button
-            className="bg-green-500 text-white px-4 py-2 ml-2 rounded-md hover:bg-green-600"
+            className="flex gap-2 items-center justify-center flex-1 border p-3 shadow-sm rounded-md hover:bg-gray-300 transition-all duration-300 w-full"
             onClick={handleSubmit(onVerifyCodeHandler)}
           >
             인증번호 확인
@@ -121,7 +109,7 @@ const EmailValidate = ({ setIsEmailVerified }) => {
       )}
       {errors.verificationCode && <p className="text-red-500 text-sm">{errors.verificationCode.message}</p>}
 
-      {/* ✅ 인증 완료 메시지 */}
+      {/*  인증 완료 메시지 */}
       {isVerified && (
         <p className="text-green-600 text-sm mt-2">✅ 이메일 인증이 완료되었습니다!</p>
       )}

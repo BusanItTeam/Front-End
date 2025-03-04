@@ -18,6 +18,7 @@ const SignUp = () => {
   const { token } = useMyContext();
   const navigate = useNavigate();
   const[isEmailVerified, setIsEmailVerified] = useState(false);
+  const[email, setEmail] = useState("");
   
   const {
     register,
@@ -28,7 +29,7 @@ const SignUp = () => {
     setValue,
     formState: { errors },
   } = useForm({       
-    defaultValues: { username: "",  name: "", email: "", phoneNumber: "", postcode: "", address: "", detailAddress: "", extraAddress: "",  password: "", confirmPassword: "" },
+    defaultValues: { username: "",  name: "",  phoneNumber: "", postcode: "", address: "", detailAddress: "", extraAddress: "",  password: "", confirmPassword: "" },
     mode: "onTouched",
   });
 
@@ -59,7 +60,7 @@ const SignUp = () => {
         return;
       }
   
-    const { username, name, email, phoneNumber,  password , postcode, address, detailAddress, extraAddress} = data;
+    const { username, name,  phoneNumber,  password , postcode, address, detailAddress, extraAddress} = data;
     const sendData = { 
       username, 
       name,
@@ -167,7 +168,8 @@ const SignUp = () => {
   
             {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
               
-            <EmailValidate email={watch("email") || ""} setIsEmailVerified={setIsEmailVerified} />
+              
+            <EmailValidate setIsEmailVerified={setIsEmailVerified} setEmail={setEmail}/>
           
             <AddressInput register={register} setValue={setValue}/>
       
