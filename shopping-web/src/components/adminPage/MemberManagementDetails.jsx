@@ -91,6 +91,8 @@ const MemberManagementDetails = () => {
     if (!window.confirm("정말로 이 사용자를 삭제하시겠습니까?")) return;
 
     try {
+   
+
       if (!token) {
         toast.error("로그인이 필요합니다.");
         return;
@@ -109,7 +111,7 @@ const MemberManagementDetails = () => {
       navigate("/admin/members");
     } catch (error) {
       console.error(
-        "❌ 사용자 삭제 실패:",
+        "사용자 삭제 실패:",
         error.response ? error.response.data : error
       );
       toast.error("사용자를 삭제하는데 실패했습니다.");
@@ -117,14 +119,14 @@ const MemberManagementDetails = () => {
   };
 
   return user ? (
-    <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md mt-10 border border-gray-200">
+    <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md mt-10 mb-10 border border-gray-200">
       {/* 헤더 */}
       <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">
         {user.name} 님의 정보
       </h2>
 
       {/* 기본 정보 */}
-      <div className="grid grid-cols-2 gap-20 border-b pb-4 mb-4">
+      <div className="grid grid-cols-2 gap-20 border-b pb-4 mb-4 ">
         <p className="text-lg text-gray-700 flex items-center gap-2">
           <FaUser />
           유저 번호:{" "}
