@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useMyContext } from "../../store/ContextApi";
 import api from "../../services/Api";
 import { formatCurrency } from "../utils/Formatting";
+import toast from "react-hot-toast";
 
 function ProductManagement() {
   const { products, setProducts, fetchProducts } = useMyContext();
@@ -112,7 +113,7 @@ function ProductManagement() {
 
       alert("상품 추가 완료!");
     } catch (error) {
-      console.error("Error adding product:", error);
+      toast.error("Error adding product:", error);
       alert("상품 추가 실패!");
     }
   };
@@ -152,10 +153,10 @@ function ProductManagement() {
       setShowEditFormFor(null);
       setEditingProduct(null);
       setNewImageFiles(null);
-      alert("상품 수정 완료!");
+      toast.success("상품 수정 완료!");
     } catch (error) {
       console.error("Error updating product:", error);
-      alert("상품 수정 실패!");
+      toast.error("상품 수정 실패!");
     }
   };
 
@@ -169,10 +170,10 @@ function ProductManagement() {
           },
         });
         fetchProducts();
-        alert("삭제 완료!");
+        toast.success("삭제 완료!");
       } catch (error) {
         console.error("Error deleting product:", error);
-        alert("삭제 실패!");
+        toast.error("삭제 실패!");
       }
     }
   };
@@ -246,7 +247,7 @@ function ProductManagement() {
         );
         fetchProducts();
       } catch (error) {
-        console.error("Error deleting category:", error);
+        toast.error("Error deleting category:", error);
       }
     }
   };
