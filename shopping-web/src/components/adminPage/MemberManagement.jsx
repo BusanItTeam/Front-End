@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid"; // 테이블 라이브러리
-import toast from "react-hot-toast";
 import moment from "moment";
 import { Link, useNavigate } from "react-router-dom";
 import { MdOutlineEmail, MdDateRange } from "react-icons/md";
@@ -29,7 +28,7 @@ const userListsColumns = [
   },
   {
     field: "name",
-    headerName: "userName",
+    headerName: "name",
     headerAlign: "center",
     minWidth: 200,
     align: "center",
@@ -140,8 +139,7 @@ const MemberManagement = () => {
     filteredUsers,
     setFilteredUsers,
     loading,
-    error,
-    setError,
+
     fetchUsers,
   } = useMyContext();
 
@@ -190,6 +188,7 @@ const MemberManagement = () => {
     created: moment(item.createdDate).format("YYYY/MM/DD hh:mm:ss a"),
     status: item?.enabled ? "Active" : "Inactive",
   }));
+  
 
   useEffect(() => {
     console.log("🔍 검색어:", searchTerm);
