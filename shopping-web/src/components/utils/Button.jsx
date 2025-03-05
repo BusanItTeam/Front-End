@@ -1,6 +1,6 @@
 import React from "react";
 
-const Buttons = ({ disabled, children, className, onClickhandler, type }) => {
+const Button = ({ disabled, children, className, onClickhandler, type }) => {
   return (
     <button
       disabled={disabled}
@@ -13,4 +13,4 @@ const Buttons = ({ disabled, children, className, onClickhandler, type }) => {
   );
 };
 
-export default Buttons;
+export default Button;

@@ -64,7 +64,7 @@ const MemberManagementDetails = () => {
           setUser(response.data);
         }
       } catch (err) {
-        console.error("❌ API 요청 실패:", err);
+        console.error(" API 요청 실패:", err);
         setError("사용자 정보를 불러오는데 실패했습니다.");
       } finally {
         setLoading(false);
@@ -100,7 +100,7 @@ const MemberManagementDetails = () => {
 
       console.log("📢 삭제 요청 토큰:", token);
 
-      await api.delete(`/admin/user/${userId}`, {
+      await api.delete(`/auths/public/user/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
