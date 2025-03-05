@@ -2,11 +2,13 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useMyContext } from "../../store/ContextApi";
 import { format, isValid, parseISO } from "date-fns";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import api from "../../services/Api";
 import { toast } from "react-hot-toast";
+import Button from "../utils/Button";
+
 const EditProfile = () => {
-  const { currentUser } = useMyContext();
+  const { currentUser, token } = useMyContext();
   const navigate = useNavigate();
   //useState로 관리
   const [name, setName] = useState("");
@@ -15,8 +17,11 @@ const EditProfile = () => {
   const [extraAddress, setExtraAddress] = useState("");
   const [detailAddress, setDetailAddress] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const { userId: paramUserId} = useParams();
 
-  
+
+  const userId = paramUserId || currentUser?.id || currentUser?.userId;
+
   console.log("데이타", currentUser);
 
   useEffect(() => {
@@ -33,6 +38,8 @@ const EditProfile = () => {
     }
   }, [currentUser]);
 
+
+  
   //페이지 이동 함수
   const handleGoToMyPage = () => {
     navigate("/myPage");
@@ -49,11 +56,10 @@ const EditProfile = () => {
 
   const handleUpdate = async () => {
     try {
-      const token = localStorage.getItem("JWT_TOKEN");
       console.log("JWT Token 확인:", token);
 
       if (!token) {
-        alert("로그인이 필요합니다.");
+        console.warn("로그인이 필요합니다.");
         return;
       }
 
@@ -94,6 +100,42 @@ const EditProfile = () => {
     );
   }
   console.log("확인", currentUser);
+
+
+
+  const handleDeleteUser = async () => {
+    
+    if (!window.confirm("정말로 이 사용자를 삭제하시겠습니까?")) return;
+
+    try {
+      if (!token) {
+        toast.error("로그인이 필요합니다.");
+        return;
+      }
+
+      console.log("📢 삭제 요청 userId:", userId);
+      console.log("📢 삭제 요청 토큰:", token);
+
+      await api.delete(`/auths/public/user/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      localStorage.removeItem("JWT_TOKEN");
+      localStorage.removeItem("USER");
+      localStorage.removeItem("IS_ADMIN");
+      toast.success("사용자가 삭제되었습니다.");
+     
+      navigate("/login");
+    } catch (error) {
+      console.error(
+        "사용자 삭제 실패:",
+        error.response ? error.response.data : error
+      );
+      toast.error("사용자를 삭제하는데 실패했습니다.");
+    }
+  };
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-lg mt-6 mb-6">
@@ -219,12 +261,21 @@ const EditProfile = () => {
           >
             Cancel
           </button>
+          <Button className="flex gap-2 items-center justify-center border p-3 shadow-sm shadow-gray-200 rounded-md hover:bg-red-300 transition-all duration-300" 
+            onClickhandler={handleDeleteUser}
+            >
+            회원 삭제
+          </Button>
+      
           <button
-            className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+            className="flex gap-2 items-center justify-center border p-3 shadow-sm shadow-gray-200 rounded-md hover:bg-gray-300 transition-all duration-300"
             onClick={handleUpdate}
           >
             Save Changes
           </button>
+          
+          
+         
         </div>
       </div>
     </div>

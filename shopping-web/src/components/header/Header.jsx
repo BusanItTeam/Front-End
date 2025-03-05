@@ -12,7 +12,7 @@ export const Header = () => {
   const location = useLocation();
   const isMyPageActive = location.pathname.startsWith("/myPage");
   const navigate = useNavigate();
-  const { token, setToken, setCurrentUser, isAdmin, setIsAdmin, products } =
+  const { token, setToken, setCurrentUser,  isAdmin, setIsAdmin, products } =
     useMyContext();
   const [categories, setCategories] = useState([]);
 
