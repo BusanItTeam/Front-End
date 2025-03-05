@@ -16,6 +16,7 @@ const EditProfile = () => {
   const [detailAddress, setDetailAddress] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
 
+  
   console.log("데이타", currentUser);
 
   useEffect(() => {
@@ -98,7 +99,7 @@ const EditProfile = () => {
     <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-lg mt-6 mb-6">
       <h2 className="text-xl font-semibold text-red-500 mb-4">
         {" "}
-        {name} 님의 Edit Your Profile
+        {name} 님의 프로필 정보
       </h2>
       <div className="grid grid-cols-2 gap-4">
         <div className="col-span-2">

@@ -59,7 +59,7 @@ export const Header = () => {
 
         <nav className="frame-3">
           <Link to="/" className="nav-link">
-            Home
+            홈
           </Link>
           <div
             className="category-dropdown"

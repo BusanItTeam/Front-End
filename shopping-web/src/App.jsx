@@ -35,6 +35,8 @@ import { Toaster } from "react-hot-toast";
 import ProductDetailPage from "./components/productCategory/ProductDetailPage";
 import ForgotPassword from "./components/Auth/ForgotPassword";
 import ResetPassword from "./components/Auth/ResetPassword";
+import MyPoint from "./components/myPage/MyPoint";
+import PointHistory from "./components/myPage/PointHistory";
 const AdminRoute = ({ children }) => {
   const { isAdmin } = useMyContext();
   return isAdmin ? children : <Navigate to="/" />;
@@ -67,6 +69,8 @@ function App() {
           <Route path="/orderpage/ordercomplete" element={<OrderComplete />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/myPage/PointHistory" element={<MyPoint />} />
+          <Route path="/points-history" element={<PointHistory />} />
           <Route
             path="/admin"
             element={
