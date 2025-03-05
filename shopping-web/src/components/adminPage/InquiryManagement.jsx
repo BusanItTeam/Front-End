@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import api from "../../services/Api"; // API 호출을 위한 axios 인스턴스
+import toast from "react-hot-toast";
 
 function InquiryManagement() {
   const [inquiries, setInquiries] = useState([]); // 문의 리스트 상태
@@ -29,7 +30,7 @@ function InquiryManagement() {
       setTotalPages(Math.ceil(sortedInquiries.length / inquiriesPerPage));
       console.log("이거다", response.data);
     } catch (error) {
-      console.error("문의 목록을 불러오는 데 오류가 발생했습니다.", error);
+      toast.error("문의 목록을 불러오는 데 오류가 발생했습니다.", error);
     }
   }, [inquiriesPerPage]);
 
@@ -59,12 +60,12 @@ function InquiryManagement() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      alert("답변이 등록되었습니다.");
+      toast.success("답변이 등록되었습니다.");
       setAnswers({ ...answers, [inquiryId]: "" });
       fetchInquiries(); // 답변 후 목록 갱신
     } catch (error) {
       console.error("답변 등록 오류", error);
-      alert("답변 등록에 실패했습니다.");
+      toast.error("답변 등록에 실패했습니다.");
     }
   };
 

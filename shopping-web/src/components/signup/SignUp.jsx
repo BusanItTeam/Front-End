@@ -19,6 +19,7 @@ const SignUp = () => {
   const navigate = useNavigate();
   const[isEmailVerified, setIsEmailVerified] = useState(false);
   const[email, setEmail] = useState("");
+ 
   
   const {
     register,

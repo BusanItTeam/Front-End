@@ -113,8 +113,8 @@ export const ContextProvider = ({ children }) => {
     const isAdmin = JSON.parse(localStorage.getItem("IS_ADMIN"));
     if (isAdmin) {
       try {
-        const response = await api.get("/admin/getusers");
-
+        const response = await api.get("/admin/getusers")
+        
         if (!response.data || !Array.isArray(response.data)) {
           throw new Error("Invalid response data");
         }
