@@ -80,7 +80,10 @@ const ProductDetailPage = () => {
           setIsWishlisted(false);
         }
       } else {
-        const wishListDTO = { productId: Number(productId) };
+        const wishListDTO = {
+          productId: Number(productId),
+          optionId: selectedOption ? selectedOption.optionId : null, // 선택된 옵션이 있을 때 optionId 추가
+        };
         const response = await axios.post(`${backendURL}/api/wishlist`, wishListDTO, { headers });
         if (response.status === 200) {
           toast.success("찜 목록에 추가되었습니다.");

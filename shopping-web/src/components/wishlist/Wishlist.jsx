@@ -27,12 +27,29 @@ const Wishlist = () => {
           return;
         }
 
-        const response = await axios.get(`${backendURL}/api/wishlist`, {
+        // 위시리스트 데이터 불러오기
+        const wishlistResponse = await axios.get(`${backendURL}/api/wishlist`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        console.log("✅ 위시리스트 데이터:", response.data);
-        setWishlist(response.data || []); // 데이터가 없으면 빈 배열 설정
+        // 옵션 정보 불러오기
+        const optionsResponse = await axios.get(`${backendURL}/api/wishlist/options`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        console.log("✅ 위시리스트 데이터:", wishlistResponse.data);
+        console.log("✅ 옵션 데이터:", optionsResponse.data);
+
+        // 옵션 정보를 포함하여 위시리스트 상태 업데이트
+        const updatedWishlist = wishlistResponse.data.map((item) => {
+          const option = optionsResponse.data.find((option) => option.optionId === item.optionId);
+          return {
+            ...item,
+            optionDescription: option ? option.description : "옵션 정보 없음",
+          };
+        });
+
+        setWishlist(updatedWishlist || []); // 데이터가 없으면 빈 배열 설정
       } catch (error) {
         console.error("🚨 위시리스트 불러오기 오류:", error);
         setError("위시리스트를 불러오는 중 오류가 발생했습니다.");
@@ -42,7 +59,7 @@ const Wishlist = () => {
     };
 
     fetchWishlist();
-  }, [navigate]);
+  }, [navigate, backendURL]);
 
   // { 전체상품 선택 }
   const handleSelectAll = (e) => {
@@ -55,11 +72,11 @@ const Wishlist = () => {
   };
 
   // { 한개상품 선택 }
-  const handleSelectItem = (productId) => {
-    if (selectedItems.includes(productId)) {
-      setSelectedItems(selectedItems.filter((id) => id !== productId));
+  const handleSelectItem = (wishListId) => {
+    if (selectedItems.includes(wishListId)) {
+      setSelectedItems(selectedItems.filter((id) => id !== wishListId));
     } else {
-      setSelectedItems([...selectedItems, productId]);
+      setSelectedItems([...selectedItems, wishListId]);
     }
   };
 
@@ -151,7 +168,7 @@ const Wishlist = () => {
                 <td className="py-2">KRW {item.price.toLocaleString()}</td>
                 <td className="flex flex-col space-y-2">
                   <button className="bg-gray-500 text-white border border-gray-600 py-0.5 mt-2">장바구니담기</button>
-                  <button onClick={() => removeFromWishlist(item.productId)} className="border border-gray-400 py-0.5 mb-2">
+                  <button onClick={() => removeFromWishlist(item.productId, item.optionId)} className="border border-gray-400 py-0.5 mb-2">
                     삭제
                   </button>
                 </td>
@@ -172,5 +189,4 @@ const Wishlist = () => {
     </div>
   );
 };
-
 export default Wishlist;
