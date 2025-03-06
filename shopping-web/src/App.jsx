@@ -67,11 +67,8 @@ function App() {
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
-<<<<<<< HEAD
-=======
           <Route path="/myPage/PointHistory" element={<MyPoint />} />
           <Route path="/points-history" element={<PointHistory />} />
->>>>>>> origin/developer
           <Route
             path="/admin"
             element={
