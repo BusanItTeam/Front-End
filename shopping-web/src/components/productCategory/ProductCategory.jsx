@@ -1,207 +1,152 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { useMyContext } from "../../store/ContextApi";
+import { formatCurrency } from "../utils/Formatting";
 
 const ProductCategory = () => {
-  const [bestProducts, setBestProducts] = useState([]);
-  const [newProducts, setNewProducts] = useState([]);
-  const [bestCurrentPage, setBestCurrentPage] = useState(1);
-  const [newCurrentPage, setNewCurrentPage] = useState(1);
-  const productsPerPage = 8;
+  const { products } = useMyContext();
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 16;
+  const backendURL = "http://localhost:8080";
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    const fetchProducts = () => {
-      const dummyProducts = [
-        {
-          id: 1,
-          name: "Best Product 1",
-          price: 100,
-          image: "/woman-2799490_1280.jpg",
-        },
-        {
-          id: 2,
-          name: "Best Product 2",
-          price: 200,
-          image: "/best-product2.jpg",
-        },
-        {
-          id: 3,
-          name: "Best Product 3",
-          price: 150,
-          image: "/best-product3.jpg",
-        },
-        {
-          id: 4,
-          name: "Best Product 4",
-          price: 180,
-          image: "/best-product4.jpg",
-        },
-        {
-          id: 5,
-          name: "Best Product 5",
-          price: 120,
-          image: "/best-product5.jpg",
-        },
-        {
-          id: 6,
-          name: "Best Product 6",
-          price: 220,
-          image: "/best-product6.jpg",
-        },
-        {
-          id: 7,
-          name: "Best Product 7",
-          price: 190,
-          image: "/best-product7.jpg",
-        },
-        {
-          id: 8,
-          name: "Best Product 8",
-          price: 160,
-          image: "/best-product8.jpg",
-        },
-        {
-          id: 9,
-          name: "Best Product 9",
-          price: 170,
-          image: "/best-product9.jpg",
-        },
-        {
-          id: 10,
-          name: "Best Product 10",
-          price: 210,
-          image: "/best-product10.jpg",
-        },
-        {
-          id: 11,
-          name: "New Product 1",
-          price: 110,
-          image: "/new-product1.jpg",
-        },
-        {
-          id: 12,
-          name: "New Product 2",
-          price: 210,
-          image: "/new-product2.jpg",
-        },
-        {
-          id: 13,
-          name: "New Product 3",
-          price: 140,
-          image: "/new-product3.jpg",
-        },
-        {
-          id: 14,
-          name: "New Product 4",
-          price: 170,
-          image: "/new-product4.jpg",
-        },
-        {
-          id: 15,
-          name: "New Product 5",
-          price: 130,
-          image: "/new-product5.jpg",
-        },
-        {
-          id: 16,
-          name: "New Product 6",
-          price: 230,
-          image: "/new-product6.jpg",
-        },
-        {
-          id: 17,
-          name: "New Product 7",
-          price: 200,
-          image: "/new-product7.jpg",
-        },
-        {
-          id: 18,
-          name: "New Product 8",
-          price: 150,
-          image: "/woman-6626615_1280.jpg",
-        },
-        {
-          id: 19,
-          name: "New Product 9",
-          price: 190,
-          image: "/new-product9.jpg",
-        },
-        {
-          id: 20,
-          name: "New Product 10",
-          price: 220,
-          image: "/new-product10.jpg",
-        },
+    if (products && products.length > 0) {
+      const uniqueCategories = [
+        ...new Map(
+          products.map((product) => [
+            product.category.categoryId,
+            product.category,
+          ])
+        ).values(),
       ];
+      setCategories(uniqueCategories);
+    }
+  }, [products]);
 
-      setBestProducts(dummyProducts.slice(0, 10));
-      setNewProducts(dummyProducts.slice(10));
-    };
+  // 최신 상품부터 표시하도록 정렬
+  const sortedProducts = [...products].sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  );
 
-    fetchProducts();
-  }, []);
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = sortedProducts.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
 
-  const paginate = (pageNumber, setPageFunction) => setPageFunction(pageNumber);
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  const renderProducts = (products, currentPage) => {
-    const indexOfLastProduct = currentPage * productsPerPage;
-    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-    const currentProducts = products.slice(
-      indexOfFirstProduct,
-      indexOfLastProduct
-    );
-
-    return currentProducts.map((product) => (
-      <div
-        key={product.id}
-        className="border border-gray-200 rounded-lg overflow-hidden flex flex-col"
-      >
-        <img
-          src={product.image}
-          alt={product.name}
-          className="w-full h-48 object-cover"
-        />
-        <div className="p-4 flex-grow flex flex-col">
-          <h3 className="text-lg mb-2">{product.name}</h3>
-          <p className="font-bold text-base mt-auto">{product.price}원</p>
-        </div>
-      </div>
-    ));
-  };
-
-  const renderPagination = (products, currentPage, setPageFunction) => {
-    return (
-      <div className="flex justify-center mt-5">
-        {Array.from(
-          { length: Math.ceil(products.length / productsPerPage) },
-          (_, i) => (
-            <button
-              key={i}
-              onClick={() => paginate(i + 1, setPageFunction)}
-              className="mx-1 px-3 py-1 border border-gray-300 bg-gray-100 hover:bg-gray-200"
-            >
-              {i + 1}
-            </button>
-          )
-        )}
-      </div>
-    );
+  const calculateDiscountedPrice = (price, discountRate) => {
+    if (discountRate && discountRate > 0) {
+      const discountAmount = (price * discountRate) / 100;
+      return price - discountAmount;
+    }
+    return price;
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-5">
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-4">BEST</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-          {renderProducts(bestProducts, bestCurrentPage)}
-        </div>
-        {renderPagination(bestProducts, bestCurrentPage, setBestCurrentPage)}
+    <div className="flex">
+      {/* 사이드바 */}
+      <div className="w-48 bg-gray-100 p-4 border-r border-gray-200">
+        <h3 className="text-lg font-semibold mb-4">카테고리</h3>
+        <ul>
+          <li key="all">
+            <Link
+              to="/category/all"
+              className="block p-2 hover:bg-gray-200 transition duration-150 ease-in-out"
+            >
+              전체 상품
+            </Link>
+          </li>
+          {categories.map((category) => (
+            <li key={category.categoryId}>
+              <Link
+                to={`/category/${category.name?.toLowerCase()}`}
+                className="block p-2 hover:bg-gray-200 transition duration-150 ease-in-out"
+              >
+                {category.name}
+              </Link>
+            </li>
+          ))}
+        </ul>
       </div>
 
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-4">NEW</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-          {renderProducts(newProducts, newCurrentPage)}
+      <div className="flex-1 max-w-6xl mx-auto px-4 py-8">
+        <h2 className="text-3xl font-bold mb-6">전체 상품</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {currentProducts.map((product) => (
+            <div
+              key={product.productId}
+              className="bg-white shadow-md rounded-lg overflow-hidden"
+            >
+              <Link to={`/product/${product.productId}`}>
+                {product.images && product.images.length > 0 ? (
+                  <img
+                    src={`${backendURL}${product.images[0].imageUrl}`}
+                    alt={product.name}
+                    className="object-contain transition-transform duration-300 hover:scale-105"
+                    style={{
+                      width: "400px",
+                      height: "400px",
+                      maxWidth: "100%",
+                      maxHeight: "100%",
+                    }}
+                  />
+                ) : (
+                  <img
+                    src="https://via.placeholder.com/400x300"
+                    alt="No Image"
+                    className="object-contain"
+                    style={{ width: "400px", height: "400px" }}
+                  />
+                )}
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
+                  {product.discountRate && product.discountRate > 0 ? (
+                    <>
+                      <span
+                        style={{
+                          textDecoration: "line-through",
+                          color: "red",
+                          marginRight: "10px",
+                        }}
+                      >
+                        {formatCurrency(product.price)}
+                      </span>
+                      {formatCurrency(
+                        calculateDiscountedPrice(
+                          product.price,
+                          product.discountRate
+                        )
+                      )}
+                    </>
+                  ) : (
+                    formatCurrency(product.price)
+                  )}
+                </div>
+              </Link>
+            </div>
+          ))}
         </div>
-        {renderPagination(newProducts, newCurrentPage, setNewCurrentPage)}
+        <div className="flex justify-center mt-8">
+          {Array.from({
+            length: Math.ceil(products.length / productsPerPage),
+          }).map((_, i) => (
+            <button
+              key={i}
+              onClick={() => paginate(i + 1)}
+              className={`mx-1 px-3 py-1 rounded ${
+                currentPage === i + 1
+                  ? "bg-gray-700 text-white"
+                  : "bg-gray-200 text-gray-700"
+              } hover:bg-gray-300 focus:outline-none`}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

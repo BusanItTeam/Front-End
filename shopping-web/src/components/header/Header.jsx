@@ -1,4 +1,3 @@
-// Header.js
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Header.css";
@@ -12,7 +11,7 @@ export const Header = () => {
   const location = useLocation();
   const isMyPageActive = location.pathname.startsWith("/myPage");
   const navigate = useNavigate();
-  const { token, setToken, setCurrentUser,  isAdmin, setIsAdmin, products } =
+  const { token, setToken, setCurrentUser, isAdmin, setIsAdmin, products } =
     useMyContext();
   const [categories, setCategories] = useState([]);
 
@@ -71,6 +70,10 @@ export const Header = () => {
             </Link>
             {showDropdown && (
               <ul className="dropdown-menu">
+                <li>
+                  <Link to={`/category/all`}>전체 상품</Link>{" "}
+                  {/* 전체 상품 링크 */}
+                </li>
                 {categories.map((category) => (
                   <li key={category.categoryId}>
                     <Link to={`/category/${category.name?.toLowerCase()}`}>
