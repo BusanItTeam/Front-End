@@ -36,6 +36,8 @@ import ProductDetailPage from "./components/productCategory/ProductDetailPage";
 import Wishlist from "./components/wishlist/wishlist";
 import ForgotPassword from "./components/Auth/ForgotPassword";
 import ResetPassword from "./components/Auth/ResetPassword";
+import MyPoint from "./components/myPage/MyPoint";
+import PointHistory from "./components/myPage/PointHistory";
 const AdminRoute = ({ children }) => {
   const { isAdmin } = useMyContext();
   return isAdmin ? children : <Navigate to="/" />;
@@ -65,6 +67,11 @@ function App() {
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+<<<<<<< HEAD
+=======
+          <Route path="/myPage/PointHistory" element={<MyPoint />} />
+          <Route path="/points-history" element={<PointHistory />} />
+>>>>>>> origin/developer
           <Route
             path="/admin"
             element={

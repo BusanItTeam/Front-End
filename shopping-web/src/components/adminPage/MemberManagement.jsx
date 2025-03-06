@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid"; // 테이블 라이브러리
-import toast from "react-hot-toast";
 import moment from "moment";
-import { Link, useNavigate,  } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { MdOutlineEmail, MdDateRange } from "react-icons/md";
 import { Blocks } from "react-loader-spinner";
 import { FaUser } from "react-icons/fa";
@@ -29,7 +28,7 @@ const userListsColumns = [
   },
   {
     field: "name",
-    headerName: "userName",
+    headerName: "name",
     headerAlign: "center",
     minWidth: 200,
     align: "center",
@@ -127,11 +126,10 @@ const userListsColumns = [
 
 // 회원 관리 페이지 컴포넌트
 const MemberManagement = () => {
-  
   const navigate = useNavigate();
-  
+
   const handleRowClick = (params) => {
-    console.log("이동할 URL:", `/admin/members/${params.row.id}`); 
+    console.log("이동할 URL:", `/admin/members/${params.row.id}`);
     navigate(`/admin/members/${params.row.id}`);
   };
 
@@ -141,40 +139,61 @@ const MemberManagement = () => {
     filteredUsers,
     setFilteredUsers,
     loading,
-    error,
-    setError,
-    fetchUsers,
-  } = useMyContext(); 
 
-  const [searchTerm, setSearchTerm] = useState(""); 
+    fetchUsers,
+  } = useMyContext();
+
+  const [searchTerm, setSearchTerm] = useState("");
 
   // 페이지 로드 시 유저 데이터 가져오기
   useEffect(() => {
-    fetchUsers(); // Context에서 제공하는 fetchUsers 호출
-  }, [fetchUsers]);
+    if (!searchTerm) {
+      fetchUsers();
+    }
+  }, [searchTerm]);
 
   useEffect(() => {
-    const filtered = (users || []).filter((user) =>
-      user.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    const filtered = (filteredUsers || []).filter(
+      (user) =>
+        user.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.phoneNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email?.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredUsers(filtered);
   }, [searchTerm, users]);
 
-  const rows = filteredUsers.map((item) => ({
+  const rows = (filteredUsers ?? []).map((item) => ({
     id: item.userId,
     username: item.userName,
     name: item.name,
     email: item.email,
     phoneNumber: item.phoneNumber,
-    postcode: item.addresses?.length > 0 ? item.addresses[0].postcode : "등록된 주소 없음",  
-    address: item.addresses?.length > 0 ? item.addresses[0].address : "등록된 주소 없음",
-    detailAddress: item.addresses?.length > 0 ? item.addresses[0].detailAddress : "등록된 주소 없음",
-    extraAddress: item.addresses?.length > 0 ? item.addresses[0].extraAddress : "등록된 주소 없음",
+    postcode:
+      item.addresses?.length > 0
+        ? item.addresses[0].postcode
+        : "등록된 주소 없음",
+    address:
+      item.addresses?.length > 0
+        ? item.addresses[0].address
+        : "등록된 주소 없음",
+    detailAddress:
+      item.addresses?.length > 0
+        ? item.addresses[0].detailAddress
+        : "등록된 주소 없음",
+    extraAddress:
+      item.addresses?.length > 0
+        ? item.addresses[0].extraAddress
+        : "등록된 주소 없음",
     created: moment(item.createdDate).format("YYYY/MM/DD hh:mm:ss a"),
     status: item?.enabled ? "Active" : "Inactive",
   }));
+  
+
+  useEffect(() => {
+    console.log("🔍 검색어:", searchTerm);
+    console.log("🧐 users 데이터 예시:", users);
+  }, [searchTerm, users]);
 
   return (
     <div className="p-4">
@@ -202,12 +221,12 @@ const MemberManagement = () => {
             initialState={{
               pagination: {
                 paginationModel: {
-                  pageSize: 10,  // 기본 사이즈 페이지 10개씩
+                  pageSize: 10, // 기본 사이즈 페이지 10개씩
                 },
               },
             }}
             disableRowSelectionOnClick
-            pageSizeOptions={[10, 25, 50, 100]} 
+            pageSizeOptions={[10, 25, 50, 100]}
             disableColumnResize
             onRowClick={handleRowClick}
           />

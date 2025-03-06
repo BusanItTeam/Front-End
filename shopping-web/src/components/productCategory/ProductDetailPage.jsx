@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { useMyContext } from "../../store/ContextApi";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { formatCurrency } from "../utils/Formatting"; // Helper function
 
 const ProductDetailPage = () => {
   const { productId } = useParams();
@@ -106,6 +107,14 @@ const ProductDetailPage = () => {
     return <div className="text-center py-4">Loading...</div>;
   }
 
+  const calculateDiscountedPrice = (price, discountRate) => {
+    if (discountRate && discountRate > 0) {
+      const discountAmount = (price * discountRate) / 100;
+      return price - discountAmount;
+    }
+    return price;
+  };
+
   const handleThumbnailClick = (imageUrl) => {
     setSelectedImage(imageUrl);
   };
@@ -170,9 +179,26 @@ const ProductDetailPage = () => {
       <div className="mt-6">
         <h1 className="text-2xl font-bold">{product.name}</h1>
         <p className="text-gray-700 mt-2">{product.description}</p>
-        <p className="text-xl font-semibold mt-4">{product.price}원</p>
+        {product.discountRate && product.discountRate > 0 ? (
+          <>
+            <p className="text-xl font-semibold mt-4">
+              <span
+                style={{
+                  textDecoration: "line-through",
+                  color: "red",
+                  marginRight: "10px",
+                }}
+              >
+                {formatCurrency(product.price)}
+              </span>
+              {formatCurrency(calculateDiscountedPrice(product.price, product.discountRate))}
+            </p>
+          </>
+        ) : (
+          <p className="text-xl font-semibold mt-4">{formatCurrency(product.price)}</p>
+        )}
         {/* 할인 정보 (더미 데이터) */}
-        <p className="text-red-500">할인: 10%</p>
+        {product.discountRate && product.discountRate > 0 && <p className="text-red-500">할인율: {product.discountRate}%</p>}
 
         {/* 상품 사양 */}
         <h3 className="text-lg font-semibold mt-4">상품 사양</h3>

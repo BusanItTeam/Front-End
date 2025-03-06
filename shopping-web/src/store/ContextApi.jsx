@@ -113,13 +113,14 @@ export const ContextProvider = ({ children }) => {
     const isAdmin = JSON.parse(localStorage.getItem("IS_ADMIN"));
     if (isAdmin) {
       try {
-        const response = await api.get("/admin/getusers");
-
+        const response = await api.get("/admin/getusers")
+        
         if (!response.data || !Array.isArray(response.data)) {
           throw new Error("Invalid response data");
         }
         setUsers(response.data);
         setFilteredUsers(response.data);
+        console.log(response.data);
       } catch (error) {
         console.error("Error fetching users:", error);
         if (error.response) {

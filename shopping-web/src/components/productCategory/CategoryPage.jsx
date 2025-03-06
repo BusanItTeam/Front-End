@@ -5,23 +5,48 @@ import DressesSidebar from "../../components/siderbar/DressesSidebar";
 import OuterSidebar from "../../components/siderbar/OuterSidebar";
 import Sidebar from "../../components/siderbar/Sidebar";
 import TopsSidebar from "../../components/siderbar/TopsSidebar";
+import { formatCurrency } from "../utils/Formatting"; // Helper function
 
 const CategoryPage = () => {
   const { products } = useMyContext();
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 8;
+  const productsPerPage = 16; // 16개씩 페이징
   const backendURL = "http://localhost:8080";
   const { categoryName } = useParams();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [categories, setCategories] = useState([]); // 사이드바 카테고리
 
-  // categoryName과 일치하는 상품만 필터링
-  const filteredProducts = products.filter(
-    (product) => product.category?.name?.toLowerCase() === categoryName
+  useEffect(() => {
+    // products 상태가 변경될 때마다 categories를 업데이트합니다.
+    if (products && products.length > 0) {
+      const uniqueCategories = [
+        ...new Map(
+          products.map((product) => [
+            product.category.categoryId,
+            product.category,
+          ])
+        ).values(),
+      ];
+      setCategories(uniqueCategories);
+    }
+  }, [products]);
+
+  // categoryName에 따라 상품 필터링
+  const filteredProducts = products.filter((product) => {
+    if (categoryName === "all") {
+      return true; // 모든 상품 표시
+    }
+    return product.category?.name?.toLowerCase() === categoryName;
+  });
+
+  // 최신 상품부터 표시하도록 정렬
+  const sortedProducts = [...filteredProducts].sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
   );
 
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = filteredProducts.slice(
+  const currentProducts = sortedProducts.slice(
     indexOfFirstProduct,
     indexOfLastProduct
   );
@@ -44,26 +69,45 @@ const CategoryPage = () => {
     // 페이지 변경 시 상품 목록 재계산
   }, [currentPage, products, categoryName]);
 
-  const renderSidebar = () => {
-    switch (categoryName) {
-      case "pants":
-        return <Sidebar />;
-      case "tops":
-        return <TopsSidebar />;
-      case "outerwear":
-        return <OuterSidebar />;
-      case "dresses":
-        return <DressesSidebar />;
-      default:
-        return null;
+  const calculateDiscountedPrice = (price, discountRate) => {
+    if (discountRate && discountRate > 0) {
+      const discountAmount = (price * discountRate) / 100;
+      return price - discountAmount;
     }
+    return price;
   };
 
   return (
     <div className="flex">
-      {renderSidebar()}
+      {/* 사이드바 */}
+      <div className="w-48 bg-gray-100 p-4 border-r border-gray-200">
+        <h3 className="text-lg font-semibold mb-4">카테고리</h3>
+        <ul>
+          <li key="all">
+            <Link
+              to="/category/all"
+              className="block p-2 hover:bg-gray-200 transition duration-150 ease-in-out"
+            >
+              전체 상품
+            </Link>
+          </li>
+          {categories.map((category) => (
+            <li key={category.categoryId}>
+              <Link
+                to={`/category/${category.name?.toLowerCase()}`}
+                className="block p-2 hover:bg-gray-200 transition duration-150 ease-in-out"
+              >
+                {category.name}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+
       <div className="flex-1 max-w-6xl mx-auto px-4 py-8">
-        <h2 className="text-3xl font-bold mb-6 capitalize">{categoryName}</h2>
+        <h2 className="text-3xl font-bold mb-6 capitalize">
+          {categoryName === "all" ? "전체 상품" : categoryName}
+        </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {currentProducts.map((product) => (
             <div
@@ -96,7 +140,27 @@ const CategoryPage = () => {
                 )}
                 <div className="p-4">
                   <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
-                  <p className="text-gray-700 font-bold">{product.price}원</p>
+                  {product.discountRate && product.discountRate > 0 ? (
+                    <>
+                      <span
+                        style={{
+                          textDecoration: "line-through",
+                          color: "red",
+                          marginRight: "10px",
+                        }}
+                      >
+                        {formatCurrency(product.price)}
+                      </span>
+                      {formatCurrency(
+                        calculateDiscountedPrice(
+                          product.price,
+                          product.discountRate
+                        )
+                      )}
+                    </>
+                  ) : (
+                    formatCurrency(product.price)
+                  )}
                 </div>
               </Link>
             </div>

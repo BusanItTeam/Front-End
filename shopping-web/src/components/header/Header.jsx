@@ -1,4 +1,3 @@
-// Header.js
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Header.css";
@@ -59,7 +58,7 @@ export const Header = () => {
 
         <nav className="frame-3">
           <Link to="/" className="nav-link">
-            Home
+            홈
           </Link>
           <div
             className="category-dropdown"
@@ -71,6 +70,10 @@ export const Header = () => {
             </Link>
             {showDropdown && (
               <ul className="dropdown-menu">
+                <li>
+                  <Link to={`/category/all`}>전체 상품</Link>{" "}
+                  {/* 전체 상품 링크 */}
+                </li>
                 {categories.map((category) => (
                   <li key={category.categoryId}>
                     <Link to={`/category/${category.name?.toLowerCase()}`}>

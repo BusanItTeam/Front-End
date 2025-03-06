@@ -87,7 +87,7 @@ const MyPage = () => {
           <span className="text-gray-500">&rarr;</span>
         </div>
         <div className="p-4 px-8 bg-gray-50 rounded-lg flex justify-between items-center">
-          <Link to="/myPage/editProfile">
+          <Link to="/myPage/PointHistory">
             <span className="text-lg font-semibold">point </span>
             <span className="text-gray-600 ">적립금 내역</span>
             <p className="pt-1 text-xs text-gray-400">
