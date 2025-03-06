@@ -47,9 +47,7 @@ function BoardList() {
         console.log("API 응답:", response.data);
 
         // 최신순 정렬 후 상태 업데이트
-        const sortedInquiries = [...response.data].sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
+        const sortedInquiries = [...response.data].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         setInquiries(sortedInquiries);
 
         // totalCount를 계산하여 totalPages 설정
@@ -86,7 +84,7 @@ function BoardList() {
 
   return (
     <div className="max-w-7xl mx-auto p-6 min-h-screen pt-9">
-      <h2 className="pb-7 text-center text-2xl font-semibold mb-4">MY BOARD</h2>
+      <h1 className="pb-7 text-center text-3xl font-semibold mb-4">MY BOARD</h1>
 
       <table className="w-full border-t text-sm text-center">
         <thead>
@@ -108,25 +106,12 @@ function BoardList() {
           ) : (
             currentInquiries.map((inquiry, index) => (
               <React.Fragment key={`inquiry-${inquiry.inquiryId}`}>
-                <tr
-                  onClick={() => toggleExpand(inquiry.inquiryId)}
-                  className="cursor-pointer hover:bg-gray-100"
-                >
-                  <td className="py-2">
-                    {(currentPage - 1) * inquiriesPerPage + index + 1}
-                  </td>
+                <tr onClick={() => toggleExpand(inquiry.inquiryId)} className="cursor-pointer hover:bg-gray-100">
+                  <td className="py-2">{(currentPage - 1) * inquiriesPerPage + index + 1}</td>
                   <td className="py-2">{inquiry.type}</td>
                   <td className="py-2">{inquiry.title}</td>
-                  <td className="py-2">
-                    {new Date(inquiry.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="py-2">
-                    {inquiry.answer ? (
-                      <span className="text-green-500">답변 완료</span>
-                    ) : (
-                      <span className="text-red-500">답변 대기 중</span>
-                    )}
-                  </td>
+                  <td className="py-2">{new Date(inquiry.createdAt).toLocaleDateString()}</td>
+                  <td className="py-2">{inquiry.answer ? <span className="text-green-500">답변 완료</span> : <span className="text-red-500">답변 대기 중</span>}</td>
                 </tr>
                 {expandedId === inquiry.inquiryId && (
                   <tr key={`inquiry-content-${inquiry.inquiryId}`}>
@@ -164,15 +149,7 @@ function BoardList() {
 
       <div className="pt-2 pb-2 flex justify-center mt-4">
         {Array.from({ length: totalPages }, (_, index) => (
-          <button
-            key={index}
-            className={`mx-1 px-3 py-1 rounded ${
-              currentPage === index + 1
-                ? "bg-pink-500 text-white"
-                : "bg-gray-200"
-            }`}
-            onClick={() => handlePageChange(index + 1)}
-          >
+          <button key={index} className={`mx-1 px-3 py-1 rounded ${currentPage === index + 1 ? "bg-pink-500 text-white" : "bg-gray-200"}`} onClick={() => handlePageChange(index + 1)}>
             {index + 1}
           </button>
         ))}
@@ -185,20 +162,12 @@ function BoardList() {
             <option>내용</option>
             <option>작성자</option>
           </select>
-          <input
-            type="text"
-            className="border p-1 text-sm w-48"
-            placeholder="검색어 입력"
-          />
-          <button className="bg-gray-400 text-white px-4 py-1 text-sm rounded">
-            찾기
-          </button>
+          <input type="text" className="border p-1 text-sm w-48" placeholder="검색어 입력" />
+          <button className="bg-gray-400 text-white px-4 py-1 text-sm rounded">찾기</button>
         </div>
         <div>
           <Link to="/myPage/inquiryForm">
-            <button className="bg-gray-400 text-white px-4 py-1 text-sm rounded">
-              글쓰기
-            </button>
+            <button className="bg-gray-400 text-white px-4 py-1 text-sm rounded">글쓰기</button>
           </Link>
         </div>
       </div>
