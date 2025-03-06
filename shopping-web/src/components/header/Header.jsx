@@ -65,7 +65,7 @@ export const Header = () => {
             onMouseEnter={() => setShowDropdown(true)}
             onMouseLeave={() => setShowDropdown(false)}
           >
-            <Link to="/productCategory" className="nav-link">
+            <Link to="/category/all" className="nav-link">
               카테고리
             </Link>
             {showDropdown && (
