@@ -4,10 +4,12 @@ import { useMyContext } from "../../store/ContextApi";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { formatCurrency } from "../utils/Formatting"; // Helper function
+import api from "../../services/Api";
+import toast from "react-hot-toast";
 
 const ProductDetailPage = () => {
   const { productId } = useParams();
-  const { products } = useMyContext();
+  const { products, token } = useMyContext();
   const [product, setProduct] = useState(null);
   const backendURL = "http://localhost:8080";
   const [selectedImage, setSelectedImage] = useState(null);
@@ -123,10 +125,38 @@ const ProductDetailPage = () => {
     setQuantity(parseInt(e.target.value, 10));
   };
 
-  const handleAddToCart = () => {
-    // 장바구니 로직
-    alert("장바구니에 추가되었습니다!");
+  const handleAddToCart = async () => {
+    const token = localStorage.getItem("JWT_TOKEN"); // 
+  
+  
+    const requestData = {
+      productId: product.productId || null,
+      optionId: selectedOption?.optionId || null,
+      quantity: quantity || 1,
+    };
+  
+    console.log("🛒 장바구니 추가 요청 데이터:", requestData);
+    console.log("🔑 현재 JWT 토큰:", token);
+  
+    try {
+      const response = await api.post("/carts/add", requestData, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // 
+        },
+      });
+  
+      alert("장바구니에 추가되었습니다!");
+    } catch (error) {
+      console.error("🚨 장바구니 추가 실패:", error);
+  
+     
+    }
   };
+  
+  
+  
+  
 
   const handleOptionChange = (e) => {
     const optionId = parseInt(e.target.value, 10);
