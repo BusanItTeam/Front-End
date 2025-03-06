@@ -71,8 +71,7 @@ export const Header = () => {
             {showDropdown && (
               <ul className="dropdown-menu">
                 <li>
-                  <Link to={`/category/all`}>전체 상품</Link>{" "}
-                  {/* 전체 상품 링크 */}
+                  <Link to={`/category/all`}>전체</Link> {/* 전체 상품 링크 */}
                 </li>
                 {categories.map((category) => (
                   <li key={category.categoryId}>

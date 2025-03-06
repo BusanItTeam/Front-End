@@ -88,7 +88,7 @@ const CategoryPage = () => {
               to="/category/all"
               className="block p-2 hover:bg-gray-200 transition duration-150 ease-in-out"
             >
-              전체 상품
+              전체
             </Link>
           </li>
           {categories.map((category) => (
