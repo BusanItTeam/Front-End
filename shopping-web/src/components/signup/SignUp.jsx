@@ -93,7 +93,8 @@ const SignUp = () => {
       } else if (errorMessage === "Email already exists") {
         setError("email", { message: "이미 가입된 이메일입니다." });
         toast.error("이미 사용 중인 이메일입니다.");
-      } else {
+        
+      }else {
         toast.error("회원가입 실패! 다시 시도해주세요.");
       }
     } finally {

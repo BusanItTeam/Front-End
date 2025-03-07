@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import CustomerFAQ from "./CustomerFAQ";
 
 // 더미 데이터
 const dummyInquiries = [
@@ -112,10 +113,11 @@ const dummyReviews = [
 
 function CustomerSupport() {
   const [inquiries, setInquiries] = useState(dummyInquiries);
-  const [faqs, setFaqs] = useState(dummyFAQs);
+
   const [reviews, setReviews] = useState(dummyReviews);
   const [selectedInquiry, setSelectedInquiry] = useState(null);
   const [answer, setAnswer] = useState("");
+
 
   // 문의 답변 함수
   const answerInquiry = () => {
@@ -129,6 +131,9 @@ function CustomerSupport() {
       setAnswer("");
     }
   };
+
+  
+
 
   // FAQ 추가 함수
   const addFAQ = (question, answer) => {
@@ -196,19 +201,7 @@ function CustomerSupport() {
         )}
       </div>
 
-      {/* FAQ 관리 UI */}
-      <div className="mb-8">
-        <h3 className="text-xl font-semibold mb-2">FAQ 관리</h3>
-        <ul className="list-disc pl-5">
-          {faqs.map((faq) => (
-            <li key={faq.id} className="mb-2">
-              <strong>Q: {faq.question}</strong>
-              <p>A: {faq.answer}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
-
+        <CustomerFAQ />
       {/* 상품 리뷰 및 평점 관리 UI */}
       <div>
         <h3 className="text-xl font-semibold mb-2">상품 리뷰 및 평점 관리</h3>

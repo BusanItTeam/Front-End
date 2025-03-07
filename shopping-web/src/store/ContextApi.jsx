@@ -29,9 +29,9 @@ export const ContextProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
 
   const [loading, setLoading] = useState(false);
-
+ const backendURL = "http://localhost:8080";
   const [error, setError] = useState(null);
-
+ 
   // 상태 관리 추가
   const [users, setUsers] = useState([]); // 사용자 목록 상태
   const [filteredUsers, setFilteredUsers] = useState([]); // 필터링된 사용자 목록 상태
@@ -175,6 +175,7 @@ export const ContextProvider = ({ children }) => {
         fetchUsers,
         setLoading,
         filteredUsers,
+        backendURL,
         setFilteredUsers,
       }}
     >
