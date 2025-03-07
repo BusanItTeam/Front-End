@@ -4,7 +4,6 @@ import { useMyContext } from "../../store/ContextApi";
 import axios from "axios";
 import { formatCurrency } from "../utils/Formatting"; // Helper function
 import api from "../../services/Api";
-import toast from "react-hot-toast";
 
 const ProductDetailPage = () => {
   const { productId } = useParams();
