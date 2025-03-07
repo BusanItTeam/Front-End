@@ -94,6 +94,7 @@ const CategoryPage = () => {
       }
     } catch (error) {
       console.error("🚨 위시리스트 추가/삭제 오류:", error);
+      toast.error("위시리스트 처리 중 오류가 발생했습니다.");
     }
   };
 
@@ -114,6 +115,15 @@ const CategoryPage = () => {
     indexOfFirstProduct,
     indexOfLastProduct
   );
+
+  // 할인 가격 계산
+  const calculateDiscountedPrice = (price, discountRate) => {
+    if (discountRate && discountRate > 0) {
+      const discountAmount = (price * discountRate) / 100;
+      return price - discountAmount;
+    }
+    return price;
+  };
 
   return (
     <div className="flex">
@@ -180,7 +190,23 @@ const CategoryPage = () => {
                     </button>
                   </div>
                   {/* 가격 */}
-                  <p>{formatCurrency(product.price)}</p>
+                  {product.discountRate && product.discountRate > 0 ? (
+                    <>
+                      <span className="text-gray-500 line-through mr-2">
+                        {formatCurrency(product.price)}
+                      </span>
+                      <span className="text-red-500 font-semibold">
+                        {formatCurrency(
+                          calculateDiscountedPrice(
+                            product.price,
+                            product.discountRate
+                          )
+                        )}
+                      </span>
+                    </>
+                  ) : (
+                    <p>{formatCurrency(product.price)}</p>
+                  )}
                 </div>
               </Link>
             </div>

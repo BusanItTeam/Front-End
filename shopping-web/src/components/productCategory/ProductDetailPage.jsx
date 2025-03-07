@@ -260,7 +260,7 @@ const ProductDetailPage = () => {
             {formatCurrency(product.price)}
           </p>
         )}
-        {/* 할인 정보 (더미 데이터) */}
+        {/* 할인 정보  */}
         {product.discountRate && product.discountRate > 0 && (
           <p className="text-red-500">할인율: {product.discountRate}%</p>
         )}
