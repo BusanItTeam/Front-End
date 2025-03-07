@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useMyContext } from "../../store/ContextApi";
 import axios from "axios";
-import toast from "react-hot-toast";
 import { formatCurrency } from "../utils/Formatting"; // Helper function
 import api from "../../services/Api";
 
@@ -260,7 +259,7 @@ const ProductDetailPage = () => {
             {formatCurrency(product.price)}
           </p>
         )}
-        {/* 할인 정보 (더미 데이터) */}
+        {/* 할인 정보  */}
         {product.discountRate && product.discountRate > 0 && (
           <p className="text-red-500">할인율: {product.discountRate}%</p>
         )}
