@@ -1,8 +1,9 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { formatCurrency } from "../utils/Formatting";
 
 const Wishlist = () => {
   const [selectedItems, setSelectedItems] = useState([]);
@@ -32,24 +33,9 @@ const Wishlist = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        // 옵션 정보 불러오기
-        const optionsResponse = await axios.get(`${backendURL}/api/wishlist/options`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
         console.log("✅ 위시리스트 데이터:", wishlistResponse.data);
-        console.log("✅ 옵션 데이터:", optionsResponse.data);
 
-        // 옵션 정보를 포함하여 위시리스트 상태 업데이트
-        const updatedWishlist = wishlistResponse.data.map((item) => {
-          const option = optionsResponse.data.find((option) => option.optionId === item.optionId);
-          return {
-            ...item,
-            optionDescription: option ? option.description : "옵션 정보 없음",
-          };
-        });
-
-        setWishlist(updatedWishlist || []); // 데이터가 없으면 빈 배열 설정
+        setWishlist(wishlistResponse.data || []); // 데이터가 없으면 빈 배열 설정
       } catch (error) {
         console.error("🚨 위시리스트 불러오기 오류:", error);
         setError("위시리스트를 불러오는 중 오류가 발생했습니다.");
@@ -91,7 +77,9 @@ const Wishlist = () => {
       });
 
       // UI에서 즉시 제거
-      setWishlist((prev) => prev.filter((item) => item.productId !== productId));
+      setWishlist((prev) =>
+        prev.filter((item) => item.productId !== productId)
+      );
     } catch (error) {
       console.error("🚨 위시리스트 삭제 오류:", error);
     }
@@ -116,7 +104,9 @@ const Wishlist = () => {
       );
 
       // UI에서 선택된 상품들 제거
-      setWishlist((prev) => prev.filter((item) => !selectedItems.includes(item.productId)));
+      setWishlist((prev) =>
+        prev.filter((item) => !selectedItems.includes(item.productId))
+      );
       setSelectedItems([]); // 삭제 후 선택 상태 초기화
       toast.success("선택된 상품이 삭제되었습니다."); // 삭제 성공 메시지
     } catch (error) {
@@ -138,7 +128,12 @@ const Wishlist = () => {
         <thead>
           <tr className="border-b border-gray-400">
             <th className="py-2">
-              <input type="checkbox" onChange={handleSelectAll} checked={selectedItems.length === wishlist.length} className="cursor-pointer" />
+              <input
+                type="checkbox"
+                onChange={handleSelectAll}
+                checked={selectedItems.length === wishlist.length}
+                className="cursor-pointer"
+              />
             </th>
             <th className="py-2">이미지</th>
             <th className="py-2">상품정보</th>
@@ -156,19 +151,63 @@ const Wishlist = () => {
             </tr>
           ) : (
             wishlist.map((item) => (
-              <tr key={item.productId} className="text-center border-b border-gray-400">
+              <tr
+                key={item.productId}
+                className="text-center border-b border-gray-400"
+              >
                 <td className="py-2">
-                  <input type="checkbox" checked={selectedItems.includes(item.productId)} onChange={() => handleSelectItem(item.productId)} className="cursor-pointer" />
+                  <input
+                    type="checkbox"
+                    checked={selectedItems.includes(item.productId)}
+                    onChange={() => handleSelectItem(item.productId)}
+                    className="cursor-pointer"
+                  />
                 </td>
+                {/* 이미지 클릭 시 상세 페이지 이동 */}
                 <td className="py-2">
-                  <img src={`${backendURL}${item.productImage}`} alt={item.productName} className="w-16 h-16 object-cover mx-auto" />
+                  <Link to={`/product/${item.productId}`}>
+                    <img
+                      src={`${backendURL}${item.productImage}`}
+                      alt={item.productName}
+                      className="w-16 h-16 object-cover mx-auto"
+                    />
+                  </Link>
                 </td>
-                <td className="py-2">{item.productName}</td>
-                <td className="py-2">{item.option}</td>
-                <td className="py-2">KRW {item.price.toLocaleString()}</td>
+                {/* 상품 클릭 시 상세 페이지 이동 */}
+                <td className="py-2">
+                  <Link
+                    to={`/product/${item.productId}`}
+                    className="hover:underline"
+                  >
+                    {item.productName}
+                  </Link>
+                </td>
+                <td className="py-2">{item.option || "옵션 없음"}</td>
+                <td className="py-2">
+                  {/* 가격 정보 */}
+                  {item.discountRate && item.discountRate > 0 ? (
+                    <>
+                      <span className="line-through text-gray-500 mr-2">
+                        {formatCurrency(item.price)}
+                      </span>
+                      {formatCurrency(
+                        item.price - (item.price * item.discountRate) / 100
+                      )}
+                    </>
+                  ) : (
+                    formatCurrency(item.price)
+                  )}
+                </td>
                 <td className="flex flex-col space-y-2">
-                  <button className="bg-gray-500 text-white border border-gray-600 py-0.5 mt-2">장바구니담기</button>
-                  <button onClick={() => removeFromWishlist(item.productId, item.optionId)} className="border border-gray-400 py-0.5 mb-2">
+                  {/* 장바구니 담기 버튼 */}
+                  <button className="bg-gray-500 text-white border border-gray-600 py-0.5 mt-2">
+                    장바구니담기
+                  </button>
+                  {/* 삭제 버튼 */}
+                  <button
+                    onClick={() => removeFromWishlist(item.productId)}
+                    className="border border-gray-400 py-0.5 mb-2"
+                  >
                     삭제
                   </button>
                 </td>
@@ -177,16 +216,24 @@ const Wishlist = () => {
           )}
         </tbody>
       </table>
+
+      {/* 선택 삭제 버튼 */}
       <div className="flex justify-end mt-4">
         <div>
           <span>선택상품 </span>
-          <button onClick={removeSelectedItems} className="border border-gray-400 py-1 px-2 mx-2">
+          <button
+            onClick={removeSelectedItems}
+            className="border border-gray-400 py-1 px-2 mx-2"
+          >
             삭제하기
           </button>
-          <button className="bg-gray-500 text-white border border-gray-600 px-2 mx-2 py-1">장바구니담기</button>
+          <button className="bg-gray-500 text-white border border-gray-600 px-2 mx-2 py-1">
+            장바구니담기
+          </button>
         </div>
       </div>
     </div>
   );
 };
+
 export default Wishlist;
