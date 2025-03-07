@@ -4,6 +4,7 @@ import { useMyContext } from "../../store/ContextApi";
 import axios from "axios";
 import { formatCurrency } from "../utils/Formatting"; // Helper function
 import api from "../../services/Api";
+import toast from "react-hot-toast";
 
 const ProductDetailPage = () => {
   const { productId } = useParams();
@@ -80,7 +81,7 @@ const ProductDetailPage = () => {
     try {
       const token = localStorage.getItem("JWT_TOKEN");
       if (!token) {
-        alert("로그인이 필요합니다.");
+        toast.error("로그인이 필요합니다.");
         return;
       }
 
@@ -162,9 +163,10 @@ const ProductDetailPage = () => {
         },
       });
 
-      alert("장바구니에 추가되었습니다!");
+      toast.success("장바구니에 추가되었습니다!");
     } catch (error) {
       console.error("🚨 장바구니 추가 실패:", error);
+      toast.error("장바구니에 추가에 실패했습니다.");
     }
   };
 
@@ -306,7 +308,6 @@ const ProductDetailPage = () => {
         )}
 
         {/* 재고 상태 */}
-
         <p
           className={`mt-4 font-semibold ${
             selectedOption && selectedOption.inventory.stock > 0
