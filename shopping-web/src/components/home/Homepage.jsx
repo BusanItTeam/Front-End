@@ -45,6 +45,12 @@ const Homepage = () => {
           &gt;
         </button>
       </div>
+      <div className="text-center">
+        <p>루나몰은</p>
+        <p>화면너머의 여러분에게 따뜻한 쇼핑메이트이고 싶습니다.</p>
+        <p>일상에 스며드는 실용적인 옷들부터</p>
+        <p>가장 빛이 나야하는 순간까지 언제나 함께 하겠습니다.</p>
+      </div>
     </div>
   );
 };
