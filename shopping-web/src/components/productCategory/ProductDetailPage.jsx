@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useMyContext } from "../../store/ContextApi";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { formatCurrency } from "../utils/Formatting"; // Helper function
 import api from "../../services/Api";
-import toast from "react-hot-toast";
+
 
 const ProductDetailPage = () => {
   const { productId } = useParams();
@@ -17,6 +17,7 @@ const ProductDetailPage = () => {
   const [isWishlisted, setIsWishlisted] = useState(null); // null로 초기화 (로딩 상태)
   const [loading, setLoading] = useState(true);
   const [selectedOption, setSelectedOption] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const selectedProduct = products.find((p) => p.productId === Number(productId));
@@ -26,7 +27,7 @@ const ProductDetailPage = () => {
     }
   }, [productId, products]);
 
-  // { ✅ 찜 상태 확인 및 초기화 }
+  // {  찜 상태 확인 및 초기화 }
   useEffect(() => {
     const checkWishlistStatus = async () => {
       setLoading(true); // 로딩 시작
@@ -65,7 +66,7 @@ const ProductDetailPage = () => {
     console.log("✅ 최종 상태 업데이트 (렌더링 후):", isWishlisted);
   }, [isWishlisted]);
 
-  // { ✅ 찜로직 }
+  // { 찜로직 }
   const handleAddToWishlist = async () => {
     try {
       const token = localStorage.getItem("JWT_TOKEN");
@@ -126,35 +127,49 @@ const ProductDetailPage = () => {
   };
 
   const handleAddToCart = async () => {
-    const token = localStorage.getItem("JWT_TOKEN"); // 
-  
-  
-    const requestData = {
-      productId: product.productId || null,
-      optionId: selectedOption?.optionId || null,
-      quantity: quantity || 1,
-    };
-  
-    console.log("🛒 장바구니 추가 요청 데이터:", requestData);
-    console.log("🔑 현재 JWT 토큰:", token);
-  
-    try {
-      const response = await api.post("/carts/add", requestData, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // 
-        },
-      });
-  
-      alert("장바구니에 추가되었습니다!");
-    } catch (error) {
-      console.error("🚨 장바구니 추가 실패:", error);
-  
-     
+    const token = localStorage.getItem("JWT_TOKEN");
+
+    if (!token) {
+        toast.error("로그인이 필요합니다.");
+        return;
     }
+
+    console.log("🔑 현재 JWT 토큰:", token); // ✅ 토큰 값 확인
+
+    //  CartDTO
+    const requestData = {
+      cartId: product.cartId,
+      productId: product.productId,  
+      productName: product.name || "상품명 없음",  
+      productImageUrl: product.images?.length > 0 ? product.images[0].imageUrl : "기본 이미지 URL",
+      productPrice: product.price || 0,
+      quantity: quantity,
+      categoryName: product.category?.name || "기본 카테고리",
+    color: selectedOption?.color || "기본 색상",
+     size: selectedOption?.size,
   };
   
-  
+
+    console.log("🛒 장바구니 추가 요청 데이터:", requestData); 
+
+    try {
+        const response = await api.post(`/cart/add`, requestData, {  
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`, 
+            },
+        });
+
+        if (response.status === 200) {
+            toast.success("장바구니에 추가되었습니다!");
+            setTimeout(() => navigate("/cart"), 2000); //2초 후 장바구니 페이지로 감
+        }
+    } catch (error) {
+        console.error("🚨 장바구니 추가 실패:", error);
+        toast.error("장바구니 추가에 실패했습니다.");
+    }
+};
+
   
   
 

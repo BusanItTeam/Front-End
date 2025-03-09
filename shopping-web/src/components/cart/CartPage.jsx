@@ -22,23 +22,31 @@ const CartPage = () => {
   };
 
   //  수량 변경 기능
-  const updateQuantity = async (id, newQuantity) => {
-    if (newQuantity < 1) return;
+  const updateQuantity = async (cartId, newQuantity) => {
+    if (newQuantity < 1) return; // 최소 수량 1 유지
+
     try {
-      const response = await api.put(
-        `/cart/${id}`,
-        { quantity: newQuantity },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setCartItems(
-        cartItems.map((item) =>
-          item.id === id ? { ...item, quantity: newQuantity } : item
-        )
-      );
+        const response = await api.put(
+            `/cart/update/${cartId}`, 
+            { quantity: newQuantity },
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (response.status === 200) {
+            setCartItems((prevItems) =>
+                prevItems.map((item) =>
+                    item.cartId === cartId ? { ...item, quantity: newQuantity } : item
+                )
+            );
+        }
     } catch (error) {
-      console.error("수량 변경 실패:", error);
+        console.error("🚨 수량 변경 실패:", error);
+        alert("❌ 수량 변경에 실패했습니다. 다시 시도해주세요.");
     }
-  };
+};
+
+  
+  
 
   // 토탈 가격 계산
   const getSelectedTotalPrice = () => {
@@ -81,7 +89,21 @@ const CartPage = () => {
     if (token) fetchCart();
   }, [token]);
   
+  const deleteCartItem = async (cartId) => {
+    try {
+      const response = await api.delete(`/cart/delete/${cartId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
   
+      if (response.status === 200) {
+        setCartItems((prevItems) => prevItems.filter((item) => item.cartId !== cartId));
+        alert("🛒 장바구니에서 삭제되었습니다.");
+      }
+    } catch (error) {
+      console.error("🚨 장바구니 아이템 삭제 실패:", error);
+      alert("❌ 장바구니 아이템 삭제에 실패했습니다. 다시 시도해주세요.");
+    }
+  };
   
   
 
@@ -110,8 +132,11 @@ const CartPage = () => {
                 <tr className="border-b">
                   <th className="py-2">선택</th>
                   <th className="py-2">이미지</th>
+                  <th className="py-2">카테고리</th>
                   <th className="py-2">상품정보</th>
                   <th className="py-2">가격</th>
+                  <th className="py-2">사이즈</th>
+                  <th className="py-2">색상</th>
                   <th className="py-2">수량</th>
                   <th className="py-2">적립금</th>
                   <th className="py-2">삭제</th>
@@ -137,15 +162,27 @@ const CartPage = () => {
                         className="w-16 h-16 object-cover rounded-md shadow-sm"
                       />
                     </td>
+                    {/* 카테고리 */}
+                    <td className="p-4 text-gray-700">
+                      {(item.categoryName)}
+                    </td>
+                    {/* 상품이름 */}
                     <td className="p-4 font-medium">{item.productName}</td>
-                    {/* 상품 정보 및 가격 */}
+                    {/* 상품 가격 */}
                     <td className="p-4 text-gray-700"> 
                       {(item.productPrice?? 0).toLocaleString("ko-KR")}원
                     </td>
-
+                    {/* 상품 사이즈 */}
+                    <td className="p-4 text-gray-700">
+                      {(item.size)}
+                    </td>
+                    {/* 상품색상 */}
+                    <td className="p-4 text-gray-700">
+                      {(item.color)}
+                    </td>
                     <td className="p-4 flex justify-center items-center mt-4">
                       <button
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        onClick={() => updateQuantity(item.cartId, item.quantity - 1)}
                         className="bg-gray-300 hover:bg-gray-400 text-gray-800 py-1 px-2 rounded-l text-xs"
                       >
                         -
@@ -154,7 +191,7 @@ const CartPage = () => {
                         {item.quantity}
                       </span>
                       <button
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        onClick={() => updateQuantity(item.cartId, item.quantity + 1)}
                         className="bg-gray-300 hover:bg-gray-400 text-gray-800 py-1 px-2 rounded-r text-xs"
                       >
                         +
@@ -165,7 +202,7 @@ const CartPage = () => {
                     </td>
                     <td className="p-4">
                       <button
-                        onClick={() => handleRemoveFromCart(item.id)}
+                        onClick={() => deleteCartItem(item.cartId)}
                         className="text-gray-800 hover:text-gray-800 text-sm font-bold"
                       >
                         ❌
