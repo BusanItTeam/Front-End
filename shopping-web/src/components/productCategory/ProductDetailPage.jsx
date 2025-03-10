@@ -159,13 +159,14 @@ const ProductDetailPage = () => {
 
     console.log("🔑 현재 JWT 토큰:", token); // 토큰 값 확인
 
+    
     //  CartDTO
     const requestData = {
       cartId: product.cartId,
       productId: product.productId,  
       productName: product.name || "상품명 없음",  
       productImageUrl: product.images?.length > 0 ? product.images[0].imageUrl : "기본 이미지 URL",
-      productPrice: product.price || 0,
+      productPrice: product.productPrice || 0,
       quantity: quantity,
       categoryName: product.category?.name || "기본 카테고리",
     color: selectedOption?.color || "기본 색상",
