@@ -82,6 +82,7 @@ const Wishlist = ({updateCart}) => {
       setWishlist((prev) =>
         prev.filter((item) => item.productId !== productId)
       );
+      toast.success("상품이 삭제되었습니다.");
     } catch (error) {
       console.error("🚨 위시리스트 삭제 오류:", error);
     }
@@ -204,24 +205,7 @@ const Wishlist = ({updateCart}) => {
                   {/* 장바구니 담기 버튼 */}
                   <button 
                     className="bg-gray-500 text-white border border-gray-600 py-0.5 mt-2"
-                    onClick={() => {
-                      let color = "기본 색상";
-                      let size = "기본 사이즈";
-
-                      if (item.option) {
-                        const optionParts = item.option.split(", "); // "Color: 검정, Size: 100" -> ["Color: 검정", "Size: 100"]
-                        optionParts.forEach(part => {
-                          if (part.includes("Color:")) {
-                            color = part.replace("Color: ", "").trim();
-                          }
-                          if (part.includes("Size:")) {
-                            size = part.replace("Size: ", "").trim(); 
-                          }
-                        });
-                      }
-
-                      handleAddToCart(item, 1, { color, size }, navigate);
-                    }}
+                    onClick={() => handleAddToCart(item, 1, navigate, updateCart)}
                   >
                     장바구니담기
                   </button>
@@ -250,10 +234,20 @@ const Wishlist = ({updateCart}) => {
           >
             삭제하기
           </button>
-          <button className="bg-gray-500 text-white border border-gray-600 px-2 mx-2 py-1"
+          <button 
+            className="bg-gray-500 text-white border border-gray-600 px-2 mx-2 py-1"
+            onClick={() => {
+                if (wishlist.length === 0) {
+                    toast.error("위시리스트에 상품이 없습니다.");
+                    return;
+                }
+                handleAddToCart(wishlist, 1, navigate, updateCart);
+                toast.success("위시리스트의 모든 상품이 장바구니에 추가되었습니다!");
+            }}
           >
-            장바구니담기
+            전체상품 장바구니에 담기
           </button>
+
         </div>
       </div>
     </div>
