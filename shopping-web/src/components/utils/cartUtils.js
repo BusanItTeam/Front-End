@@ -23,7 +23,7 @@ export const handleAddToCart = async (product, quantity, selectedOption, navigat
       productPrice: product.price || 0,
       quantity: quantity,
       categoryName: product.category?.name || "기본 카테고리",
-    color: selectedOption?.color || "기본 색상",
+      color: selectedOption?.color || "기본 색상",
      size: selectedOption?.size,
   };
   
@@ -40,7 +40,7 @@ export const handleAddToCart = async (product, quantity, selectedOption, navigat
 
         if (response.status === 200) {
             toast.success("장바구니에 추가되었습니다!");
-            setTimeout(() => navigate("/cart"), 2000); //2초 후 장바구니 페이지로 감
+            setTimeout(() => navigate("/cart"), 1000); //1초 후 장바구니 페이지로 감
         }
     } catch (error) {
       console.error("🚨 장바구니 추가 실패:", error);
