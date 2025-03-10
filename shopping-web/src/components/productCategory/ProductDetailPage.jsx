@@ -7,6 +7,7 @@ import { formatCurrency } from "../utils/Formatting"; // Helper function
 import api from "../../services/Api";
 
 
+
 const ProductDetailPage = () => {
   const { productId } = useParams();
   const { products, token, error } = useMyContext();
@@ -192,6 +193,7 @@ const ProductDetailPage = () => {
         console.error("🚨 장바구니 추가 실패:", error);
         toast.error("장바구니 추가에 실패했습니다.");
     }
+    
 };
 
   

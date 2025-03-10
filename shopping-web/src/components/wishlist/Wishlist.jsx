@@ -4,14 +4,16 @@ import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { formatCurrency } from "../utils/Formatting";
+import { handleAddToCart } from "../utils/cartUtils";
 
-const Wishlist = () => {
+const Wishlist = ({updateCart}) => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const backendURL = "http://localhost:8080";
+  
 
   useEffect(() => {
     const fetchWishlist = async () => {
@@ -200,9 +202,30 @@ const Wishlist = () => {
                 </td>
                 <td className="flex flex-col space-y-2">
                   {/* 장바구니 담기 버튼 */}
-                  <button className="bg-gray-500 text-white border border-gray-600 py-0.5 mt-2">
+                  <button 
+                    className="bg-gray-500 text-white border border-gray-600 py-0.5 mt-2"
+                    onClick={() => {
+                      let color = "기본 색상";
+                      let size = "기본 사이즈";
+
+                      if (item.option) {
+                        const optionParts = item.option.split(", "); // "Color: 검정, Size: 100" -> ["Color: 검정", "Size: 100"]
+                        optionParts.forEach(part => {
+                          if (part.includes("Color:")) {
+                            color = part.replace("Color: ", "").trim();
+                          }
+                          if (part.includes("Size:")) {
+                            size = part.replace("Size: ", "").trim(); 
+                          }
+                        });
+                      }
+
+                      handleAddToCart(item, 1, { color, size }, navigate);
+                    }}
+                  >
                     장바구니담기
                   </button>
+
                   {/* 삭제 버튼 */}
                   <button
                     onClick={() => removeFromWishlist(item.productId)}
@@ -227,7 +250,8 @@ const Wishlist = () => {
           >
             삭제하기
           </button>
-          <button className="bg-gray-500 text-white border border-gray-600 px-2 mx-2 py-1">
+          <button className="bg-gray-500 text-white border border-gray-600 px-2 mx-2 py-1"
+          >
             장바구니담기
           </button>
         </div>

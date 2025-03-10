@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMyContext } from "../../store/ContextApi";
 import api from "../../services/Api";
+import Wishlist from "../wishlist/Wishlist";
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]); // 장바구니 아이템 상태
@@ -15,10 +16,26 @@ const CartPage = () => {
 
   
   // 체크박스 선택/해제 기능
-  const toggleSelectItem = (id) => {
-    setSelectedItems((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+  const toggleSelectItem = (cartId) => {
+    setSelectedItems((prevSelected) => {
+      if (prevSelected.includes(cartId)) {
+        return prevSelected.filter((id) => id !== cartId);
+      } else {
+        return [...prevSelected, cartId];
+      }
+    });
+  };
+
+  // 장바구니 데이터 불러오기
+  const updateCart = async () => {
+    try {
+      const response = await api.get("/cart/show", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setCartItems(response.data);
+    } catch (error) {
+      console.error("🚨 장바구니 데이터 불러오기 실패:", error)
+    }
   };
 
   //  수량 변경 기능
@@ -45,13 +62,16 @@ const CartPage = () => {
     }
 };
 
-  
+  const getAllSelectedItems = () => {
+    return cartItems.map((item) => item.cartId);
+    
+  }
   
 
   // 토탈 가격 계산
   const getSelectedTotalPrice = () => {
     return cartItems
-      .filter((item) => selectedItems.includes(item.id))
+      .filter((item) => selectedItems.includes(item.cartId))
       .reduce((total, item) => total + item.productPrice * item.quantity, 0);
   };
 
@@ -68,7 +88,7 @@ const CartPage = () => {
   useEffect(() => {
     const fetchCart = async () => {
       try {
-        const token = localStorage.getItem("JWT_TOKEN");
+       
         if (!token) throw new Error("🚨 인증 토큰이 없습니다.");
   
     
@@ -89,6 +109,10 @@ const CartPage = () => {
     if (token) fetchCart();
   }, [token]);
   
+  useEffect(() => {
+    updateCart(); // 최초 장바구니 데이터 불러오기
+  }, [token]);
+
   const deleteCartItem = async (cartId) => {
     try {
       const response = await api.delete(`/cart/delete/${cartId}`, {
@@ -151,8 +175,8 @@ const CartPage = () => {
                     <td className="p-4">
                       <input
                         type="checkbox"
-                        checked={selectedItems.includes(item.id)}
-                        onChange={() => toggleSelectItem(item.id)}
+                        checked={selectedItems.includes(item.cartId)}
+                        onChange={() => toggleSelectItem(item.cartId)}
                       />
                     </td>
                     <td className="p-4">
@@ -200,6 +224,7 @@ const CartPage = () => {
                     <td className="p-4 text-gray-800 font-medium text-sm">
                       {item.productPrice / 10 * (item.quantity)}
                     </td>
+                    
                     <td className="p-4">
                       <button
                         onClick={() => deleteCartItem(item.cartId)}
