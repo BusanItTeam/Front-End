@@ -4,6 +4,7 @@ import { useMyContext } from "../../store/ContextApi";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { formatCurrency } from "../utils/Formatting"; // Helper function
+import { useNavigate } from "react-router-dom";
 
 const ProductDetailPage = () => {
   const { productId } = useParams();
@@ -15,6 +16,7 @@ const ProductDetailPage = () => {
   const [isWishlisted, setIsWishlisted] = useState(null); // null로 초기화 (로딩 상태)
   const [loading, setLoading] = useState(true);
   const [selectedOption, setSelectedOption] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const selectedProduct = products.find((p) => p.productId === Number(productId));
@@ -95,6 +97,24 @@ const ProductDetailPage = () => {
       console.error("찜하기 오류:", error);
       toast.error("찜하기에 실패했습니다.");
     }
+  };
+
+  // { ✅ 바로구매 }
+  const handleDirectBuy = () => {
+    if (!selectedOption) {
+      alert("옵션을 선택해주세요.");
+      return;
+    }
+
+    const directBuyInfo = {
+      productId: productId,
+      quantity: quantity,
+      optionId: selectedOption.optionId,
+      product: product, // 상품 정보
+    };
+
+    localStorage.setItem("directBuyInfo", JSON.stringify(directBuyInfo));
+    navigate("/order");
   };
 
   useEffect(() => {
@@ -269,7 +289,7 @@ const ProductDetailPage = () => {
             {console.log("🛠 렌더링된 isWishlisted 상태:", isWishlisted)}
             {loading ? "로딩..." : isWishlisted === null ? "찜하기" : isWishlisted ? "찜 취소" : "찜하기"}
           </button>
-          <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" disabled={!selectedOption || selectedOption.inventory.stock <= 0}>
+          <button onClick={handleDirectBuy} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" disabled={!selectedOption || selectedOption.inventory.stock <= 0}>
             바로 구매
           </button>
         </div>
