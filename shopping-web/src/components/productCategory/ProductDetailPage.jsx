@@ -4,7 +4,6 @@ import { useMyContext } from "../../store/ContextApi";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { formatCurrency } from "../utils/Formatting"; // Helper function
-import { useNavigate } from "react-router-dom";
 import api from "../../services/Api";
 
 const ProductDetailPage = () => {
@@ -116,7 +115,7 @@ const ProductDetailPage = () => {
     };
 
     localStorage.setItem("directBuyInfo", JSON.stringify(directBuyInfo));
-    navigate("/order");
+    navigate("/orderpage");
   };
 
   useEffect(() => {

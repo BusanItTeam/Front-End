@@ -52,8 +52,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Homepage />} />
           {/* <Route path="/productcategory" element={<ProductCategory />} /> */}
-          <Route path="/category/:categoryName" element={<CategoryPage />} />{" "}
-          {/* CategoryPage 라우트 */}
+          <Route path="/category/:categoryName" element={<CategoryPage />} /> {/* CategoryPage 라우트 */}
           <Route path="/product/:productId" element={<ProductDetailPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
@@ -62,7 +61,7 @@ function App() {
           <Route path="/myPage/boardList" element={<BoardList />} />
           <Route path="/myPage/inquiryForm" element={<InquiryForm />} />
           <Route path="/cart" element={<CartPage />} />
-          <Route path="/order" element={<OrderPage />} />
+          <Route path="/orderpage" element={<OrderPage />} />
           <Route path="/orderpage/payment" element={<Payment />} />
           <Route path="/orderpage/ordercomplete" element={<OrderComplete />} />
           <Route path="/wishlist" element={<Wishlist />} />

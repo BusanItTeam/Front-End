@@ -5,55 +5,44 @@ import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
 const OrderPage = () => {
-  const { cartItems, currentUser, setCurrentUser } = useMyContext();
+  const { currentUser } = useMyContext();
   console.log("커런트", currentUser);
   const SHIPPING_COST = 3000;
+  const backendURL = "http://localhost:8080";
 
   const [sameAsOrderer, setSameAsOrderer] = useState(false);
   const [selectedValue, setSelectedValue] = useState("적립금");
   const [selectedMethod, setSelectedMethod] = useState("credit");
+
   const [point, setPoint] = useState(0);
   const [deliveryMessage, setDeliveryMessage] = useState("");
 
-  const [directBuyItem, setDirectBuyItem] = useState(null); // 로컬 스토리지에서 가져온 상품 정보를 저장할 상태
+  const [Item, setItem] = useState(null); // 로컬 스토리지에서 가져온 상품 정보를 저장할 상태
 
   // ✅ 바로 구매 상품 정보 가져오기
   useEffect(() => {
     const storedDirectBuyInfo = localStorage.getItem("directBuyInfo");
     if (storedDirectBuyInfo) {
       const directBuyInfo = JSON.parse(storedDirectBuyInfo);
-      setDirectBuyItem(directBuyInfo);
+      setItem(directBuyInfo);
       localStorage.removeItem("directBuyInfo"); // 정보 사용 후 삭제
       console.log("Direct Buy Item Info:", directBuyInfo);
     }
   }, []);
 
+  //✅ 유저 정보 가져오기
   const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    phoneNumber: "",
-    postcode: "N/A",
-    address: "N/A",
-    detailAddress: "N/A",
-    extraAddress: "N/A",
+    name: currentUser?.name || "",
+    email: currentUser?.email || "",
+    phoneNumber: currentUser?.phoneNumber || "",
+    postcode: currentUser?.addresses?.[0]?.postcode || "",
+    address: currentUser?.addresses?.[0]?.address || "",
+    detailAddress: currentUser?.addresses?.[0]?.detailAddress || "",
+    extraAddress: currentUser?.addresses?.[0]?.extraAddress || "",
   });
 
-  useEffect(() => {
-    if (currentUser) {
-      setFormData({
-        username: currentUser.username || "",
-        email: currentUser.email || "",
-        phoneNumber: currentUser.phoneNumber || "",
-        postcode: currentUser.addresses?.[0]?.postcode || "N/A",
-        address: currentUser.addresses?.[0]?.address || "N/A",
-        detailAddress: currentUser.addresses?.[0]?.detailAddress || "N/A",
-        extraAddress: currentUser.addresses?.[0]?.extraAddress || "N/A",
-      });
-    }
-  }, [currentUser]); // `currentUser`가 변경될 때마다 `formData` 업데이트
-
   const [formData2, setFormData2] = useState({
-    username: "",
+    name: "",
     email: "",
     phoneNumber: "",
     postcode: "",
@@ -62,41 +51,25 @@ const OrderPage = () => {
     extraAddress: "",
   });
 
-  // ✅ 백엔드에서 사용자 정보 가져오기
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await Api.get("/auths/user");
-        console.log(response.data);
-        const data = response.data;
-        //const data = await response.json();
-        setCurrentUser(data); // Context API에 저장
+    if (currentUser) {
+      setPoint(currentUser.points || 0); // 포인트 설정
 
-        setPoint(data.points || 0); // 포인트 설정
+      // UserInfoResponse에서 첫 번째 주소 정보 가져오기
+      const userAddress = currentUser?.addresses?.[0] || {};
 
-        // ✅ UserInfoResponse에서 첫 번째 주소 정보 가져오기
-        const userAddress = currentUser?.addresses?.[0] || {};
-
-        // ✅ formData 상태 업데이트
-        const updatedFormData = {
-          username: data.username || "",
-          email: data.email || "",
-          phoneNumber: data.phoneNumber || "",
-          postcode: userAddress.postcode || "",
-          address: userAddress.address || "",
-          detailAddress: userAddress.detailAddress || "",
-          extraAddress: userAddress.extraAddress || "",
-        };
-
-        setFormData(updatedFormData);
-        // setFormData2(updatedFormData); // 배송지 정보도 초기화
-      } catch (error) {
-        console.error("Failed to fetch user data:", error);
-      }
-    };
-
-    fetchUser();
-  }, []);
+      // formData 상태 업데이트
+      setFormData({
+        name: currentUser.name || "",
+        email: currentUser.email || "",
+        phoneNumber: currentUser.phoneNumber || "",
+        postcode: userAddress.postcode || "",
+        address: userAddress.address || "",
+        detailAddress: userAddress.detailAddress || "",
+        extraAddress: userAddress.extraAddress || "",
+      });
+    }
+  }, [currentUser]);
 
   // ✅ 결제하기 버튼 클릭 시 주문저장
   const handleOrderSubmit = async () => {
@@ -127,19 +100,35 @@ const OrderPage = () => {
     }
   }, [sameAsOrderer, formData]);
 
+  // ✅ 최대 사용 가능 포인트 계산 함수
+  const getMaxUsablePoint = () => {
+    const totalPrice = getTotalPrice();
+    const userPoints = currentUser?.points || 0;
+    return Math.min(totalPrice, userPoints);
+  };
+
   // ✅ 포인트 전액 사용 함수
   const handleFullUse = () => {
-    setPoint(currentUser?.points || 0);
+    setPoint(getMaxUsablePoint()); // 최대 사용 가능 포인트로 설정
   };
 
-  // ✅ 포인트 입력 값 제한 함수 (onChange 이벤트 적용)
+  // ✅ 포인트 입력 값 제한 함수
   const handlePointChange = (event) => {
-    const value = Number(event.target.value);
-    if (value < 0) {
-      setPoint(0);
-    }
-  };
+    let value = Number(event.target.value);
+    const maxUsablePoint = getMaxUsablePoint();
 
+    // 최대 사용 가능 포인트 제한
+    if (value > maxUsablePoint) {
+      value = maxUsablePoint;
+    }
+
+    // 음수 값 제한
+    if (value < 0) {
+      value = 0;
+    }
+
+    setPoint(value);
+  };
   // ✅ 주문자 정보 변경 핸들러
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -167,7 +156,7 @@ const OrderPage = () => {
       setFormData2({ ...formData }); // ✅ Immediately copy orderer info
     } else {
       setFormData2({
-        username: "",
+        name: "",
         email: "",
         phoneNumber: "",
         postcode: "",
@@ -191,7 +180,8 @@ const OrderPage = () => {
 
   // ✅ 전체 상품 가격 계산
   const getTotalPrice = () => {
-    return cartItems?.reduce((total, item) => total + item.price * item.quantity, 0) || 0;
+    if (!Item || !Item.product) return 0;
+    return Item.product.price * Item.quantity;
   };
 
   //포인트 적립
@@ -209,39 +199,6 @@ const OrderPage = () => {
     document.body.appendChild(script);
   }, []);
 
-  //주소 검색 기능
-
-  // const handleAddressSearch = () => {
-  //   if (!window.daum) {
-  //     alert("주소 검색 기능을 불러오는 중입니다. 잠시 후 다시 시도해주세요.");
-  //     return;
-  //   }
-
-  //   new window.daum.Postcode({
-  //     oncomplete: function (data) {
-  //       let addr = data.roadAddress || data.jibunAddress; // 도로명 주소 또는 지번 주소
-  //       let extraAddr = "";
-
-  //       if (data.userSelectedType === "R") {
-  //         if (data.bname !== "" && /[동|로|가]$/g.test(data.bname)) {
-  //           extraAddr += data.bname;
-  //         }
-  //         if (data.buildingName !== "" && data.apartment === "Y") {
-  //           extraAddr +=
-  //             extraAddr !== "" ? `, ${data.buildingName}` : data.buildingName;
-  //         }
-  //         if (extraAddr !== "") {
-  //           extraAddr = `(${extraAddr})`;
-  //         }
-  //       }
-
-  //       setValue("postcode", data.zonecode); // 우편번호
-  //       setValue("address", addr); // 주소
-  //       setValue("extraAddress", extraAddr); // 참고 항목
-  //       setValue("detailAddress", ""); // 상세 주소 초기화
-  //     },
-  //   }).open();
-  // };
   const handleAddressSearch = () => {
     if (!window.daum) {
       alert("주소 검색 기능을 불러오는 중입니다. 잠시 후 다시 시도해주세요.");
@@ -284,8 +241,8 @@ const OrderPage = () => {
 
   // 예상 적립금 계산 함수
   const calculateEstimatedPoints = () => {
-    if (directBuyItem && directBuyItem.product) {
-      return Math.floor(directBuyItem.product.price * 0.01); // 예시: 상품 가격의 1% 적립
+    if (Item && Item.product) {
+      return Math.floor(Item.product.price * Item.quantity * 0.01); // 예시: 상품 가격의 1% 적립
     }
     return 0;
   };
@@ -299,10 +256,11 @@ const OrderPage = () => {
 
         <div className="overflow-x-auto">
           {/* 바로 구매 상품 정보 테이블 */}
-          {directBuyItem && directBuyItem.product && (
+          {Item && Item.product && (
             <table className="table-auto w-full mt-4">
               <thead>
                 <tr>
+                  <th className="px-4 py-2"></th>
                   <th className="px-4 py-2">상품 정보</th>
                   <th className="px-4 py-2">가격</th>
                   <th className="px-4 py-2">수량</th>
@@ -311,45 +269,21 @@ const OrderPage = () => {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td className="border px-4 py-2">{directBuyItem.product.name}</td>
-                  <td className="border px-4 py-2">{directBuyItem.product.price}</td>
-                  <td className="border px-4 py-2">{directBuyItem.quantity}</td>
-                  <td className="border px-4 py-2">{calculateEstimatedPoints()}</td>
-                  <td className="border px-4 py-2">일반 배송</td>
-                </tr>
+                {[Item].map((item) => (
+                  <tr key={item.product.productId} className="text-center border-b border-gray-400">
+                    <td className="border px-4 py-2">
+                      <img src={`${backendURL}${item.product.mainImageUrl} `} alt={item.product.name} className="w-16 h-16 mr-2 inline-block" />
+                    </td>
+                    <td className="border px-4 py-2">{item.product.name}</td>
+                    <td className="border px-4 py-2">{(item.product.price * item.quantity).toLocaleString("ko-KR")}원</td>
+                    <td className="border px-4 py-2">{item.quantity}</td>
+                    <td className="border px-4 py-2">{calculateEstimatedPoints().toLocaleString("ko-KR")}원</td>
+                    <td className="border px-4 py-2">일반 배송</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           )}
-          {/* 
-          <table className="w-full border-t text-sm text-center">
-            <thead>
-              <tr className="border-b">
-                <th className="py-2"></th>
-                <th className="py-2">상품정보</th>
-                <th className="py-2">가격</th>
-                <th className="py-2">수량</th>
-                <th className="py-2">예상 적립금</th>
-                <th className="py-2">배송구분</th>
-              </tr>
-            </thead>
-            <tbody>
-              {cartItems.map((item) => (
-                <tr key={item.id} className="border-b text-center text-gray-800">
-                  <td className="p-4">
-                    <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-md shadow-sm" />
-                  </td>
-                  <td className="p-4 font-medium">{item.name}</td>
-                  <td className="p-4 text-gray-700">{item.price.toLocaleString("ko-KR")}원</td>
-                  <td className="p-4 flex justify-center items-center mt-4">
-                    <span className="mx-2 text-sm text-gray-900">{item.quantity}</span>
-                  </td>
-                  <td className="p-4 text-gray-800 font-medium text-sm">{item.points * item.quantity}P</td>
-                  <td className="p-4">기본배송</td>
-                </tr>
-              ))}
-            </tbody>
-          </table> */}
         </div>
       </div>
       <br />
@@ -361,22 +295,13 @@ const OrderPage = () => {
             <tr className="border-b border-gray-200 mt-0.5">
               <td className="p-2 border-gray-200">이름</td>
               <td className="p-2 border-gray-200">
-                <input type="text" name="username" value={currentUser?.username} onChange={handleChange} required className="w-300px; p-1 border rounded border-gray-200 text-xs" />
+                <input type="text" name="name" value={currentUser?.name} onChange={handleChange} required className="w-300px; p-1 border rounded border-gray-200 text-xs" />
               </td>
             </tr>
             <tr className="border-b border-gray-200">
               <td className="p-2 border-gray-200">주소</td>
               <td className="p-2 border-gray-200 space-y-2">
                 <input type="text" name="postcode" placeholder="" value={formData.postcode} onChange={handleChange} required className="w- p-1 border rounded border-gray-200 text-xs" />
-                {/* <span>
-                  <button
-                    type="button"
-                    onClick={() => alert("우편번호 검색 기능 추가 필요")}
-                    className="p-1 border rounded border-gray-200 text-xs bg-gray-100 hover:bg-gray-200 mr-2"
-                  >
-                    우편번호 찾기
-                  </button>
-                </span> */}
                 <input type="text" name="address" placeholder="기본주소" value={formData.address} onChange={handleChange} required className="w-full p-1 border rounded border-gray-200 text-xs" />
                 <input type="text" name="detailAddress" placeholder="상세주소" value={formData.detailAddress} onChange={handleChange} className="w-full p-1 border rounded border-gray-200 text-xs" />
                 <span>
@@ -399,14 +324,6 @@ const OrderPage = () => {
             </tr>
           </tbody>
         </table>
-        {/* <div className="mt-4 text-center">
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-500 text-white rounded"
-          >
-            Submit
-          </button>
-        </div> */}
         <br />
         <br />
 
@@ -418,7 +335,7 @@ const OrderPage = () => {
             <tr className="border-b border-gray-200">
               <td className="p-2 border-gray-200">이름</td>
               <td className="p-2 border-gray-200">
-                <input type="text" name="name" value={formData2.username} onChange={handleChange2} required className="w-300px; p-1 border rounded border-gray-200 text-xs" />
+                <input type="text" name="name" value={formData2.name} onChange={handleChange2} required className="w-300px; p-1 border rounded border-gray-200 text-xs" />
                 <label className="flex items-center text-xs">
                   <input type="checkbox" checked={sameAsOrderer} onChange={handleSameOrderer} className="mr-1" />
                   주문자 정보와 동일
@@ -463,12 +380,22 @@ const OrderPage = () => {
       <div className="p-2 border border-gray-200 w-210 ml-1 mt-1">
         <div className="mb-2 flex justify-between items-center">
           <label className="text-gray-700">적립금</label>
-          <button onClick={handleFullUse} className="bg-gray-700 text-white py-2 rounded-lg font-small text-xs" disabled={!currentUser?.points}>
+          <button
+            onClick={handleFullUse}
+            className="bg-gray-700 text-white py-2 rounded-lg font-small text-xs"
+            disabled={!currentUser?.points} // 보유 포인트가 없으면 비활성화
+          >
             <span>전액 사용</span>
           </button>
         </div>
         <div className="flex border rounded p-2 items-centesr">
-          <input type="number" value={currentUser?.points || 0} onChange={handlePointChange} className="flex-grow outline-none" placeholder="0" />
+          <input
+            type="number"
+            value={point} // point 상태를 value로 설정
+            onChange={handlePointChange}
+            className="flex-grow outline-none"
+            placeholder="0"
+          />
           <span className="text-gray-500">원</span>
         </div>
         <p className="text-gray-500 text-sm mt-1">보유 잔액 {currentUser?.points?.toLocaleString() || 0}원</p>
@@ -480,6 +407,7 @@ const OrderPage = () => {
           <span className="text-gray-700">{point.toLocaleString()}원</span>
         </div>
       </div>
+
       {/* 환불방법 */}
       <div className="p-4 w-full max-w-md">
         <h2 className="text-lg  text-gray-800 mb-1 font-semibold mt-5 mr-1">품절시 환불방법</h2>
