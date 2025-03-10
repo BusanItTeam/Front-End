@@ -1,23 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useMyContext } from "../../store/ContextApi";
-import DressesSidebar from "../../components/siderbar/DressesSidebar";
-import OuterSidebar from "../../components/siderbar/OuterSidebar";
-import Sidebar from "../../components/siderbar/Sidebar";
-import TopsSidebar from "../../components/siderbar/TopsSidebar";
+import axios from "axios";
+import toast from "react-hot-toast";
 import { formatCurrency } from "../utils/Formatting"; // Helper function
 
 const CategoryPage = () => {
   const { products } = useMyContext();
   const [currentPage, setCurrentPage] = useState(1);
+  const [wishlist, setWishlist] = useState([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState({});
   const productsPerPage = 16; // 16개씩 페이징
   const backendURL = "http://localhost:8080";
   const { categoryName } = useParams();
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [categories, setCategories] = useState([]); // 사이드바 카테고리
+  const [categories, setCategories] = useState([]);
 
+  // 카테고리 설정
   useEffect(() => {
-    // products 상태가 변경될 때마다 categories를 업데이트합니다.
     if (products && products.length > 0) {
       const uniqueCategories = [
         ...new Map(
@@ -31,15 +30,81 @@ const CategoryPage = () => {
     }
   }, [products]);
 
-  // categoryName에 따라 상품 필터링
-  const filteredProducts = products.filter((product) => {
-    if (categoryName === "all") {
-      return true; // 모든 상품 표시
-    }
-    return product.category?.name?.toLowerCase() === categoryName;
-  });
+  // 위시리스트 상태 불러오기
+  useEffect(() => {
+    const fetchWishlist = async () => {
+      try {
+        const token = localStorage.getItem("JWT_TOKEN");
+        if (!token) return;
 
-  // 최신 상품부터 표시하도록 정렬
+        const response = await axios.get(`${backendURL}/api/wishlist`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setWishlist(response.data.map((item) => item.productId));
+      } catch (error) {
+        console.error("🚨 위시리스트 불러오기 오류:", error);
+      }
+    };
+    fetchWishlist();
+  }, []);
+
+  // 이미지 자동 전환
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndexes) => {
+        const newIndexes = { ...prevIndexes };
+        products.forEach((product) => {
+          if (product.images.length > 1) {
+            newIndexes[product.productId] =
+              (newIndexes[product.productId] || 0) + 1;
+            if (newIndexes[product.productId] >= product.images.length) {
+              newIndexes[product.productId] = 0;
+            }
+          }
+        });
+        return newIndexes;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [products]);
+
+  // 위시리스트 추가/삭제 함수
+  const toggleWishlist = async (productId) => {
+    try {
+      const token = localStorage.getItem("JWT_TOKEN");
+      if (!token) return;
+
+      if (wishlist.includes(productId)) {
+        // 이미 위시리스트에 있으면 삭제
+        await axios.delete(`${backendURL}/api/wishlist/product/${productId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setWishlist(wishlist.filter((id) => id !== productId));
+        toast.success("위시리스트에서 제거되었습니다.");
+      } else {
+        // 위시리스트에 없으면 추가 (옵션 ID는 null로 추가)
+        await axios.post(
+          `${backendURL}/api/wishlist`,
+          { productId, optionId: null },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setWishlist([...wishlist, productId]);
+        toast.success("위시리스트에 추가되었습니다.");
+      }
+    } catch (error) {
+      console.error("🚨 위시리스트 추가/삭제 오류:", error);
+      toast.error("위시리스트 처리 중 오류가 발생했습니다.");
+    }
+  };
+
+  // 필터링 및 정렬
+  const filteredProducts = products.filter((product) =>
+    categoryName === "all"
+      ? true
+      : product.category?.name?.toLowerCase() === categoryName
+  );
+
   const sortedProducts = [...filteredProducts].sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
   );
@@ -51,24 +116,7 @@ const CategoryPage = () => {
     indexOfLastProduct
   );
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  useEffect(() => {
-    // 1초마다 이미지 변경
-    const intervalId = setInterval(() => {
-      setCurrentImageIndex(
-        (prevIndex) =>
-          (prevIndex + 1) % (currentProducts[0]?.images?.length || 1)
-      );
-    }, 1000);
-
-    return () => clearInterval(intervalId);
-  }, [currentProducts]);
-
-  useEffect(() => {
-    // 페이지 변경 시 상품 목록 재계산
-  }, [currentPage, products, categoryName]);
-
+  // 할인 가격 계산
   const calculateDiscountedPrice = (price, discountRate) => {
     if (discountRate && discountRate > 0) {
       const discountAmount = (price * discountRate) / 100;
@@ -84,18 +132,15 @@ const CategoryPage = () => {
         <h3 className="text-lg font-semibold mb-4">카테고리</h3>
         <ul>
           <li key="all">
-            <Link
-              to="/category/all"
-              className="block p-2 hover:bg-gray-200 transition duration-150 ease-in-out"
-            >
-              전체 상품
+            <Link to="/category/all" className="block p-2 hover:bg-gray-200">
+              전체
             </Link>
           </li>
           {categories.map((category) => (
             <li key={category.categoryId}>
               <Link
                 to={`/category/${category.name?.toLowerCase()}`}
-                className="block p-2 hover:bg-gray-200 transition duration-150 ease-in-out"
+                className="block p-2 hover:bg-gray-200"
               >
                 {category.name}
               </Link>
@@ -104,6 +149,7 @@ const CategoryPage = () => {
         </ul>
       </div>
 
+      {/* 상품 목록 */}
       <div className="flex-1 max-w-6xl mx-auto px-4 py-8">
         <h2 className="text-3xl font-bold mb-6 capitalize">
           {categoryName === "all" ? "전체 상품" : categoryName}
@@ -112,72 +158,74 @@ const CategoryPage = () => {
           {currentProducts.map((product) => (
             <div
               key={product.productId}
-              className="bg-white shadow-md rounded-lg overflow-hidden"
+              className="bg-white shadow-md rounded-lg overflow-hidden relative"
             >
               <Link to={`/product/${product.productId}`}>
-                {product.images && product.images.length > 0 ? (
-                  <img
-                    src={`${backendURL}${
-                      product.images[currentImageIndex % product.images.length]
-                        .imageUrl
-                    }`}
-                    alt={product.name}
-                    className="object-contain transition-transform duration-300 hover:scale-105"
-                    style={{
-                      width: "400px",
-                      height: "400px",
-                      maxWidth: "100%",
-                      maxHeight: "100%",
-                    }}
-                  />
-                ) : (
-                  <img
-                    src="https://via.placeholder.com/400x300"
-                    alt="No Image"
-                    className="object-contain"
-                    style={{ width: "400px", height: "400px" }}
-                  />
-                )}
+                {/* 이미지 */}
+                <img
+                  src={`${backendURL}${
+                    product.images[currentImageIndex[product.productId] || 0]
+                      ?.imageUrl
+                  }`}
+                  alt={product.name}
+                  className="object-cover w-full h-64"
+                />
                 <div className="p-4">
-                  <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
+                  {/* 상품명과 하트 버튼 */}
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-semibold">{product.name}</h3>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleWishlist(product.productId);
+                      }}
+                      className={`text-xl ${
+                        wishlist.includes(product.productId)
+                          ? "text-red-500"
+                          : "text-gray-400"
+                      }`}
+                    >
+                      ♥
+                    </button>
+                  </div>
+                  {/* 가격 */}
                   {product.discountRate && product.discountRate > 0 ? (
                     <>
-                      <span
-                        style={{
-                          textDecoration: "line-through",
-                          color: "red",
-                          marginRight: "10px",
-                        }}
-                      >
+                      <span className="text-gray-500 line-through mr-2">
                         {formatCurrency(product.price)}
                       </span>
-                      {formatCurrency(
-                        calculateDiscountedPrice(
-                          product.price,
-                          product.discountRate
-                        )
-                      )}
+                      <span className="text-red-500 font-semibold">
+                        {formatCurrency(
+                          calculateDiscountedPrice(
+                            product.price,
+                            product.discountRate
+                          )
+                        )}
+                      </span>
                     </>
                   ) : (
-                    formatCurrency(product.price)
+                    <p>{formatCurrency(product.price)}</p>
                   )}
                 </div>
               </Link>
             </div>
           ))}
         </div>
+
+        {/* 페이지네이션 */}
         <div className="flex justify-center mt-8">
           {Array.from({
             length: Math.ceil(filteredProducts.length / productsPerPage),
           }).map((_, i) => (
             <button
               key={i}
-              onClick={() => paginate(i + 1)}
+              onClick={() => setCurrentPage(i + 1)}
               className={`mx-1 px-3 py-1 rounded ${
                 currentPage === i + 1
                   ? "bg-gray-700 text-white"
                   : "bg-gray-200 text-gray-700"
-              } hover:bg-gray-300 focus:outline-none`}
+              }`}
             >
               {i + 1}
             </button>

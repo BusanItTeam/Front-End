@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useMyContext } from "../../store/ContextApi";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { formatCurrency } from "../utils/Formatting"; // Helper function
 import { useNavigate } from "react-router-dom";
+import api from "../../services/Api";
 
 const ProductDetailPage = () => {
   const { productId } = useParams();
-  const { products } = useMyContext();
+  const { products, token, error } = useMyContext();
   const [product, setProduct] = useState(null);
   const backendURL = "http://localhost:8080";
   const [selectedImage, setSelectedImage] = useState(null);
@@ -16,6 +17,7 @@ const ProductDetailPage = () => {
   const [isWishlisted, setIsWishlisted] = useState(null); // null로 초기화 (로딩 상태)
   const [loading, setLoading] = useState(true);
   const [selectedOption, setSelectedOption] = useState(null);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,7 +28,7 @@ const ProductDetailPage = () => {
     }
   }, [productId, products]);
 
-  // { ✅ 찜 상태 확인 및 초기화 }
+  // {  찜 상태 확인 및 초기화 }
   useEffect(() => {
     const checkWishlistStatus = async () => {
       setLoading(true); // 로딩 시작
@@ -65,12 +67,12 @@ const ProductDetailPage = () => {
     console.log("✅ 최종 상태 업데이트 (렌더링 후):", isWishlisted);
   }, [isWishlisted]);
 
-  // { ✅ 찜로직 }
+  // { 찜로직 }
   const handleAddToWishlist = async () => {
     try {
       const token = localStorage.getItem("JWT_TOKEN");
       if (!token) {
-        alert("로그인이 필요합니다.");
+        toast.error("로그인이 필요합니다.");
         return;
       }
 
@@ -143,9 +145,49 @@ const ProductDetailPage = () => {
     setQuantity(parseInt(e.target.value, 10));
   };
 
-  const handleAddToCart = () => {
-    // 장바구니 로직
-    alert("장바구니에 추가되었습니다!");
+  const handleAddToCart = async () => {
+    const token = localStorage.getItem("JWT_TOKEN");
+
+    if (!token) {
+      toast.error("로그인이 필요합니다.");
+      return;
+    }
+
+    console.log("🔑 현재 JWT 토큰:", token); // 토큰 값 확인
+
+    //  CartDTO
+    const requestData = {
+      cartId: product.cartId,
+      productId: product.productId,
+      productName: product.name || "상품명 없음",
+      productImageUrl: product.images?.length > 0 ? product.images[0].imageUrl : "기본 이미지 URL",
+      productPrice: product.price || 0,
+      quantity: quantity,
+      categoryName: product.category?.name || "기본 카테고리",
+      color: selectedOption?.color || "기본 색상",
+      size: selectedOption?.size,
+    };
+
+    console.log("🛒 장바구니 추가 요청 데이터:", requestData);
+
+    try {
+      const response = await api.post(`/cart/add`, requestData, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 200) {
+        toast.success("장바구니에 추가되었습니다!");
+        setTimeout(() => navigate("/cart"), 2000); //2초 후 장바구니 페이지로 감
+      }
+    } catch (error) {
+      console.error("🚨 장바구니 추가 실패:", error);
+      toast.error("장바구니에 추가에 실패했습니다.");
+      console.error("🚨 장바구니 추가 실패:", error);
+      toast.error("장바구니 추가에 실패했습니다.");
+    }
   };
 
   const handleOptionChange = (e) => {
@@ -217,7 +259,7 @@ const ProductDetailPage = () => {
         ) : (
           <p className="text-xl font-semibold mt-4">{formatCurrency(product.price)}</p>
         )}
-        {/* 할인 정보 (더미 데이터) */}
+        {/* 할인 정보  */}
         {product.discountRate && product.discountRate > 0 && <p className="text-red-500">할인율: {product.discountRate}%</p>}
 
         {/* 상품 사양 */}
@@ -257,7 +299,6 @@ const ProductDetailPage = () => {
         )}
 
         {/* 재고 상태 */}
-
         <p className={`mt-4 font-semibold ${selectedOption && selectedOption.inventory.stock > 0 ? "text-green-500" : "text-red-500"}`}>재고 상태: {selectedOption ? (selectedOption.inventory.stock > 0 ? "재고 있음" : "재고 없음") : "옵션을 선택하세요"}</p>
 
         {/* 수량 선택 */}

@@ -33,7 +33,7 @@ import Payment from "./components/order/Payment";
 import InquiryManagement from "./components/adminPage/InquiryManagement";
 import { Toaster } from "react-hot-toast";
 import ProductDetailPage from "./components/productCategory/ProductDetailPage";
-import Wishlist from "./components/wishlist/wishlist";
+import Wishlist from "./components/wishlist/Wishlist";
 import ForgotPassword from "./components/Auth/ForgotPassword";
 import ResetPassword from "./components/Auth/ResetPassword";
 import MyPoint from "./components/myPage/MyPoint";
@@ -51,8 +51,9 @@ function App() {
         <Header />
         <Routes>
           <Route path="/" element={<Homepage />} />
-          <Route path="/productcategory" element={<ProductCategory />} />
-          <Route path="/category/:categoryName" element={<CategoryPage />} /> {/* CategoryPage 라우트 */}
+          {/* <Route path="/productcategory" element={<ProductCategory />} /> */}
+          <Route path="/category/:categoryName" element={<CategoryPage />} />{" "}
+          {/* CategoryPage 라우트 */}
           <Route path="/product/:productId" element={<ProductDetailPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />

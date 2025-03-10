@@ -65,14 +65,13 @@ export const Header = () => {
             onMouseEnter={() => setShowDropdown(true)}
             onMouseLeave={() => setShowDropdown(false)}
           >
-            <Link to="/productCategory" className="nav-link">
+            <Link to="/category/all" className="nav-link">
               카테고리
             </Link>
             {showDropdown && (
               <ul className="dropdown-menu">
                 <li>
-                  <Link to={`/category/all`}>전체 상품</Link>{" "}
-                  {/* 전체 상품 링크 */}
+                  <Link to={`/category/all`}>전체</Link> {/* 전체 상품 링크 */}
                 </li>
                 {categories.map((category) => (
                   <li key={category.categoryId}>
