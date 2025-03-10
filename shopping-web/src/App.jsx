@@ -38,6 +38,7 @@ import ForgotPassword from "./components/Auth/ForgotPassword";
 import ResetPassword from "./components/Auth/ResetPassword";
 import MyPoint from "./components/myPage/MyPoint";
 import PointHistory from "./components/myPage/PointHistory";
+import AdminLayout from "./components/adminPage/AdminLayout";
 const AdminRoute = ({ children }) => {
   const { isAdmin } = useMyContext();
   return isAdmin ? children : <Navigate to="/" />;
@@ -70,6 +71,8 @@ function App() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/myPage/PointHistory" element={<MyPoint />} />
           <Route path="/points-history" element={<PointHistory />} />
+
+     
           <Route
             path="/admin"
             element={
@@ -126,7 +129,9 @@ function App() {
               </AdminRoute>
             }
           />
+         
           <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
+        
         </Routes>
         <Footer />
       </Router>
