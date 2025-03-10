@@ -6,20 +6,18 @@ import toast from "react-hot-toast";
 import { formatCurrency } from "../utils/Formatting"; // Helper function
 import api from "../../services/Api";
 
-
-
 const ProductDetailPage = () => {
   const { productId } = useParams();
-  const { products, token, error } = useMyContext();
+  const { products, token, error, backendURL, currentUser, isAdmin } =
+    useMyContext();
   const [product, setProduct] = useState(null);
-  const backendURL = "http://localhost:8080";
   const [selectedImage, setSelectedImage] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(null); // null로 초기화 (로딩 상태)
   const [loading, setLoading] = useState(true);
   const [selectedOption, setSelectedOption] = useState(null);
-  
- const navigate = useNavigate();
+  const [reviews, setReviews] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const selectedProduct = products.find(
@@ -126,6 +124,20 @@ const ProductDetailPage = () => {
       setSelectedOption(product.options[0]); // Default to first option
     }
   }, [product]);
+  // Fetch reviews
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const response = await api.get(`/reviews/product/${productId}`);
+        setReviews(response.data);
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+        toast.error("리뷰를 가져오는데 실패했습니다.");
+      }
+    };
+
+    fetchReviews();
+  }, [productId]);
 
   if (!product) {
     return <div className="text-center py-4">Loading...</div>;
@@ -148,57 +160,52 @@ const ProductDetailPage = () => {
   };
 
   const handleAddToCart = async () => {
-    const token = localStorage.getItem("JWT_TOKEN"); 
+    const token = localStorage.getItem("JWT_TOKEN");
 
     if (!token) {
       toast.error("로그인이 필요합니다.");
       return;
-  }
-
-  
+    }
 
     console.log("🔑 현재 JWT 토큰:", token); // 토큰 값 확인
 
-    
     //  CartDTO
     const requestData = {
       cartId: product.cartId,
-      productId: product.productId,  
-      productName: product.name || "상품명 없음",  
-      productImageUrl: product.images?.length > 0 ? product.images[0].imageUrl : "기본 이미지 URL",
+      productId: product.productId,
+      productName: product.name || "상품명 없음",
+      productImageUrl:
+        product.images?.length > 0
+          ? product.images[0].imageUrl
+          : "기본 이미지 URL",
       productPrice: product.productPrice || 0,
       quantity: quantity,
       categoryName: product.category?.name || "기본 카테고리",
-    color: selectedOption?.color || "기본 색상",
-     size: selectedOption?.size,
-  };
-  
+      color: selectedOption?.color || "기본 색상",
+      size: selectedOption?.size,
+    };
 
-    console.log("🛒 장바구니 추가 요청 데이터:", requestData); 
+    console.log("🛒 장바구니 추가 요청 데이터:", requestData);
 
     try {
-        const response = await api.post(`/cart/add`, requestData, {  
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`, 
-            },
-        });
+      const response = await api.post(`/cart/add`, requestData, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        if (response.status === 200) {
-            toast.success("장바구니에 추가되었습니다!");
-            setTimeout(() => navigate("/cart"), 2000); //2초 후 장바구니 페이지로 감
-        }
+      if (response.status === 200) {
+        toast.success("장바구니에 추가되었습니다!");
+        setTimeout(() => navigate("/cart"), 2000); //2초 후 장바구니 페이지로 감
+      }
     } catch (error) {
       console.error("🚨 장바구니 추가 실패:", error);
       toast.error("장바구니에 추가에 실패했습니다.");
-        console.error("🚨 장바구니 추가 실패:", error);
-        toast.error("장바구니 추가에 실패했습니다.");
+      console.error("🚨 장바구니 추가 실패:", error);
+      toast.error("장바구니 추가에 실패했습니다.");
     }
-    
-};
-
-  
-  
+  };
 
   const handleOptionChange = (e) => {
     const optionId = parseInt(e.target.value, 10);
@@ -215,15 +222,26 @@ const ProductDetailPage = () => {
   const deliveryInfo = "평균 2~3일 소요 (주말/공휴일 제외)";
   const refundPolicy = "수령 후 7일 이내 (단, 상품 훼손 시 불가)";
 
-  const dummyReviews = [
-    { id: 1, author: "홍길동", rating: 5, comment: "아주 좋아요!" },
-    { id: 2, author: "김철수", rating: 4, comment: "배송이 조금 느려요." },
-  ];
-
   const dummyFaqs = [
     { id: 1, question: "배송은 얼마나 걸리나요?", answer: deliveryInfo },
     { id: 2, question: "반품 정책은 어떻게 되나요?", answer: refundPolicy },
   ];
+  // 리뷰 삭제
+  const handleDeleteReview = async (reviewId) => {
+    try {
+      // 리뷰 삭제 API 호출
+      await api.delete(`/api/reviews/${reviewId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // 리뷰 목록 업데이트
+      setReviews(reviews.filter((review) => review.reviewId !== reviewId));
+      toast.success("리뷰가 삭제되었습니다.");
+    } catch (error) {
+      console.error("Error deleting review:", error);
+      toast.error("리뷰 삭제에 실패했습니다.");
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -264,7 +282,6 @@ const ProductDetailPage = () => {
           ))}
         </div>
       )}
-
       {/* 상품 정보 (기존 코드 유지) */}
       <div className="mt-6">
         <h1 className="text-2xl font-bold">{product.name}</h1>
@@ -409,24 +426,34 @@ const ProductDetailPage = () => {
           </button>
         </div>
       </div>
-
       {/* 리뷰 및 평점 */}
       <div className="mt-8">
         <h2 className="text-xl font-semibold">리뷰</h2>
         <ul>
-          {dummyReviews.map((review) => (
-            <div key={review.id} className="border rounded p-4 mt-2">
-              <div className="flex items-center">
-                <p className="font-semibold">{review.author}</p>
-                <div className="ml-2">
-                  {Array.from({ length: review.rating }).map((_, i) => (
-                    <span key={i} className="text-yellow-500">
-                      ★
-                    </span>
-                  ))}
+          {reviews.map((review) => (
+            <div key={review.reviewId} className="border rounded p-4 mt-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <p className="font-semibold">{review.user.userName}</p>
+                  <div className="ml-2">
+                    {Array.from({ length: review.rating }).map((_, i) => (
+                      <span key={i} className="text-yellow-500">
+                        ★
+                      </span>
+                    ))}
+                  </div>
                 </div>
+                {/* 리뷰 삭제 버튼 (작성자 또는 관리자만) */}
+                {(review.user.userId === currentUser?.userId || isAdmin) && (
+                  <button
+                    onClick={() => handleDeleteReview(review.reviewId)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    삭제
+                  </button>
+                )}
               </div>
-              <p className="mt-2">{review.comment}</p>
+              <p className="mt-2">{review.content}</p>
             </div>
           ))}
         </ul>

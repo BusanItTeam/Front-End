@@ -38,6 +38,8 @@ import ForgotPassword from "./components/Auth/ForgotPassword";
 import ResetPassword from "./components/Auth/ResetPassword";
 import MyPoint from "./components/myPage/MyPoint";
 import PointHistory from "./components/myPage/PointHistory";
+import ReviewForm from "./components/review/ReviewForm";
+import OrderHistory from "./components/order/OrderHistory";
 const AdminRoute = ({ children }) => {
   const { isAdmin } = useMyContext();
   return isAdmin ? children : <Navigate to="/" />;
@@ -70,6 +72,8 @@ function App() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/myPage/PointHistory" element={<MyPoint />} />
           <Route path="/points-history" element={<PointHistory />} />
+          <Route path="/review/:orderItemId" element={<ReviewForm />} />
+          <Route path="/orders/history" element={<OrderHistory />} />
           <Route
             path="/admin"
             element={
