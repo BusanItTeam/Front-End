@@ -38,8 +38,11 @@ import ForgotPassword from "./components/Auth/ForgotPassword";
 import ResetPassword from "./components/Auth/ResetPassword";
 import MyPoint from "./components/myPage/MyPoint";
 import PointHistory from "./components/myPage/PointHistory";
+
 import ReviewForm from "./components/review/ReviewForm";
 import OrderHistory from "./components/order/OrderHistory";
+import AdminLayout from "./components/adminPage/AdminLayout";
+
 const AdminRoute = ({ children }) => {
   const { isAdmin } = useMyContext();
   return isAdmin ? children : <Navigate to="/" />;

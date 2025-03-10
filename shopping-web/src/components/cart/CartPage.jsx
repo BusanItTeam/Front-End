@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMyContext } from "../../store/ContextApi";
 import api from "../../services/Api";
-import Wishlist from "../wishlist/Wishlist";
+
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]); // 장바구니 아이템 상태
@@ -121,11 +121,11 @@ const CartPage = () => {
   
       if (response.status === 200) {
         setCartItems((prevItems) => prevItems.filter((item) => item.cartId !== cartId));
-        alert("🛒 장바구니에서 삭제되었습니다.");
+        alert(" 장바구니에서 삭제되었습니다.");
       }
     } catch (error) {
       console.error("🚨 장바구니 아이템 삭제 실패:", error);
-      alert("❌ 장바구니 아이템 삭제에 실패했습니다. 다시 시도해주세요.");
+      alert(" 장바구니 아이템 삭제에 실패했습니다. 다시 시도해주세요.");
     }
   };
   
