@@ -3,6 +3,7 @@ import { useMyContext } from "../../store/ContextApi";
 import api from "../../services/Api";
 import { formatCurrency } from "../utils/Formatting";
 import toast from "react-hot-toast";
+import AdminLayout from "./AdminLayout";
 
 function ProductManagement() {
   const { products, setProducts, fetchProducts } = useMyContext();
