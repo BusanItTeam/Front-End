@@ -120,7 +120,7 @@ const OrderPage = () => {
       shippingCost: SHIPPING_COST,
       paymentMethod: selectedMethod,
       refundMethod: selectedValue,
-      shippingAddress: formData2.address,
+      shippingAddress: `${formData2.address} ${formData2.detailAddress} ${formData2.extraAddress}`.trim(),
       recipient: formData2.name,
       orderMessage: deliveryMessage,
       orderDetails: orderDetails, // 장바구니 상품 + 바로 구매 상품
