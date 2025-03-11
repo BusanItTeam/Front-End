@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useMyContext } from "../../store/ContextApi";
 import Api from "../../services/Api";
 import { Link } from "react-router-dom";
-import { useLocation } from "react-router-dom";
 
 const OrderPage = () => {
   const { currentUser } = useMyContext();
@@ -108,8 +107,7 @@ const OrderPage = () => {
       orderDetails.push({
         productId: Item.productId,
         quantity: Item.quantity,
-        color: Item.product.options[0]?.color,
-        size: Item.product.options[0]?.size,
+        optionId: Item.optionId,
       });
     }
 
@@ -358,7 +356,13 @@ const OrderPage = () => {
                     </td>
                     <td className="py-2">{item.product.name}</td>
                     <td className="py-2">
-                      color: {item.product.options[0]?.color}, size: {item.product.options[0]?.size}
+                      {item.product.options.map((option) =>
+                        option.optionId === item.optionId ? (
+                          <span key={option.optionId}>
+                            color: {option.color}, size: {option.size}
+                          </span>
+                        ) : null
+                      )}
                     </td>
                     <td className="py-2">{(item.product.price * item.quantity).toLocaleString("ko-KR")}원</td>
                     <td className="py-2">{item.quantity}</td>

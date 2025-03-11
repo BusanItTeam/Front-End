@@ -5,7 +5,7 @@ import api from "../../services/Api";
  * 장바구니에 상품 추가 (단일 상품 또는 여러 개 상품)
   @param {Array | Object} products - 상품 객체 또는 상품 배열
   @param {number} quantity - 추가할 수량
-  @param {Function} navigate - 페이지 이동 함수
+  @param {Function} navigate - 페이지 이동 함수PC에서 공동인증서를 선택하고 비밀번호 입력	스마트
   @param {Function} updateCart - 장바구니 업데이트 함수
  */
 export const handleAddToCart = async (products, quantity, navigate, updateCart) => {

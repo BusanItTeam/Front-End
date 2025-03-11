@@ -222,23 +222,16 @@ const ProductDetailPage = () => {
 
     console.log("🔑 현재 JWT 토큰:", token);
 
-    // CartDTO
+    // 요청 데이터 생성
+
     const requestData = {
-      cartId: product.cartId,
-      productId: product.productId,
-      productName: product.name || "상품명 없음",
-      productImageUrl:
-        product.images?.length > 0
-          ? product.images[0].imageUrl
-          : "기본 이미지 URL",
-      productPrice: product.productPrice || 0,
+      optionId: selectedOption.optionId,
+      color: selectedOption.color,
+      size: selectedOption.size,
       quantity: quantity,
-      categoryName: product.category?.name || "기본 카테고리",
-      color: selectedOption?.color || "기본 색상",
-      size: selectedOption?.size,
     };
 
-    console.log("🛒 장바구니 추가 요청 데이터:", requestData);
+    console.log("장바구니 추가 요청 데이터:", requestData);
 
     try {
       const response = await api.post(`/cart/add`, requestData, {
