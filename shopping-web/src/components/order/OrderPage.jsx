@@ -98,6 +98,8 @@ const OrderPage = () => {
       orderDetails = selectedItems.map((item) => ({
         productId: item.productId,
         quantity: item.quantity,
+        color: item.color,
+        size: item.size,
       }));
     }
 
@@ -106,7 +108,8 @@ const OrderPage = () => {
       orderDetails.push({
         productId: Item.productId,
         quantity: Item.quantity,
-        optionId: Item.optionId,
+        color: Item.product.options[0]?.color,
+        size: Item.product.options[0]?.size,
       });
     }
 
