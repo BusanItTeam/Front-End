@@ -5,21 +5,14 @@ const OrderComplete = () => {
   const { cartItems, currentUser } = useMyContext();
   const SHIPPING_COST = 3000;
   const getTotalPrice = () => {
-    return (
-      cartItems?.reduce(
-        (total, item) => total + item.price * item.quantity,
-        0
-      ) || 0
-    );
+    return cartItems?.reduce((total, item) => total + item.price * item.quantity, 0) || 0;
   };
 
   return (
     <div className="p-10 max-w-5xl mx-auto mt-10 bg-gray-100 shadow-lg rounded-lg">
-      <h1 className="text-3xl font-bold mb-6 text-center text-gray-900">
-        🎉 주문이 완료되었습니다!
-      </h1>
+      <h1 className="text-3xl font-bold mb-6 text-center text-gray-900">🎉 주문이 완료되었습니다!</h1>
 
-      <div className="bg-white p-6 rounded-lg shadow-md">
+      {/* <div className="bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-xl text-gray-800 mb-4 font-bold border-b pb-2">
           주문 상세
         </h2>
@@ -61,12 +54,10 @@ const OrderComplete = () => {
             </tbody>
           </table>
         </div>
-      </div>
+      </div> */}
 
       <div className="bg-white p-6 rounded-lg shadow-md mt-6">
-        <h2 className="text-xl text-gray-800 mb-4 font-bold border-b pb-2">
-          결제 정보
-        </h2>
+        <h2 className="text-xl text-gray-800 mb-4 font-bold border-b pb-2">결제 정보</h2>
         <div className="text-gray-700 text-lg">
           <div className="flex justify-between py-2 border-b">
             <span>총 상품금액</span>
@@ -78,17 +69,13 @@ const OrderComplete = () => {
           </div>
           <div className="flex justify-between py-3 font-bold text-2xl text-gray-900">
             <span>총 결제금액</span>
-            <span>
-              {(getTotalPrice() + SHIPPING_COST).toLocaleString("ko-KR")}원
-            </span>
+            <span>{(getTotalPrice() + SHIPPING_COST).toLocaleString("ko-KR")}원</span>
           </div>
         </div>
       </div>
 
       <div className="bg-white p-6 rounded-lg shadow-md mt-6">
-        <h2 className="text-xl text-gray-800 mb-4 font-bold border-b pb-2">
-          주문자 정보
-        </h2>
+        <h2 className="text-xl text-gray-800 mb-4 font-bold border-b pb-2">주문자 정보</h2>
         <div className="bg-gray-50 p-4 rounded-lg text-gray-700 text-lg">
           <div className="flex items-center mb-2">
             <span className="font-semibold w-32">👤 이름:</span>
@@ -99,9 +86,7 @@ const OrderComplete = () => {
             <span>{currentUser?.email}</span>
           </div>
           <div className="flex items-center mb-2">
-            <span className="font-semibold w-32 whitespace-nowrap">
-              📞 전화번호:
-            </span>
+            <span className="font-semibold w-32 whitespace-nowrap">📞 전화번호:</span>
             <span className="truncate">{currentUser?.phoneNumber}</span>
           </div>
           <div className="flex items-start">
@@ -112,10 +97,7 @@ const OrderComplete = () => {
       </div>
 
       <div className="mt-10 flex justify-center">
-        <Link
-          to="/"
-          className="w-1/2 bg-gray-900 text-white py-3 rounded-lg font-medium hover:bg-gray-800 text-center text-lg"
-        >
+        <Link to="/" className="w-1/2 bg-gray-900 text-white py-3 rounded-lg font-medium hover:bg-gray-800 text-center text-lg">
           홈으로 이동
         </Link>
       </div>
