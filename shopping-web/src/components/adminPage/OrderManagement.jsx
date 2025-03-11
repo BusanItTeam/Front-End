@@ -78,7 +78,7 @@ function OrderManagement() {
           <thead>
             <tr className="bg-gray-200">
               <th className="border p-2">주문 ID</th>
-              <th className="border p-2">주문자</th>
+              <th className="border p-2">고객명</th>
               <th className="border p-2">주문일</th>
               <th className="border p-2">총액</th>
               <th className="border p-2">배송 상태</th>
