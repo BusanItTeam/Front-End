@@ -22,6 +22,7 @@ const ProductDetailPage = () => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [faqs, setFaqs] = useState([]);
+  const [isCartOpen, setIsCartOpen] = useState(false); // 장바구니 팝업 상태
 
   useEffect(() => {
     const selectedProduct = products.find(
@@ -231,7 +232,7 @@ const ProductDetailPage = () => {
 
       if (response.status === 200) {
         toast.success("장바구니에 추가되었습니다!");
-        setTimeout(() => navigate("/cart"), 2000); //2초 후 장바구니 페이지로 감
+        setIsCartOpen(true); // 팝업 열기
       }
     } catch (error) {
       console.error("🚨 장바구니 추가 실패:", error);
@@ -271,6 +272,35 @@ const ProductDetailPage = () => {
       console.error("Error deleting review:", error);
       toast.error("리뷰 삭제에 실패했습니다.");
     }
+  };
+
+  const CartPopup = ({ onClose }) => {
+    return (
+      <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-transparent">
+        <div className="bg-white p-8 rounded shadow-md">
+          <h2 className="text-xl font-semibold mb-4">장바구니</h2>
+          <p>장바구니에 상품이 담겼습니다.</p>
+          <div className="mt-4 flex justify-between">
+            <button
+              onClick={() => {
+                onClose(); // 팝업 닫기
+              }}
+              className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
+            >
+              계속 쇼핑하기
+            </button>
+            <button
+              onClick={() => {
+                navigate("/cart"); // 장바구니 페이지로 이동
+              }}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            >
+              장바구니로 이동하기
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -532,6 +562,9 @@ const ProductDetailPage = () => {
           </div>
         </div>
       </div>
+
+      {/* 장바구니 팝업 */}
+      {isCartOpen && <CartPopup onClose={() => setIsCartOpen(false)} />}
     </div>
   );
 };
