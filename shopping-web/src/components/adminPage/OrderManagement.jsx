@@ -88,11 +88,7 @@ function OrderManagement() {
           </thead>
           <tbody>
             {orders.map((order) => (
-              <tr
-                key={order.userId + order.totalPrice} // 유니크한 key 값을 사용
-                onClick={() => handleOrderClick(order)}
-                className="hover:bg-gray-100 cursor-pointer"
-              >
+              <tr key={order.userId + order.totalPrice} onClick={() => handleOrderClick(order)} className="hover:bg-gray-100 cursor-pointer">
                 <td className="border p-2">{order.orderId}</td>
                 <td className="border p-2">{order.name}</td>
                 <td className="border p-2">{new Date().toLocaleDateString()}</td> {/* 현재 날짜로 처리 */}
