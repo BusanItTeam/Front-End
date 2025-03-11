@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMyContext } from "../../store/ContextApi";
 import api from "../../services/Api";
+import { formatCurrency } from "../utils/Formatting";
 
 
 const CartPage = () => {
@@ -12,7 +13,7 @@ const CartPage = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const SHIPPING_COST = 3000; // 배송비
-  const { userId } = useParams();
+
 
   
   // 체크박스 선택/해제 기능
@@ -45,7 +46,7 @@ const CartPage = () => {
     try {
         const response = await api.put(
             `/cart/update/${cartId}`, 
-            { quantity: newQuantity },
+            { quantity: newQuantity }, 
             { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -62,18 +63,28 @@ const CartPage = () => {
     }
 };
 
+
+
   const getAllSelectedItems = () => {
     return cartItems.map((item) => item.cartId);
     
   }
   
 
-  // 토탈 가격 계산
+  //선택한 상품 가격
   const getSelectedTotalPrice = () => {
-    return cartItems
-      .filter((item) => selectedItems.includes(item.cartId))
-      .reduce((total, item) => total + item.productPrice * item.quantity, 0);
+    return Math.round(
+      cartItems
+        .filter((item) => selectedItems.includes(item.cartId))
+        .reduce((total, item) => {
+          const discountRate = item.discountRate ? item.discountRate / 100 : 0; 
+          const discountedPrice = item.price * (1 - discountRate); 
+          return total + discountedPrice * item.quantity; 
+        }, 0)
+    );
   };
+  
+  
 
 
   const handleSelectedOrder = () => {
@@ -84,7 +95,7 @@ const CartPage = () => {
     navigate("/orderpage", { state: { selectedItems } });
   };
 
-  
+    //장바구니 데이터 불러오기
   useEffect(() => {
     const fetchCart = async () => {
       try {
@@ -113,6 +124,7 @@ const CartPage = () => {
     updateCart(); // 최초 장바구니 데이터 불러오기
   }, [token]);
 
+  //삭제
   const deleteCartItem = async (cartId) => {
     try {
       const response = await api.delete(`/cart/delete/${cartId}`, {
@@ -169,7 +181,7 @@ const CartPage = () => {
               <tbody>
                 {cartItems.map((item) => (
                   <tr
-                    key={item.id ?? item.productId}
+                    key={item.cartId ?? item.productId}
                     className="border-b text-center text-gray-800"
                   >
                     <td className="p-4">
@@ -194,7 +206,18 @@ const CartPage = () => {
                     <td className="p-4 font-medium">{item.productName}</td>
                     {/* 상품 가격 */}
                     <td className="p-4 text-gray-700"> 
-                      {(item.productPrice?? 0).toLocaleString("ko-KR")}원
+                      {item.discountRate && item.discountRate > 0 ? (
+                        <>
+                          <span className="line-through text-gray-500 mr-2">
+                            {formatCurrency(item.price)}
+                          </span>
+                            {formatCurrency(
+                              item.price - (item.price * item.discountRate) / 100
+                            )}
+                          </>
+                          ) : (
+                            formatCurrency(item.price)
+                      )}
                     </td>
                     {/* 상품 사이즈 */}
                     <td className="p-4 text-gray-700">
@@ -222,7 +245,7 @@ const CartPage = () => {
                       </button>
                     </td>
                     <td className="p-4 text-gray-800 font-medium text-sm">
-                      {item.productPrice / 10 * (item.quantity)}
+                      {item.price / 10 * (item.quantity)}
                     </td>
                     
                     <td className="p-4">
