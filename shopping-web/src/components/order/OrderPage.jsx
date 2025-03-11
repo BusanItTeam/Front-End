@@ -18,6 +18,7 @@ const OrderPage = () => {
   const [deliveryMessage, setDeliveryMessage] = useState("");
 
   const [Item, setItem] = useState(null); // 로컬 스토리지에서 가져온 상품 정보를 저장할 상태
+  const [selectedItems, setSelectedItems] = useState([]);
 
   // ✅ 바로 구매 상품 정보 가져오기
   useEffect(() => {
@@ -27,6 +28,16 @@ const OrderPage = () => {
       setItem(directBuyInfo);
       localStorage.removeItem("directBuyInfo"); // 정보 사용 후 삭제
       console.log("Direct Buy Item Info:", directBuyInfo);
+    }
+  }, []);
+
+  // ✅ 페이지 마운트 시 장바구니에서 선택된 상품 정보 가져오기
+  useEffect(() => {
+    const storedItems = localStorage.getItem("selectedItems");
+    if (storedItems) {
+      setSelectedItems(JSON.parse(storedItems));
+      localStorage.removeItem("selectedItems"); // 정보 사용 후 삭제
+      console.log("Selected Items:", JSON.parse(storedItems));
     }
   }, []);
 
@@ -73,20 +84,63 @@ const OrderPage = () => {
 
   // ✅ 결제하기 버튼 클릭 시 주문저장
   const handleOrderSubmit = async () => {
-    if (!currentUser?.id || cartItems.length === 0) {
+    // 사용자 정보와 상품 정보가 모두 필요한 경우
+    if (!currentUser?.id || (selectedItems.length === 0 && !Item)) {
       alert("유효한 사용자 또는 장바구니 상품이 없습니다.");
       return;
+    }
+
+    // 장바구니 상품과 바로 구매 상품에 대해 구분하여 처리
+    let orderDetails = [];
+
+    // 장바구니 상품이 있을 경우
+    if (selectedItems.length > 0) {
+      orderDetails = selectedItems.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+      }));
+    }
+
+    // 바로 구매 상품이 있을 경우
+    if (Item && Item.product) {
+      orderDetails.push({
+        productId: Item.productId,
+        quantity: Item.quantity,
+        optionId: Item.optionId,
+      });
     }
 
     const orderData = {
       userId: currentUser.id,
       totalPrice: getTotalPrice() + SHIPPING_COST - point,
-      status: "배송준비중",
+      status: "PENDING",
+      shippingCost: SHIPPING_COST,
+      paymentMethod: selectedMethod,
+      refundMethod: selectedValue,
+      shippingAddress: formData2.address,
+      recipient: formData2.name,
+      orderMessage: deliveryMessage,
+      orderDetails: orderDetails, // 장바구니 상품 + 바로 구매 상품
     };
 
     try {
-      const response = await Api.post("/orders/create", orderData);
-      console.log("Order Created:", response.data);
+      const token = localStorage.getItem("JWT_TOKEN");
+      console.log("🔑 JWT 토큰 확인:", token);
+
+      if (!token) {
+        alert("로그인이 필요합니다.");
+        return;
+      }
+
+      const response = await Api.post("/orders/create", orderData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log("주문이 성공적으로 생성되었습니다:", response.data);
+
+      alert("주문이 완료되었습니다.");
+      window.location.href = "/orderpage/ordercomplete";
     } catch (error) {
       console.error("주문 생성 실패:", error);
       alert("주문을 생성하는 중 오류가 발생했습니다.");
@@ -180,8 +234,21 @@ const OrderPage = () => {
 
   // ✅ 전체 상품 가격 계산
   const getTotalPrice = () => {
-    if (!Item || !Item.product) return 0;
-    return Item.product.price * Item.quantity;
+    let totalPrice = 0;
+
+    // 바로 구매 상품이 있을 경우 가격 계산
+    if (Item && Item.product) {
+      totalPrice += Item.product.price * Item.quantity;
+    }
+
+    // 장바구니 상품이 있을 경우 가격 계산
+    if (selectedItems.length > 0) {
+      selectedItems.forEach((item) => {
+        totalPrice += item.productPrice * item.quantity; // 장바구니 상품의 가격을 사용
+      });
+    }
+
+    return totalPrice;
   };
 
   //포인트 적립
@@ -241,15 +308,26 @@ const OrderPage = () => {
 
   // 예상 적립금 계산 함수
   const calculateEstimatedPoints = () => {
+    let totalPoints = 0;
+
+    // 바로 구매 상품의 예상 적립금 계산
     if (Item && Item.product) {
-      return Math.floor(Item.product.price * Item.quantity * 0.01); // 예시: 상품 가격의 1% 적립
+      totalPoints += Math.floor(Item.product.price * Item.quantity * 0.01);
     }
-    return 0;
+
+    // 장바구니 상품의 예상 적립금 계산
+    if (selectedItems.length > 0) {
+      selectedItems.forEach((item) => {
+        totalPoints += Math.floor(item.productPrice * item.quantity * 0.01);
+      });
+    }
+
+    return totalPoints;
   };
 
   return (
     <div className="p-6 max-w-4xl mx-auto mt-6">
-      <h1 className="text-2xl font-semibold mb-6 text-center text-gray-800">ORDER</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">ORDER</h1>
 
       <div className=" bg-white  p-4">
         <h2 className="text-lg  text-gray-800 mb-3 font-semibold">주문상품</h2>
@@ -257,28 +335,65 @@ const OrderPage = () => {
         <div className="overflow-x-auto">
           {/* 바로 구매 상품 정보 테이블 */}
           {Item && Item.product && (
-            <table className="table-auto w-full mt-4">
+            <table className="w-full border-t border-gray-200 text-sm text-center">
               <thead>
-                <tr>
-                  <th className="px-4 py-2"></th>
-                  <th className="px-4 py-2">상품 정보</th>
-                  <th className="px-4 py-2">가격</th>
-                  <th className="px-4 py-2">수량</th>
-                  <th className="px-4 py-2">예상 적립금</th>
-                  <th className="px-4 py-2">배송 구분</th>
+                <tr className="border-b border-gray-200">
+                  <th className="py-2">이미지</th>
+                  <th className="py-2">상품 정보</th>
+                  <th className="py-2">옵션</th>
+                  <th className="py-2">가격</th>
+                  <th className="py-2">수량</th>
+                  <th className="py-2">예상 적립금</th>
+                  <th className="py-2">배송 구분</th>
                 </tr>
               </thead>
               <tbody>
                 {[Item].map((item) => (
-                  <tr key={item.product.productId} className="text-center border-b border-gray-400">
-                    <td className="border px-4 py-2">
-                      <img src={`${backendURL}${item.product.mainImageUrl} `} alt={item.product.name} className="w-16 h-16 mr-2 inline-block" />
+                  <tr key={item.product.productId} className="text-center border-b border-gray-200">
+                    <td className="py-2">
+                      <img src={`${backendURL}${item.product.mainImageUrl}`} alt={item.product.name} className="w-16 h-16 mr-2 inline-block" />
                     </td>
-                    <td className="border px-4 py-2">{item.product.name}</td>
-                    <td className="border px-4 py-2">{(item.product.price * item.quantity).toLocaleString("ko-KR")}원</td>
-                    <td className="border px-4 py-2">{item.quantity}</td>
-                    <td className="border px-4 py-2">{calculateEstimatedPoints().toLocaleString("ko-KR")}원</td>
-                    <td className="border px-4 py-2">일반 배송</td>
+                    <td className="py-2">{item.product.name}</td>
+                    <td className="py-2">
+                      color: {item.product.options[0]?.color}, size: {item.product.options[0]?.size}
+                    </td>
+                    <td className="py-2">{(item.product.price * item.quantity).toLocaleString("ko-KR")}원</td>
+                    <td className="py-2">{item.quantity}</td>
+                    <td className="py-2">{calculateEstimatedPoints().toLocaleString("ko-KR")}원</td>
+                    <td className="py-2">일반 배송</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+        <div className="overflow-x-auto">
+          {/* 장바구니 상품 정보 테이블 */}
+          {selectedItems.length > 0 && (
+            <table className="w-full border-t border-gray-200 text-sm text-center">
+              <thead className="border-b border-gray-200">
+                <tr>
+                  <th className=" py-2">이미지</th>
+                  <th className=" py-2">상품 정보</th>
+                  <th className=" py-2">옵션</th>
+                  <th className=" py-2">가격</th>
+                  <th className=" py-2">수량</th>
+                  <th className=" py-2">예상 적립금</th>
+                  <th className=" py-2">배송 구분</th>
+                </tr>
+              </thead>
+              <tbody>
+                {selectedItems.map((item) => (
+                  <tr key={item.cartId} className="text-center border-b border-gray-200">
+                    <td className=" py-2">
+                      <img src={`${backendURL}${item.productImageUrl}`} alt={item.productName} className="w-16 h-16 object-cover rounded-md shadow-sm" />
+                    </td>
+                    <td className=" py-2">{item.productName}</td>
+                    <td className=" py-2">{item.color && item.size ? `color: ${item.color}, size: ${item.size}` : "옵션 없음"}</td>
+                    <td className=" py-2">{(item.productPrice * item.quantity).toLocaleString("ko-KR")}원</td>
+                    <td className=" py-2">{item.quantity}</td>
+                    <td className=" py-2">{((item.productPrice / 10) * item.quantity).toLocaleString("ko-KR")}원</td>
+                    <td className=" py-2">일반 배송</td>
                   </tr>
                 ))}
               </tbody>
@@ -495,7 +610,7 @@ const OrderPage = () => {
         </div>
         <div className="mt-6 flex space-x-2">
           {/* 버튼클릭시 order 데이터베이스 */}
-          <Link to={`/orderpage/payment?price=${getTotalPrice() + SHIPPING_COST - point}`} onClick={handleOrderSubmit} className="w-1/2 bg-gray-900 text-white py-3 rounded-lg font-medium hover:bg-gray-800 text-center">
+          <Link to={`/orderpage/ordercomplete`} onClick={handleOrderSubmit} className="w-1/2 bg-gray-900 text-white py-3 rounded-lg font-medium hover:bg-gray-800 text-center">
             결제하기
           </Link>
 
