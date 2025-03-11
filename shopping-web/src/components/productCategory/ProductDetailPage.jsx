@@ -6,8 +6,6 @@ import toast from "react-hot-toast";
 import { formatCurrency } from "../utils/Formatting"; // Helper function
 import api from "../../services/Api";
 
-
-
 const ProductDetailPage = () => {
   const { productId } = useParams();
   const { products, token, error } = useMyContext();
@@ -18,19 +16,13 @@ const ProductDetailPage = () => {
   const [isWishlisted, setIsWishlisted] = useState(null); // null로 초기화 (로딩 상태)
   const [loading, setLoading] = useState(true);
   const [selectedOption, setSelectedOption] = useState(null);
-  
- const navigate = useNavigate();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const selectedProduct = products.find(
-      (p) => p.productId === Number(productId)
-    );
+    const selectedProduct = products.find((p) => p.productId === Number(productId));
     setProduct(selectedProduct);
-    if (
-      selectedProduct &&
-      selectedProduct.images &&
-      selectedProduct.images.length > 0
-    ) {
+    if (selectedProduct && selectedProduct.images && selectedProduct.images.length > 0) {
       setSelectedImage(selectedProduct.images[0].imageUrl);
     }
   }, [productId, products]);
@@ -47,19 +39,13 @@ const ProductDetailPage = () => {
           return;
         }
 
-        const response = await axios.get(
-          `${backendURL}/api/wishlist/product/${productId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const response = await axios.get(`${backendURL}/api/wishlist/product/${productId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
         if (typeof response.data === "boolean") {
           setIsWishlisted(response.data); // 서버가 true/false 자체를 반환하면 그대로 설정
-        } else if (
-          response.data &&
-          typeof response.data.isWishlisted === "boolean"
-        ) {
+        } else if (response.data && typeof response.data.isWishlisted === "boolean") {
           setIsWishlisted(response.data.isWishlisted);
         } else {
           setIsWishlisted(false);
@@ -92,10 +78,7 @@ const ProductDetailPage = () => {
       const headers = { Authorization: `Bearer ${token}` };
 
       if (isWishlisted) {
-        const response = await axios.delete(
-          `${backendURL}/api/wishlist/product/${productId}`,
-          { headers }
-        );
+        const response = await axios.delete(`${backendURL}/api/wishlist/product/${productId}`, { headers });
         if (response.status === 200) {
           toast.success("찜 목록에서 삭제되었습니다.");
           setIsWishlisted(false);
@@ -105,11 +88,7 @@ const ProductDetailPage = () => {
           productId: Number(productId),
           optionId: selectedOption ? selectedOption.optionId : null, // 선택된 옵션이 있을 때 optionId 추가
         };
-        const response = await axios.post(
-          `${backendURL}/api/wishlist`,
-          wishListDTO,
-          { headers }
-        );
+        const response = await axios.post(`${backendURL}/api/wishlist`, wishListDTO, { headers });
         if (response.status === 200) {
           toast.success("찜 목록에 추가되었습니다.");
           setIsWishlisted(true);
@@ -119,6 +98,24 @@ const ProductDetailPage = () => {
       console.error("찜하기 오류:", error);
       toast.error("찜하기에 실패했습니다.");
     }
+  };
+
+  // { ✅ 바로구매 }
+  const handleDirectBuy = () => {
+    if (!selectedOption) {
+      alert("옵션을 선택해주세요.");
+      return;
+    }
+
+    const directBuyInfo = {
+      productId: productId,
+      quantity: quantity,
+      optionId: selectedOption.optionId,
+      product: product, // 상품 정보
+    };
+
+    localStorage.setItem("directBuyInfo", JSON.stringify(directBuyInfo));
+    navigate("/orderpage");
   };
 
   useEffect(() => {
@@ -148,57 +145,49 @@ const ProductDetailPage = () => {
   };
 
   const handleAddToCart = async () => {
-    const token = localStorage.getItem("JWT_TOKEN"); 
+    const token = localStorage.getItem("JWT_TOKEN");
 
     if (!token) {
       toast.error("로그인이 필요합니다.");
       return;
-  }
-
-  
+    }
 
     console.log("🔑 현재 JWT 토큰:", token); // 토큰 값 확인
 
-    
     //  CartDTO
     const requestData = {
       cartId: product.cartId,
-      productId: product.productId,  
-      productName: product.name || "상품명 없음",  
+      productId: product.productId,
+      productName: product.name || "상품명 없음",
       productImageUrl: product.images?.length > 0 ? product.images[0].imageUrl : "기본 이미지 URL",
       productPrice: product.productPrice || 0,
       quantity: quantity,
       categoryName: product.category?.name || "기본 카테고리",
-    color: selectedOption?.color || "기본 색상",
-     size: selectedOption?.size,
-  };
-  
+      color: selectedOption?.color || "기본 색상",
+      size: selectedOption?.size,
+    };
 
-    console.log("🛒 장바구니 추가 요청 데이터:", requestData); 
+    console.log("🛒 장바구니 추가 요청 데이터:", requestData);
 
     try {
-        const response = await api.post(`/cart/add`, requestData, {  
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`, 
-            },
-        });
+      const response = await api.post(`/cart/add`, requestData, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        if (response.status === 200) {
-            toast.success("장바구니에 추가되었습니다!");
-            setTimeout(() => navigate("/cart"), 2000); //2초 후 장바구니 페이지로 감
-        }
+      if (response.status === 200) {
+        toast.success("장바구니에 추가되었습니다!");
+        setTimeout(() => navigate("/cart"), 2000); //2초 후 장바구니 페이지로 감
+      }
     } catch (error) {
       console.error("🚨 장바구니 추가 실패:", error);
       toast.error("장바구니에 추가에 실패했습니다.");
-        console.error("🚨 장바구니 추가 실패:", error);
-        toast.error("장바구니 추가에 실패했습니다.");
+      console.error("🚨 장바구니 추가 실패:", error);
+      toast.error("장바구니 추가에 실패했습니다.");
     }
-    
-};
-
-  
-  
+  };
 
   const handleOptionChange = (e) => {
     const optionId = parseInt(e.target.value, 10);
@@ -230,19 +219,9 @@ const ProductDetailPage = () => {
       {/* 메인 이미지 */}
       <div className="w-full md:w-1/2 mx-auto mb-4">
         {selectedImage ? (
-          <img
-            src={`${backendURL}${selectedImage}`}
-            alt={product.name}
-            className="object-contain rounded-lg shadow-md"
-            style={{ width: "400px", height: "400px" }}
-          />
+          <img src={`${backendURL}${selectedImage}`} alt={product.name} className="object-contain rounded-lg shadow-md" style={{ width: "400px", height: "400px" }} />
         ) : (
-          <img
-            src="https://via.placeholder.com/400x300"
-            alt="No Image"
-            className="object-contain rounded-lg shadow-md"
-            style={{ width: "400px", height: "400px" }}
-          />
+          <img src="https://via.placeholder.com/400x300" alt="No Image" className="object-contain rounded-lg shadow-md" style={{ width: "400px", height: "400px" }} />
         )}
       </div>
 
@@ -250,16 +229,8 @@ const ProductDetailPage = () => {
       {product.images && product.images.length > 0 && (
         <div className="flex overflow-x-auto space-x-2 py-2">
           {product.images.map((image, index) => (
-            <div
-              key={index}
-              className="w-24 h-24 rounded-md shadow-md cursor-pointer flex-shrink-0"
-              onClick={() => handleThumbnailClick(image.imageUrl)}
-            >
-              <img
-                src={`${backendURL}${image.imageUrl}`}
-                alt={`Thumbnail ${index + 1}`}
-                className="w-full h-full object-cover rounded-md"
-              />
+            <div key={index} className="w-24 h-24 rounded-md shadow-md cursor-pointer flex-shrink-0" onClick={() => handleThumbnailClick(image.imageUrl)}>
+              <img src={`${backendURL}${image.imageUrl}`} alt={`Thumbnail ${index + 1}`} className="w-full h-full object-cover rounded-md" />
             </div>
           ))}
         </div>
@@ -281,20 +252,14 @@ const ProductDetailPage = () => {
               >
                 {formatCurrency(product.price)}
               </span>
-              {formatCurrency(
-                calculateDiscountedPrice(product.price, product.discountRate)
-              )}
+              {formatCurrency(calculateDiscountedPrice(product.price, product.discountRate))}
             </p>
           </>
         ) : (
-          <p className="text-xl font-semibold mt-4">
-            {formatCurrency(product.price)}
-          </p>
+          <p className="text-xl font-semibold mt-4">{formatCurrency(product.price)}</p>
         )}
         {/* 할인 정보  */}
-        {product.discountRate && product.discountRate > 0 && (
-          <p className="text-red-500">할인율: {product.discountRate}%</p>
-        )}
+        {product.discountRate && product.discountRate > 0 && <p className="text-red-500">할인율: {product.discountRate}%</p>}
 
         {/* 상품 사양 */}
         <h3 className="text-lg font-semibold mt-4">상품 사양</h3>
@@ -320,12 +285,7 @@ const ProductDetailPage = () => {
             <label htmlFor="option" className="mr-2 font-semibold">
               옵션 선택:
             </label>
-            <select
-              id="option"
-              onChange={handleOptionChange}
-              className="border rounded w-auto px-2 py-1"
-              value={selectedOption ? selectedOption.optionId : ""}
-            >
+            <select id="option" onChange={handleOptionChange} className="border rounded w-auto px-2 py-1" value={selectedOption ? selectedOption.optionId : ""}>
               {product.options.map((option) => (
                 <option key={option.optionId} value={option.optionId}>
                   {option.color ? `[ 색상: ${option.color} ] , ` : ""}
@@ -338,45 +298,19 @@ const ProductDetailPage = () => {
         )}
 
         {/* 재고 상태 */}
-        <p
-          className={`mt-4 font-semibold ${
-            selectedOption && selectedOption.inventory.stock > 0
-              ? "text-green-500"
-              : "text-red-500"
-          }`}
-        >
-          재고 상태:{" "}
-          {selectedOption
-            ? selectedOption.inventory.stock > 0
-              ? "재고 있음"
-              : "재고 없음"
-            : "옵션을 선택하세요"}
-        </p>
+        <p className={`mt-4 font-semibold ${selectedOption && selectedOption.inventory.stock > 0 ? "text-green-500" : "text-red-500"}`}>재고 상태: {selectedOption ? (selectedOption.inventory.stock > 0 ? "재고 있음" : "재고 없음") : "옵션을 선택하세요"}</p>
 
         {/* 수량 선택 */}
         <div className="mt-4">
           <label htmlFor="quantity" className="mr-2 font-semibold">
             수량:
           </label>
-          <input
-            type="number"
-            id="quantity"
-            value={quantity}
-            onChange={handleQuantityChange}
-            min="1"
-            max={selectedOption ? selectedOption.inventory.stock : 0}
-            className="border rounded w-20 px-2 py-1"
-            disabled={!selectedOption}
-          />
+          <input type="number" id="quantity" value={quantity} onChange={handleQuantityChange} min="1" max={selectedOption ? selectedOption.inventory.stock : 0} className="border rounded w-20 px-2 py-1" disabled={!selectedOption} />
         </div>
 
         {/* 구매 버튼 */}
         <div className="mt-6">
-          <button
-            onClick={handleAddToCart}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
-            disabled={!selectedOption || selectedOption.inventory.stock <= 0}
-          >
+          <button onClick={handleAddToCart} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2" disabled={!selectedOption || selectedOption.inventory.stock <= 0}>
             장바구니
           </button>
           <button
@@ -393,18 +327,9 @@ const ProductDetailPage = () => {
             disabled={loading} // 로딩 중에는 버튼 비활성화
           >
             {console.log("🛠 렌더링된 isWishlisted 상태:", isWishlisted)}
-            {loading
-              ? "로딩..."
-              : isWishlisted === null
-              ? "찜하기"
-              : isWishlisted
-              ? "찜 취소"
-              : "찜하기"}
+            {loading ? "로딩..." : isWishlisted === null ? "찜하기" : isWishlisted ? "찜 취소" : "찜하기"}
           </button>
-          <button
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-            disabled={!selectedOption || selectedOption.inventory.stock <= 0}
-          >
+          <button onClick={handleDirectBuy} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" disabled={!selectedOption || selectedOption.inventory.stock <= 0}>
             바로 구매
           </button>
         </div>

@@ -53,8 +53,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Homepage />} />
           {/* <Route path="/productcategory" element={<ProductCategory />} /> */}
-          <Route path="/category/:categoryName" element={<CategoryPage />} />{" "}
-          {/* CategoryPage 라우트 */}
+          <Route path="/category/:categoryName" element={<CategoryPage />} /> {/* CategoryPage 라우트 */}
           <Route path="/product/:productId" element={<ProductDetailPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
