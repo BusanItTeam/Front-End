@@ -38,7 +38,11 @@ import ForgotPassword from "./components/Auth/ForgotPassword";
 import ResetPassword from "./components/Auth/ResetPassword";
 import MyPoint from "./components/myPage/MyPoint";
 import PointHistory from "./components/myPage/PointHistory";
+
+import ReviewForm from "./components/review/ReviewForm";
+import OrderHistory from "./components/order/OrderHistory";
 import AdminLayout from "./components/adminPage/AdminLayout";
+
 const AdminRoute = ({ children }) => {
   const { isAdmin } = useMyContext();
   return isAdmin ? children : <Navigate to="/" />;
@@ -53,7 +57,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Homepage />} />
           {/* <Route path="/productcategory" element={<ProductCategory />} /> */}
-          <Route path="/category/:categoryName" element={<CategoryPage />} /> {/* CategoryPage 라우트 */}
+          <Route path="/category/:categoryName" element={<CategoryPage />} />{" "}
+          {/* CategoryPage 라우트 */}
           <Route path="/product/:productId" element={<ProductDetailPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
@@ -70,8 +75,8 @@ function App() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/myPage/PointHistory" element={<MyPoint />} />
           <Route path="/points-history" element={<PointHistory />} />
-
-     
+          <Route path="/review/:orderItemId" element={<ReviewForm />} />
+          <Route path="/orders/history" element={<OrderHistory />} />
           <Route
             path="/admin"
             element={
@@ -128,9 +133,7 @@ function App() {
               </AdminRoute>
             }
           />
-         
           <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
-        
         </Routes>
         <Footer />
       </Router>
