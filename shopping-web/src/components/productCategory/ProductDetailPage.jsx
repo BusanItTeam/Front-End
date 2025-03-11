@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import { useMyContext } from "../../store/ContextApi";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { formatCurrency } from "../utils/Formatting"; // Helper function
+import { formatCurrency } from "../utils/Formatting";
 import api from "../../services/Api";
 import CustomerFAQ from "../adminPage/CustomerFAQ";
-import { Link } from "react-router-dom";
 
 const ProductDetailPage = () => {
   const { productId } = useParams();
@@ -15,14 +14,14 @@ const ProductDetailPage = () => {
   const [product, setProduct] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [isWishlisted, setIsWishlisted] = useState(null); // null로 초기화 (로딩 상태)
+  const [isWishlisted, setIsWishlisted] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedOption, setSelectedOption] = useState(null);
   const [reviews, setReviews] = useState([]);
+  const [categories, setCategories] = useState([]); // [1]
+  const [faqs, setFaqs] = useState([]); // [1]
+  const [isCartOpen, setIsCartOpen] = useState(false); // [1]
   const navigate = useNavigate();
-  const [categories, setCategories] = useState([]);
-  const [faqs, setFaqs] = useState([]);
-  const [isCartOpen, setIsCartOpen] = useState(false); // 장바구니 팝업 상태
 
   useEffect(() => {
     const selectedProduct = products.find(
@@ -52,14 +51,14 @@ const ProductDetailPage = () => {
     }
   }, [products]);
 
-  // {  찜 상태 확인 및 초기화 }
+  // 찜 상태 확인 및 초기화
   useEffect(() => {
     const checkWishlistStatus = async () => {
-      setLoading(true); // 로딩 시작
+      setLoading(true);
       try {
         const token = localStorage.getItem("JWT_TOKEN");
         if (!token) {
-          setIsWishlisted(false); // 토큰이 없으면 찜하지 않은 상태로 설정
+          setIsWishlisted(false);
           setLoading(false);
           return;
         }
@@ -72,7 +71,7 @@ const ProductDetailPage = () => {
         );
 
         if (typeof response.data === "boolean") {
-          setIsWishlisted(response.data); // 서버가 true/false 자체를 반환하면 그대로 설정
+          setIsWishlisted(response.data);
         } else if (
           response.data &&
           typeof response.data.isWishlisted === "boolean"
@@ -97,7 +96,7 @@ const ProductDetailPage = () => {
     console.log("✅ 최종 상태 업데이트 (렌더링 후):", isWishlisted);
   }, [isWishlisted]);
 
-  // { 찜로직 }
+  // 찜 로직
   const handleAddToWishlist = async () => {
     try {
       const token = localStorage.getItem("JWT_TOKEN");
@@ -138,11 +137,30 @@ const ProductDetailPage = () => {
     }
   };
 
+  // 바로 구매
+  const handleDirectBuy = () => {
+    if (!selectedOption) {
+      alert("옵션을 선택해주세요.");
+      return;
+    }
+
+    const directBuyInfo = {
+      productId: productId,
+      quantity: quantity,
+      optionId: selectedOption.optionId,
+      product: product, // 상품 정보
+    };
+
+    localStorage.setItem("directBuyInfo", JSON.stringify(directBuyInfo));
+    navigate("/orderpage");
+  };
+
   useEffect(() => {
     if (product && product.options && product.options.length > 0) {
       setSelectedOption(product.options[0]); // Default to first option
     }
   }, [product]);
+
   // Fetch reviews
   useEffect(() => {
     const fetchReviews = async () => {
@@ -158,7 +176,7 @@ const ProductDetailPage = () => {
     fetchReviews();
   }, [productId]);
 
-  //**추가: FAQ 로딩**
+  // FAQ 로딩
   useEffect(() => {
     const fetchFAQs = async () => {
       try {
@@ -202,9 +220,9 @@ const ProductDetailPage = () => {
       return;
     }
 
-    console.log("🔑 현재 JWT 토큰:", token); // 토큰 값 확인
+    console.log("🔑 현재 JWT 토큰:", token);
 
-    //  CartDTO
+    // CartDTO
     const requestData = {
       cartId: product.cartId,
       productId: product.productId,
@@ -237,8 +255,6 @@ const ProductDetailPage = () => {
     } catch (error) {
       console.error("🚨 장바구니 추가 실패:", error);
       toast.error("장바구니에 추가에 실패했습니다.");
-      console.error("🚨 장바구니 추가 실패:", error);
-      toast.error("장바구니 추가에 실패했습니다.");
     }
   };
 
@@ -505,6 +521,7 @@ const ProductDetailPage = () => {
                 : "찜하기"}
             </button>
             <button
+              onClick={handleDirectBuy}
               className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
               disabled={!selectedOption || selectedOption.inventory.stock <= 0}
             >
