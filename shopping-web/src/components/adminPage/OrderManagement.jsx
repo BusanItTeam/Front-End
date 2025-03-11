@@ -5,6 +5,7 @@ function OrderManagement() {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [deliveryStatus, setDeliveryStatus] = useState("");
+  const backendURL = "http://localhost:8080";
 
   useEffect(() => {
     fetchOrders();
@@ -14,7 +15,8 @@ function OrderManagement() {
   const fetchOrders = async () => {
     try {
       const response = await api.get("/orders"); // 실제 API 호출
-      setOrders(response.data); // 주문 목록을 받아옴
+      console.log("뿅뿅", response.data); // 응답 데이터 확인
+      setOrders(response.data); // 주문 목록을 상태에 저장
     } catch (error) {
       console.error("주문 목록을 불러오는데 실패했습니다.", error);
     }
@@ -69,7 +71,7 @@ function OrderManagement() {
 
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">주문 및 배송 관리</h2>
+      <h2 className="text-2xl text-center font-bold mb-8">주문 및 배송 관리</h2>
 
       {/* 주문 목록 */}
       <div className="mb-8">
@@ -78,7 +80,7 @@ function OrderManagement() {
           <thead>
             <tr className="bg-gray-200">
               <th className="border p-2">주문 ID</th>
-              <th className="border p-2">주문자</th>
+              <th className="border p-2">고객명</th>
               <th className="border p-2">주문일</th>
               <th className="border p-2">총액</th>
               <th className="border p-2">배송 상태</th>
@@ -86,15 +88,11 @@ function OrderManagement() {
           </thead>
           <tbody>
             {orders.map((order) => (
-              <tr
-                key={order.userId + order.totalPrice} // 유니크한 key 값을 사용
-                onClick={() => handleOrderClick(order)}
-                className="hover:bg-gray-100 cursor-pointer"
-              >
-                <td className="border p-2">{order.userId}</td>
-                <td className="border p-2">{order.orderMessage}</td>
+              <tr key={order.userId + order.totalPrice} onClick={() => handleOrderClick(order)} className="hover:bg-gray-100 cursor-pointer">
+                <td className="border p-2">{order.orderId}</td>
+                <td className="border p-2">{order.name}</td>
                 <td className="border p-2">{new Date().toLocaleDateString()}</td> {/* 현재 날짜로 처리 */}
-                <td className="border p-2">{order.totalPrice}</td>
+                <td className="border p-2">{order.totalPrice + order.shippingCost}</td>
                 <td className="border p-2">{order.status}</td>
               </tr>
             ))}
@@ -107,32 +105,44 @@ function OrderManagement() {
         <div>
           <h3 className="text-xl font-semibold mb-2">주문 상세 정보</h3>
           <div className="mb-4">
-            <p>주문 ID: {selectedOrder.userId}</p>
-            <p>주문자: {selectedOrder.orderMessage}</p>
-            <p>총액: {selectedOrder.totalPrice}</p>
+            <p>주문 ID: {selectedOrder.orderId}</p>
+            <p>고객명: {selectedOrder.name}</p>
+            <p>수령인: {selectedOrder.recipient}</p>
             <p>배송 주소: {selectedOrder.shippingAddress}</p>
+            <p>배송 메세지: {selectedOrder.orderMessage}</p>
             <p>결제 방법: {selectedOrder.paymentMethod}</p>
+            <p>환불 방법: {selectedOrder.refundeMethod}</p>
             <p>배송비: {selectedOrder.shippingCost}</p>
+            <p>상품구매액: {selectedOrder.totalPrice - selectedOrder.shippingCost}</p>
+            <p>총액: {selectedOrder.totalPrice}</p>
           </div>
 
           {/* 주문 상세 항목 (orderDetails) */}
           <h4 className="text-lg font-semibold">주문 상세 항목</h4>
-          <table className="w-full border-collapse border mt-4">
+          <table className="w-full border-collapse border mt-4 mb-8">
             <thead>
               <tr className="bg-gray-200">
-                <th className="border p-2">상품 ID</th>
-                <th className="border p-2">수량</th>
+                <th className="border p-2">번호</th>
+                <th className="border p-2">이미지</th>
+                <th className="border p-2">상품명</th>
                 <th className="border p-2">가격</th>
-                <th className="border p-2">옵션 ID</th>
+                <th className="border p-2">수량</th>
+                <th className="border p-2">옵션</th>
               </tr>
             </thead>
             <tbody>
               {selectedOrder.orderDetails.map((detail, index) => (
                 <tr key={index}>
-                  <td className="border p-2">{detail.productId}</td>
-                  <td className="border p-2">{detail.quantity}</td>
+                  <td className="border p-2">{index + 1}</td>
+                  <td className="border p-2">
+                    <img src={`${backendURL}${detail.image}`} alt={detail.image} className="w-16 h-16 mr-2 inline-block" />
+                  </td>
+                  <td className="border p-2">{detail.productName}</td>
                   <td className="border p-2">{detail.price}</td>
-                  <td className="border p-2">{detail.optionId}</td>
+                  <td className="border p-2">{detail.quantity}</td>
+                  <td className="border p-2">
+                    color: {detail.optionColor}, size: {detail.optionSize}
+                  </td>
                 </tr>
               ))}
             </tbody>
