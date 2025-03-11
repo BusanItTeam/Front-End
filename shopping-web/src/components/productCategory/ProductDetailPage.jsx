@@ -5,6 +5,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { formatCurrency } from "../utils/Formatting"; // Helper function
 import api from "../../services/Api";
+import CustomerFAQ from "../adminPage/CustomerFAQ";
 
 const ProductDetailPage = () => {
   const { productId } = useParams();
@@ -18,6 +19,8 @@ const ProductDetailPage = () => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [reviews, setReviews] = useState([]);
   const navigate = useNavigate();
+
+  const [faqs, setFaqs] = useState([]);
 
   useEffect(() => {
     const selectedProduct = products.find(
@@ -139,6 +142,22 @@ const ProductDetailPage = () => {
     fetchReviews();
   }, [productId]);
 
+  //**추가: FAQ 로딩**
+  useEffect(() => {
+    const fetchFAQs = async () => {
+      try {
+        setLoading(true);
+        const response = await api.get("/public/FAQ");
+        setFaqs(response.data);
+      } catch (error) {
+        console.error("FAQ 불러오기 실패:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFAQs();
+  }, []);
+
   if (!product) {
     return <div className="text-center py-4">Loading...</div>;
   }
@@ -222,10 +241,6 @@ const ProductDetailPage = () => {
   const deliveryInfo = "평균 2~3일 소요 (주말/공휴일 제외)";
   const refundPolicy = "수령 후 7일 이내 (단, 상품 훼손 시 불가)";
 
-  const dummyFaqs = [
-    { id: 1, question: "배송은 얼마나 걸리나요?", answer: deliveryInfo },
-    { id: 2, question: "반품 정책은 어떻게 되나요?", answer: refundPolicy },
-  ];
   // 리뷰 삭제
   const handleDeleteReview = async (reviewId) => {
     try {
@@ -460,16 +475,17 @@ const ProductDetailPage = () => {
       </div>
 
       {/* FAQ */}
+      {/* **변경: CustomerFAQ 대신 FAQ 목록 직접 렌더링** */}
       <div className="mt-8">
-        <h2 className="text-xl font-semibold">FAQ</h2>
-        <ul>
-          {dummyFaqs.map((faq) => (
-            <div key={faq.id} className="border rounded p-4 mt-2">
+        <h2 className="text-xl font-semibold">자주 묻는 질문</h2>
+        <div>
+          {faqs.map((faq) => (
+            <div key={faq.faqId} className="border rounded p-4 mt-2 shadow-sm">
               <p className="font-semibold">{faq.question}</p>
               <p className="mt-2">{faq.answer}</p>
             </div>
           ))}
-        </ul>
+        </div>
       </div>
     </div>
   );
