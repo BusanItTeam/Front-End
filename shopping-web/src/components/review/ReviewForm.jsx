@@ -5,7 +5,7 @@ import api from "../../services/Api";
 import toast from "react-hot-toast";
 
 const ReviewForm = () => {
-  const { orderItemId } = useParams(); // 주문 상품 ID
+  const { productId } = useParams(); // 상품 ID
   const { token, backendURL, currentUser } = useMyContext();
   const [product, setProduct] = useState(null);
   const [rating, setRating] = useState(5);
@@ -13,11 +13,11 @@ const ReviewForm = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 주문 상품 ID로 상품 정보 가져오기 (API 필요)
+    // 상품 ID로 상품 정보 가져오기 (API 필요)
     const fetchProduct = async () => {
       try {
-        // 예시: /api/orders/:orderItemId/product
-        const response = await api.get(`/orders/${orderItemId}/product`, {
+        // 예시: /api/products/:productId
+        const response = await api.get(`/products/${productId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setProduct(response.data);
@@ -28,7 +28,7 @@ const ReviewForm = () => {
     };
 
     fetchProduct();
-  }, [orderItemId, token]);
+  }, [productId, token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
