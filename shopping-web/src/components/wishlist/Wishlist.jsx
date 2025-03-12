@@ -35,7 +35,7 @@ const Wishlist = ({updateCart}) => {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        console.log("✅ 위시리스트 데이터:", wishlistResponse.data);
+        console.log(" 위시리스트 데이터:", wishlistResponse.data);
 
         setWishlist(wishlistResponse.data || []); // 데이터가 없으면 빈 배열 설정
       } catch (error) {

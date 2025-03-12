@@ -100,7 +100,7 @@ const ProductDetailPage = () => {
     }
   };
 
-  // { ✅ 바로구매 }
+  // { 매 }
   const handleDirectBuy = () => {
     if (!selectedOption) {
       alert("옵션을 선택해주세요.");
