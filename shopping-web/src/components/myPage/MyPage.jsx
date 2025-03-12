@@ -66,7 +66,8 @@ const MyPage = () => {
 
       <div className="mt-6 space-y-4">
         <div className="p-4 px-8 bg-gray-50 rounded-lg flex justify-between items-center">
-          <Link to="/myPage/editProfile">
+          <Link to="/orders/history">
+            {/* 주소바꿈 orders/history로 */}
             <span className="text-lg font-semibold">order </span>
             <span className="text-gray-600"> 주문내역 조회</span>
             <p className="pt-1 text-xs text-gray-400">
