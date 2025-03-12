@@ -132,6 +132,27 @@ const OrderPage = () => {
         return;
       }
 
+      // 예상 적립금 계산
+      const estimatedPoints = calculateEstimatedPoints();
+
+      // 포인트 사용 및 적립 API 호출
+      const pointResponse = await Api.post(
+        "/orders/updatePoints",
+        {
+          usedPoints: point, // 사용 포인트
+          earnedPoints: estimatedPoints, // 적립 포인트
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (pointResponse.status !== 200) {
+        throw new Error("포인트 업데이트 실패");
+      }
+
       const response = await Api.post("/orders/create", orderData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -398,7 +419,7 @@ const OrderPage = () => {
                     <td className=" py-2">{item.color && item.size ? `color: ${item.color}, size: ${item.size}` : "옵션 없음"}</td>
                     <td className=" py-2">{(item.price * item.quantity).toLocaleString("ko-KR")}원</td>
                     <td className=" py-2">{item.quantity}</td>
-                    <td className=" py-2">{((item.price / 10) * item.quantity).toLocaleString("ko-KR")}원</td>
+                    <td className=" py-2">{((item.price / 100) * item.quantity).toLocaleString("ko-KR")}원</td>
                     <td className=" py-2">일반 배송</td>
                   </tr>
                 ))}
