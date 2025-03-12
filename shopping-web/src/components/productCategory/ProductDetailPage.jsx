@@ -137,7 +137,6 @@ const ProductDetailPage = () => {
     }
   };
 
-
   // 바로 구매
   const handleDirectBuy = () => {
     if (!selectedOption) {
@@ -227,8 +226,7 @@ const ProductDetailPage = () => {
 
     const requestData = {
       optionId: selectedOption.optionId,
-      color: selectedOption.color,
-      size: selectedOption.size,
+      productId: product.productId,
       quantity: quantity,
     };
 
