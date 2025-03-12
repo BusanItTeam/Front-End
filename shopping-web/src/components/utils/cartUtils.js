@@ -47,8 +47,7 @@ export const handleAddToCart = async (products, quantity, navigate, updateCart) 
             productPrice: product.price || 0,
             quantity: quantity,
             categoryName: product.category?.name || "기본 카테고리",
-            color,
-            size
+            optionId: product.optionId || 0,
         };
 
         console.log("장바구니 추가 요청 데이터:", requestData);

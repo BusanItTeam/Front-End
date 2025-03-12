@@ -137,6 +137,7 @@ const ProductDetailPage = () => {
     }
   };
 
+
   // 바로 구매
   const handleDirectBuy = () => {
     if (!selectedOption) {
