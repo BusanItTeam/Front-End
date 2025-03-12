@@ -4,7 +4,6 @@ import { useMyContext } from "../../store/ContextApi";
 import api from "../../services/Api";
 import { formatCurrency } from "../utils/Formatting";
 
-
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]); // 장바구니 아이템 상태
   const [selectedItems, setSelectedItems] = useState([]); // 선택된 아이템 상태
@@ -13,7 +12,6 @@ const CartPage = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const SHIPPING_COST = 3000; // 배송비
-
 
   // 체크박스 선택/해제 기능
   const toggleSelectItem = (cartId) => {
@@ -43,11 +41,7 @@ const CartPage = () => {
     if (newQuantity < 1) return; // 최소 수량 1 유지
 
     try {
-        const response = await api.put(
-            `/cart/update/${cartId}`, 
-            { quantity: newQuantity }, 
-            { headers: { Authorization: `Bearer ${token}` } }
-        );
+      const response = await api.put(`/cart/update/${cartId}`, { quantity: newQuantity }, { headers: { Authorization: `Bearer ${token}` } });
 
       if (response.status === 200) {
         setCartItems((prevItems) => prevItems.map((item) => (item.cartId === cartId ? { ...item, quantity: newQuantity } : item)));
@@ -57,8 +51,6 @@ const CartPage = () => {
       alert("❌ 수량 변경에 실패했습니다. 다시 시도해주세요.");
     }
   };
-
-
 
   const getAllSelectedItems = () => {
     return cartItems.map((item) => item.cartId);
@@ -70,14 +62,12 @@ const CartPage = () => {
       cartItems
         .filter((item) => selectedItems.includes(item.cartId))
         .reduce((total, item) => {
-          const discountRate = item.discountRate ? item.discountRate / 100 : 0; 
-          const discountedPrice = item.price * (1 - discountRate); 
-          return total + discountedPrice * item.quantity; 
+          const discountRate = item.discountRate ? item.discountRate / 100 : 0;
+          const discountedPrice = item.price * (1 - discountRate);
+          return total + discountedPrice * item.quantity;
         }, 0)
     );
   };
-  
-  
 
   // 선택 상품 주문
   const handleSelectedOrder = () => {
@@ -93,7 +83,7 @@ const CartPage = () => {
     navigate("/orderpage");
   };
 
-    //장바구니 데이터 불러오기
+  //장바구니 데이터 불러오기
   useEffect(() => {
     const fetchCart = async () => {
       try {
@@ -178,10 +168,7 @@ const CartPage = () => {
               </thead>
               <tbody>
                 {cartItems.map((item) => (
-                  <tr
-                    key={item.cartId ?? item.productId}
-                    className="border-b text-center text-gray-800"
-                  >
+                  <tr key={item.cartId ?? item.productId} className="border-b text-center text-gray-800">
                     <td className="p-4">
                       <input type="checkbox" checked={selectedItems.includes(item.cartId)} onChange={() => toggleSelectItem(item.cartId)} />
                     </td>
@@ -197,18 +184,14 @@ const CartPage = () => {
                     {/* 상품이름 */}
                     <td className="p-4 font-medium">{item.productName}</td>
                     {/* 상품 가격 */}
-                    <td className="p-4 text-gray-700"> 
+                    <td className="p-4 text-gray-700">
                       {item.discountRate && item.discountRate > 0 ? (
                         <>
-                          <span className="line-through text-gray-500 mr-2">
-                            {formatCurrency(item.price)}
-                          </span>
-                            {formatCurrency(
-                              item.price - (item.price * item.discountRate) / 100
-                            )}
-                          </>
-                          ) : (
-                            formatCurrency(item.price)
+                          <span className="line-through text-gray-500 mr-2">{formatCurrency(item.price)}</span>
+                          {formatCurrency(item.price - (item.price * item.discountRate) / 100)}
+                        </>
+                      ) : (
+                        formatCurrency(item.price)
                       )}
                     </td>
                     {/* 상품 사이즈 */}
@@ -224,10 +207,8 @@ const CartPage = () => {
                         +
                       </button>
                     </td>
-                    <td className="p-4 text-gray-800 font-medium text-sm">
-                      {item.price / 10 * (item.quantity)}
-                    </td>
-                    
+                    <td className="p-4 text-gray-800 font-medium text-sm">{(item.price / 100) * item.quantity}</td>
+
                     <td className="p-4">
                       <button onClick={() => deleteCartItem(item.cartId)} className="text-gray-800 hover:text-gray-800 text-sm font-bold">
                         ❌
