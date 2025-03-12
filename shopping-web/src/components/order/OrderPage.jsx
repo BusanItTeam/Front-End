@@ -97,8 +97,7 @@ const OrderPage = () => {
       orderDetails = selectedItems.map((item) => ({
         productId: item.productId,
         quantity: item.quantity,
-        color: item.color,
-        size: item.size,
+        optionId: item.optionId,
       }));
     }
 
@@ -245,7 +244,7 @@ const OrderPage = () => {
     // 장바구니 상품이 있을 경우 가격 계산
     if (selectedItems.length > 0) {
       selectedItems.forEach((item) => {
-        totalPrice += item.productPrice * item.quantity; // 장바구니 상품의 가격을 사용
+        totalPrice += item.price * item.quantity; // 장바구니 상품의 가격을 사용
       });
     }
 
@@ -319,7 +318,7 @@ const OrderPage = () => {
     // 장바구니 상품의 예상 적립금 계산
     if (selectedItems.length > 0) {
       selectedItems.forEach((item) => {
-        totalPoints += Math.floor(item.productPrice * item.quantity * 0.01);
+        totalPoints += Math.floor(item.price * item.quantity * 0.01);
       });
     }
 
@@ -397,9 +396,9 @@ const OrderPage = () => {
                     </td>
                     <td className=" py-2">{item.productName}</td>
                     <td className=" py-2">{item.color && item.size ? `color: ${item.color}, size: ${item.size}` : "옵션 없음"}</td>
-                    <td className=" py-2">{(item.productPrice * item.quantity).toLocaleString("ko-KR")}원</td>
+                    <td className=" py-2">{(item.price * item.quantity).toLocaleString("ko-KR")}원</td>
                     <td className=" py-2">{item.quantity}</td>
-                    <td className=" py-2">{((item.productPrice / 10) * item.quantity).toLocaleString("ko-KR")}원</td>
+                    <td className=" py-2">{((item.price / 10) * item.quantity).toLocaleString("ko-KR")}원</td>
                     <td className=" py-2">일반 배송</td>
                   </tr>
                 ))}
