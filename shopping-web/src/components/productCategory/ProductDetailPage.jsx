@@ -226,7 +226,6 @@ const ProductDetailPage = () => {
 
     const requestData = {
       optionId: selectedOption.optionId,
-
       productId: product.productId,
       quantity: quantity,
     };
