@@ -97,6 +97,7 @@ const ProductDetailPage = () => {
         const wishListDTO = {
           productId: Number(productId),
           optionId: selectedOption ? selectedOption.optionId : null, // 선택된 옵션이 있을 때 optionId 추가
+          
         };
         const response = await axios.post(`${backendURL}/api/wishlist`, wishListDTO, { headers });
         if (response.status === 200) {
@@ -116,6 +117,12 @@ const ProductDetailPage = () => {
       alert("옵션을 선택해주세요.");
       return;
     }
+
+    if (selectedOption.inventory.stock < quantity) {
+      toast.error("재고가 부족합니다.");
+      return;
+    }
+
 
     const directBuyInfo = {
       productId: productId,
@@ -190,6 +197,11 @@ const ProductDetailPage = () => {
 
     if (!token) {
       toast.error("로그인이 필요합니다.");
+      return;
+    }
+
+    if (selectedOption.inventory.stock < quantity) {
+      toast.error("재고가 부족합니다.");
       return;
     }
 
@@ -391,7 +403,9 @@ const ProductDetailPage = () => {
 
           {/* 재고 상태 */}
           <p className={`mt-4 font-semibold ${selectedOption && selectedOption.inventory.stock > 0 ? "text-green-500" : "text-red-500"}`}>재고 상태: {selectedOption ? (selectedOption.inventory.stock > 0 ? "재고 있음" : "재고 없음") : "옵션을 선택하세요"}</p>
-
+          <p className={`font-semibold mt-4 ${selectedOption && selectedOption.inventory.stock <= 0 ? "text-red-500" : "text-green-500"}`}>
+            남은 재고: {selectedOption ? selectedOption.inventory.stock : "옵션을 선택하세요"}
+          </p>
           {/* 수량 선택 */}
           <div className="mt-4">
             <label htmlFor="quantity" className="mr-2 font-semibold">
