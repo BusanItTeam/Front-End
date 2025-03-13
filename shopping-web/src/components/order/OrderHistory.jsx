@@ -10,115 +10,144 @@ const OrderHistory = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // 상태 매핑 객체
+  const statusMap = {
+    PENDING: "입금대기중",
+    PAID: "결제완료",
+    READY_FOR_SHIPPING: "배송준비중",
+    SHIPPING: "배송중",
+    SHIPPED: "배송완료",
+  };
+
   useEffect(() => {
     const fetchOrders = async () => {
       setLoading(true);
       try {
         const response = await api.get("/orders/history", {
-          // 백엔드 API 엔드포인트 확인 필요
           headers: { Authorization: `Bearer ${token}` },
         });
+        console.log("API 응답 데이터:", response.data); // 데이터 구조 확인용
         setOrders(response.data);
       } catch (error) {
-        console.error("Error fetching order history:", error);
-        toast.error("주문 내역을 가져오는데 실패했습니다.");
+        console.error("주문 내역 조회 오류:", error);
+        toast.error("주문 내역을 불러오는데 실패했습니다.");
       } finally {
         setLoading(false);
       }
     };
-
     fetchOrders();
   }, [token]);
 
-  if (loading) {
-    return <div className="text-center py-4">Loading order history...</div>;
-  }
-
-  // 주문 내역이 없는 경우 메시지 표시
-  if (!orders || orders.length === 0) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <h2 className="text-2xl font-semibold mb-4">주문 내역</h2>
-        <div className="text-center py-4">주문한 내역이 없습니다.</div>
-      </div>
-    );
-  }
+  if (loading) return <div className="text-center py-4">로딩 중...</div>;
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h2 className="text-2xl font-semibold mb-4">주문 내역</h2>
-      <div className="overflow-x-auto">
-        <table className="min-w-full table-auto">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                주문 번호
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                주문 일자
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                상품 정보
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                총 결제 금액
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                배송 상태
-              </th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                리뷰 작성
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {orders.map((order) => (
-              <tr key={order.orderId}>
-                <td className="px-4 py-2 whitespace-nowrap">{order.orderId}</td>
-                <td className="px-4 py-2 whitespace-nowrap">
-                  {new Date(order.orderDate).toLocaleDateString()}
-                </td>
-                <td className="px-4 py-2 whitespace-nowrap">
-                  {order.orderItems.map((item) => (
-                    <div key={item.orderItemId} className="mb-2">
-                      {item.productName} - {item.quantity}개
-                    </div>
-                  ))}
-                </td>
-                <td className="px-4 py-2 whitespace-nowrap">
-                  {formatCurrency(order.totalAmount)}
-                </td>
-                <td className="px-4 py-2 whitespace-nowrap">
-                  {order.deliveryStatus}
-                </td>
-                <td className="px-4 py-2 whitespace-nowrap">
-                  {order.deliveryStatus === "배송 완료" ? (
-                    <button
-                      onClick={() =>
-                        navigate(`/review/${order.orderItems[0].orderItemId}`)
-                      }
-                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                    >
-                      리뷰 쓰러 가기
-                    </button>
-                  ) : (
-                    "배송 완료 후 작성 가능"
-                  )}
-                </td>
+      <h2 className="text-2xl font-bold mb-6">주문 내역</h2>
+
+      {orders.length === 0 ? (
+        <div className="text-center py-8">주문 내역이 없습니다.</div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  주문번호
+                </th>
+
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  상품정보
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  가격
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  배송상태
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  리뷰
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {orders.map((order) => (
+                <tr key={order.orderId} className="hover:bg-gray-50">
+                  {/* 주문번호 */}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    #{order.orderId}
+                  </td>
+
+                  {/* 상품정보 */}
+                  <td className="px-6 py-4">
+                    {order.orderDetails?.map((detail, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center mb-4 last:mb-0"
+                      >
+                        <img
+                          src={`${backendURL}${detail.Image}`}
+                          alt={detail.ProductName}
+                          className="w-20 h-20 object-cover rounded-lg mr-4"
+                        />
+                        <div>
+                          <p className="font-semibold">{detail.ProductName}</p>
+                          <p className="text-sm text-gray-500">
+                            {detail.OptionColor} / {detail.OptionSize}
+                          </p>
+                          <p className="text-sm">수량: {detail.quantity}개</p>
+                        </div>
+                      </div>
+                    ))}
+                  </td>
+
+                  {/* 가격 */}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {order.orderDetails?.map((detail, index) => (
+                      <div key={index} className="mb-2">
+                        {formatCurrency(detail.price)}
+                      </div>
+                    ))}
+                  </td>
+
+                  {/* 배송상태 */}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-800">
+                      {statusMap[order.status] || order.status}
+                    </span>
+                  </td>
+
+                  {/* 리뷰 버튼 */}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {order.status === "SHIPPED" ? (
+                      <button
+                        onClick={() =>
+                          navigate(`/review/${order.orderDetails[0].productId}`)
+                        }
+                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
+                      >
+                        리뷰 작성
+                      </button>
+                    ) : (
+                      <span className="text-gray-400">배송 완료 후 가능</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };
 
-export default OrderHistory;
-
+// 가격 포매팅 함수
 export const formatCurrency = (amount) => {
   return new Intl.NumberFormat("ko-KR", {
     style: "currency",
     currency: "KRW",
+    minimumFractionDigits: 0,
   }).format(amount);
 };
+
+export default OrderHistory;
