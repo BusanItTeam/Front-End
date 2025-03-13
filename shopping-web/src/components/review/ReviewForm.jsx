@@ -1,115 +1,141 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useMyContext } from "../../store/ContextApi";
 import api from "../../services/Api";
 import toast from "react-hot-toast";
+import { formatCurrency } from "../order/OrderHistory"; // OrderHistory에서 가져온 함수 사용
 
 const ReviewForm = () => {
-  const { productId } = useParams(); // 상품 ID
-  const { token, backendURL, currentUser } = useMyContext();
-  const [product, setProduct] = useState(null);
+  const { productId } = useParams();
+  const { token, backendURL } = useMyContext();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [productInfo, setProductInfo] = useState(null);
   const [rating, setRating] = useState(5);
   const [content, setContent] = useState("");
-  const navigate = useNavigate();
+  const [files, setFiles] = useState([]);
+  const [previews, setPreviews] = useState([]);
 
   useEffect(() => {
-    // 상품 ID로 상품 정보 가져오기 (API 필요)
     const fetchProduct = async () => {
       try {
-        // 예시: /api/products/:productId
-        const response = await api.get(`/products/${productId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setProduct(response.data);
+        const response = await api.get(`/products/${productId}`);
+        setProductInfo(response.data);
       } catch (error) {
-        console.error("Error fetching product:", error);
-        toast.error("상품 정보를 가져오는데 실패했습니다.");
+        toast.error("상품 정보를 불러오는데 실패했습니다.");
+      } finally {
+        setLoading(false);
       }
     };
-
     fetchProduct();
-  }, [productId, token]);
+  }, [productId]);
+
+  const handleFileChange = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+    setFiles(selectedFiles);
+    const newPreviews = selectedFiles.map((file) => URL.createObjectURL(file));
+    setPreviews(newPreviews);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const reviewDTO = {
+      productId: Number(productId),
+      rating,
+      content,
+    };
+
+    const formData = new FormData();
+    formData.append(
+      "reviewDTO",
+      new Blob([JSON.stringify(reviewDTO)], { type: "application/json" })
+    );
+    files.forEach((file) => formData.append("images", file));
+
     try {
-      const reviewData = {
-        productId: product.productId, // 상품 ID
-        rating: rating,
-        content: content,
-      };
-
-      // 리뷰 생성 API 호출
-      await api.post("/reviews", reviewData, {
-        headers: { Authorization: `Bearer ${token}` },
+      await api.post("/review", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
       });
-
-      toast.success("리뷰가 성공적으로 작성되었습니다!");
-      navigate(`/product/${product.productId}`); // 상품 상세 페이지로 이동
+      toast.success("리뷰 작성 성공!");
+      navigate(`/product/${productId}`);
     } catch (error) {
-      console.error("Error submitting review:", error);
-      toast.error("리뷰 작성에 실패했습니다.");
+      toast.error("리뷰 작성 실패");
     }
   };
 
-  if (!product) {
-    return <div>Loading...</div>;
-  }
+  if (loading) return <div className="text-center py-4">로딩 중...</div>;
 
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-semibold mb-4">
-        {product.name}에 대한 리뷰 작성
-      </h2>
-      <form onSubmit={handleSubmit} className="max-w-lg">
+    <div className="max-w-2xl mx-auto p-4">
+      <h2 className="text-2xl font-bold mb-6">리뷰 작성</h2>
+
+      {/* 상품 정보 표시 */}
+
+      <form onSubmit={handleSubmit}>
+        {/* 별점 선택 */}
         <div className="mb-4">
-          <label
-            htmlFor="rating"
-            className="block text-gray-700 text-sm font-bold mb-2"
-          >
-            평점:
-          </label>
-          <select
-            id="rating"
-            value={rating}
-            onChange={(e) => setRating(parseInt(e.target.value))}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          >
-            <option value="5">5 - 아주 좋아요!</option>
-            <option value="4">4 - 좋아요</option>
-            <option value="3">3 - 괜찮아요</option>
-            <option value="2">2 - 별로에요</option>
-            <option value="1">1 - 최악이에요</option>
-          </select>
+          <label className="block mb-2">별점</label>
+          <div className="flex">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                key={star}
+                type="button"
+                onClick={() => setRating(star)}
+                className={`text-3xl ${
+                  star <= rating ? "text-yellow-400" : "text-gray-300"
+                }`}
+              >
+                ★
+              </button>
+            ))}
+          </div>
         </div>
+
+        {/* 사진 업로드 */}
         <div className="mb-4">
-          <label
-            htmlFor="content"
-            className="block text-gray-700 text-sm font-bold mb-2"
-          >
-            리뷰 내용:
-          </label>
+          <label className="block mb-2">사진 첨부</label>
+          <input
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={handleFileChange}
+          />
+          <div className="flex mt-2 gap-2">
+            {previews.map((preview, index) => (
+              <img
+                key={index}
+                src={preview}
+                alt={`미리보기 ${index}`}
+                className="w-20 h-20 object-cover rounded"
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* 리뷰 내용 */}
+        <div className="mb-4">
           <textarea
-            id="content"
             value={content}
             onChange={(e) => setContent(e.target.value)}
+            placeholder="리뷰 내용을 입력해주세요"
+            required
             rows="4"
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
+            className="w-full p-2 border rounded"
+          ></textarea>
         </div>
-        <div className="flex items-center justify-between">
-          <button
-            type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          >
-            리뷰 작성 완료
-          </button>
-        </div>
+
+        {/* 제출 버튼 */}
+        <button
+          type="submit"
+          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+        >
+          리뷰 등록하기
+        </button>
       </form>
-      <button onClick={() => navigate(`/product/${product.productId}`)}>
-        돌아가기
-      </button>
     </div>
   );
 };

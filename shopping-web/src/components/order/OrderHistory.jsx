@@ -121,9 +121,7 @@ const OrderHistory = () => {
                     {order.status === "SHIPPED" ? (
                       <button
                         onClick={() =>
-                          navigate(
-                            `/review/${order.orderDetails?.[0]?.orderDetailId}`
-                          )
+                          navigate(`/review/${order.orderDetails[0].productId}`)
                         }
                         className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
                       >
