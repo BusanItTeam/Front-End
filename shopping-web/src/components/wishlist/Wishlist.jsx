@@ -26,7 +26,7 @@ const Wishlist = ({updateCart}) => {
 
         if (!token) {
           console.warn("JWT 토큰이 없습니다. 로그인 페이지로 이동합니다.");
-          alert("로그인이 필요합니다.");
+          toast.error("로그인이 필요합니다");
           navigate("/login");
           return;
         }
