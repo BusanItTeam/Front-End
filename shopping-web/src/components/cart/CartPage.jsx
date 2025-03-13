@@ -27,6 +27,14 @@ const CartPage = () => {
 
   // 장바구니 데이터 불러오기
   const updateCart = async () => {
+
+    if (!token) {
+      console.warn("JWT 토큰이 없습니다. 로그인 페이지로 이동합니다.");
+      toast.error("로그인이 필요합니다");
+      navigate("/login");
+      return;
+    }
+    
     try {
       const response = await api.get("/cart/show", {
         headers: { Authorization: `Bearer ${token}` },

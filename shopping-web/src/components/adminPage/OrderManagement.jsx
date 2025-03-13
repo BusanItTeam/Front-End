@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import api from "../../services/Api";
+import toast from "react-hot-toast";
+import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
 function OrderManagement() {
   const [orders, setOrders] = useState([]);
@@ -14,9 +16,8 @@ function OrderManagement() {
   // 주문 목록을 가져오는 함수
   const fetchOrders = async () => {
     try {
-      const response = await api.get("/orders"); // 실제 API 호출
-      console.log("뿅뿅", response.data); // 응답 데이터 확인
-      setOrders(response.data); // 주문 목록을 상태에 저장
+      const response = await api.get("/orders");
+      setOrders(response.data); 
     } catch (error) {
       console.error("주문 목록을 불러오는데 실패했습니다.", error);
     }
@@ -25,7 +26,7 @@ function OrderManagement() {
   // 주문을 클릭했을 때, 상세 정보와 배송 상태를 설정하는 함수
   const handleOrderClick = (order) => {
     setSelectedOrder(order);
-    setDeliveryStatus(order.status); // 주문의 현재 상태를 배송 상태로 설정
+    setDeliveryStatus(order.status);
   };
 
   // 배송 상태를 한글로 변환하는 매핑 객체
@@ -54,118 +55,134 @@ function OrderManagement() {
   // 배송 상태 업데이트 함수
   const updateDeliveryStatus = async () => {
     try {
-      const token = localStorage.getItem("JWT_TOKEN"); // ✅ 토큰 추출
+      const token = localStorage.getItem("JWT_TOKEN");
       await api.put(
         `/orders/${selectedOrder.orderId}/status`,
-        { status: deliveryStatus }, // ✅ 상태값만 전송
+        { status: deliveryStatus },
         {
           headers: {
-            Authorization: `Bearer ${token}`, // ✅ 토큰 추가
+            Authorization: `Bearer ${token}`,
           },
         }
       );
       fetchOrders();
-      alert("업데이트 성공");
+      toast.success("업데이트 성공");
     } catch (error) {
       console.error("업데이트 실패:", error.response?.data);
     }
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-2xl text-center font-bold mb-8">주문 및 배송 관리</h2>
+    <div className="container mx-auto p-6">
+      <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">주문 및 배송 관리</h2>
 
       {/* 주문 목록 */}
       <div className="mb-8">
-        <h3 className="text-xl font-semibold mb-2">주문 목록</h3>
-        <table className="w-full border-collapse border">
-          <thead>
-            <tr className="bg-gray-200">
-              <th className="border p-2">주문 ID</th>
-              <th className="border p-2">고객명</th>
-              <th className="border p-2">주문일</th>
-              <th className="border p-2">총액</th>
-              <th className="border p-2">배송 상태</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order.userId + order.totalPrice} onClick={() => handleOrderClick(order)} className="hover:bg-gray-100 cursor-pointer">
-                <td className="border p-2">{order.orderId}</td>
-                <td className="border p-2">{order.name}</td>
-                <td className="border p-2">{new Date().toLocaleDateString()}</td> {/* 현재 날짜로 처리 */}
-                <td className="border p-2">{order.totalPrice}</td>
-                <td className="border p-2">{statusMap[order.status] || order.status}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* 주문 상세 정보 및 배송 상태 업데이트 */}
-      {selectedOrder && (
-        <div>
-          <h3 className="text-xl font-semibold mb-2">주문 상세 정보</h3>
-          <div className="mb-4">
-            <p>주문 ID: {selectedOrder.orderId}</p>
-            <p>고객명: {selectedOrder.name}</p>
-            <p>수령인: {selectedOrder.recipient}</p>
-            <p>배송 주소: {selectedOrder.shippingAddress}</p>
-            <p>배송 메세지: {selectedOrder.orderMessage}</p>
-            <p>결제 방법: {selectedOrder.paymentMethod}</p>
-            <p>환불 방법: {selectedOrder.refundeMethod}</p>
-            <p>배송비: {selectedOrder.shippingCost}</p>
-            <p>상품구매액: {selectedOrder.totalPrice - selectedOrder.shippingCost}</p>
-            <p>총액: {selectedOrder.totalPrice}</p>
-          </div>
-
-          {/* 주문 상세 항목 (orderDetails) */}
-          <h4 className="text-lg font-semibold">주문 상세 항목</h4>
-          <table className="w-full border-collapse border mt-4 mb-8">
+        <h3 className="text-xl font-semibold text-gray-800 mb-4">주문 목록</h3>
+        <div className="overflow-x-auto">
+          <table className="min-w-full border-collapse text-left text-sm">
             <thead>
-              <tr className="bg-gray-200">
-                <th className="border p-2">번호</th>
-                <th className="border p-2">이미지</th>
-                <th className="border p-2">상품명</th>
-                <th className="border p-2">가격</th>
-                <th className="border p-2">수량</th>
-                <th className="border p-2">옵션</th>
+              <tr className="bg-gray-100 text-gray-700">
+                <th className="py-3 px-6">주문 ID</th>
+                <th className="py-3 px-6">고객명</th>
+                <th className="py-3 px-6">주문일</th>
+                <th className="py-3 px-6">총액</th>
+                <th className="py-3 px-6">배송 상태</th>
               </tr>
             </thead>
             <tbody>
-              {selectedOrder.orderDetails.map((detail, index) => (
-                <tr key={index}>
-                  <td className="border p-2">{index + 1}</td>
-                  <td className="border p-2">
-                    <img src={`${backendURL}${detail.image}`} alt={detail.image} className="w-16 h-16 mr-2 inline-block" />
-                  </td>
-                  <td className="border p-2">{detail.productName}</td>
-                  <td className="border p-2">{detail.price}</td>
-                  <td className="border p-2">{detail.quantity}</td>
-                  <td className="border p-2">
-                    color: {detail.optionColor}, size: {detail.optionSize}
+              {orders.map((order) => (
+                <tr 
+                  key={order.orderId} 
+                  className="hover:bg-gray-50 cursor-pointer transition duration-300"
+                  onClick={() => handleOrderClick(order)}
+                >
+                  <td className="border-t py-3 px-6">{order.orderId}</td>
+                  <td className="border-t py-3 px-6">{order.name}</td>
+                  <td className="border-t py-3 px-6">{new Date().toLocaleDateString()}</td>
+                  <td className="border-t py-3 px-6">{order.totalPrice}</td>
+                  <td className="border-t py-3 px-6">
+                    <span 
+                      className={`inline-block py-1 px-3 rounded-full text-sm 
+                        ${order.status === "SHIPPED" ? "bg-green-200 text-green-700" : 
+                        order.status === "PENDING" ? "bg-yellow-200 text-yellow-800" : 
+                        order.status === "PAID" ? "bg-blue-200 text-blue-800" : "bg-red-200 text-red-700"}`}
+                    >
+                      {statusMap[order.status] || order.status}
+                    </span>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+      </div>
 
-          {/* 배송 상태 업데이트 */}
-          <div className="mb-4">
-            <label className="block font-semibold mb-1">배송 상태 변경:</label>
+      {/* 주문 상세 정보 및 배송 상태 업데이트 */}
+      {selectedOrder && (
+        <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">주문 상세 정보</h3>
+          <div className="space-y-4 mb-6">
+            <p><strong>주문 ID:</strong> {selectedOrder.orderId}</p>
+            <p><strong>고객명:</strong> {selectedOrder.name}</p>
+            <p><strong>수령인:</strong> {selectedOrder.recipient}</p>
+            <p><strong>배송 주소:</strong> {selectedOrder.shippingAddress}</p>
+            <p><strong>배송 메세지:</strong> {selectedOrder.orderMessage}</p>
+            <p><strong>결제 방법:</strong> {selectedOrder.paymentMethod}</p>
+            <p><strong>환불 방법:</strong> {selectedOrder.refundeMethod}</p>
+            <p><strong>배송비:</strong> {selectedOrder.shippingCost}</p>
+            <p><strong>상품구매액:</strong> {selectedOrder.totalPrice - selectedOrder.shippingCost}</p>
+            <p><strong>총액:</strong> {selectedOrder.totalPrice}</p>
+          </div>
+
+          {/* 주문 상세 항목 (orderDetails) */}
+          <h4 className="text-lg font-semibold text-gray-800">주문 상세 항목</h4>
+          <div className="overflow-x-auto mb-6">
+            <table className="w-full table-auto text-sm">
+              <thead>
+                <tr className="bg-gray-100 text-gray-700">
+                  <th className="py-3 px-6">번호</th>
+                  <th className="py-3 px-6">이미지</th>
+                  <th className="py-3 px-6">상품명</th>
+                  <th className="py-3 px-6">가격</th>
+                  <th className="py-3 px-6">수량</th>
+                  <th className="py-3 px-6">옵션</th>
+                </tr>
+              </thead>
+              <tbody>
+                {selectedOrder.orderDetails.map((detail, index) => (
+                  <tr key={index}>
+                    <td className="border-t py-3 px-6">{index + 1}</td>
+                    <td className="border-t py-3 px-6">
+                      <img src={`${backendURL}${detail.image}`} alt={detail.productName} className="w-16 h-16 object-cover" />
+                    </td>
+                    <td className="border-t py-3 px-6">{detail.productName}</td>
+                    <td className="border-t py-3 px-6">{detail.price}</td>
+                    <td className="border-t py-3 px-6">{detail.quantity}</td>
+                    <td className="border-t py-3 px-6">{detail.optionColor} / {detail.optionSize}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* 배송 상태 변경 */}
+          <div className="flex items-center space-x-4">
+            <label className="font-semibold text-gray-800">배송 상태 변경:</label>
             <select
-              value={statusMap[deliveryStatus] || "입금대기중"} // 기본값 설정
+              value={statusMap[deliveryStatus] || "입금대기중"}
               onChange={handleDeliveryStatusChange}
-              className="border p-2 rounded"
+              className="border py-2 px-4 rounded-lg"
             >
               {Object.values(statusMap).map((status, index) => (
-                <option key={index} value={status}>
-                  {status}
-                </option>
+                <option key={index} value={status}>{status}</option>
               ))}
             </select>
-            <button onClick={updateDeliveryStatus} className="bg-blue-500 text-white px-4 py-2 rounded ml-2">
-              배송 상태 업데이트
+            <button
+              onClick={updateDeliveryStatus}
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-500"
+            >
+              상태 업데이트
             </button>
           </div>
         </div>

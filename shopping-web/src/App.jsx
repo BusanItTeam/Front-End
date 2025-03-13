@@ -42,6 +42,7 @@ import PointHistory from "./components/myPage/PointHistory";
 import ReviewForm from "./components/review/ReviewForm";
 import OrderHistory from "./components/order/OrderHistory";
 import AdminLayout from "./components/adminPage/AdminLayout";
+import NotFound from "./components/Auth/NotFound";
 
 const AdminRoute = ({ children }) => {
   const { isAdmin } = useMyContext();
@@ -77,6 +78,7 @@ function App() {
           <Route path="/points-history" element={<PointHistory />} />
           <Route path="/review/:orderItemId" element={<ReviewForm />} />
           <Route path="/orders/history" element={<OrderHistory />} />
+          <Route path="*" element={<NotFound />} />
           <Route
             path="/admin"
             element={
