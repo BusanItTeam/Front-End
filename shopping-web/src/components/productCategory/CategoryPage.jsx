@@ -190,7 +190,7 @@ const CategoryPage = () => {
             <p>현재 베스트상품이 없습니다.</p>
           )}
         </div>
-        h
+
         <h2 className="text-3xl font-bold mb-6 capitalize">
           {categoryName === "all" ? "전체 상품" : categoryName}
         </h2>
