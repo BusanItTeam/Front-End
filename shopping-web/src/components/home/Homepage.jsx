@@ -71,7 +71,7 @@ const Homepage = () => {
       </div>
 
       <section className="w-full max-w-[2100px] mt-12">
-        <h2 className="text-2xl font-bold mb-6 text-center">전체 베스트상품</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">베스트상품</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {bestProducts.map((product) => (
             <Link
