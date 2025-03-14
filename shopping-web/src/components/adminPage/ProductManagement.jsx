@@ -284,7 +284,7 @@ function ProductManagement() {
         <h2 className="text-2xl font-bold mb-4">상품 관리</h2>
         {/* 카테고리 관리 섹션 */}
         <div className="mb-8">
-          <h3 className="text-xl font-semibold mb-2">카테고리 관리</h3>
+          <h3 className="text-xl font-semibold mb-2">카테고리관리</h3>
           <form onSubmit={handleAddCategory} className="mb-4">
             <input
               type="text"
