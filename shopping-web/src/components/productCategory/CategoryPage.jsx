@@ -76,7 +76,7 @@ const CategoryPage = () => {
     const fetchBestSellingProducts = async () => {
       try {
         const response = await axios.get(
-          `${backendURL}/api/products/best-selling?limit=8`
+          `${backendURL}/api/products/best-selling/${categoryName}?limit=8`
         );
         setBestSellingProducts(response.data);
       } catch (error) {
@@ -84,7 +84,7 @@ const CategoryPage = () => {
       }
     };
     fetchBestSellingProducts();
-  }, []);
+  }, [categoryName]);
 
   // 위시리스트 추가/삭제 함수
   const toggleWishlist = async (productId) => {
