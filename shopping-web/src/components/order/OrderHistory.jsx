@@ -51,62 +51,25 @@ const OrderHistory = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-<<<<<<< HEAD
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">주문번호</th>
 
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">상품정보</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">가격</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">배송상태</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">리뷰</th>
-=======
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  주문번호
-                </th>
-
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  상품정보
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  가격
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  배송상태
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  리뷰
-                </th>
->>>>>>> origin/developer
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {orders.map((order) => (
                 <tr key={order.orderId} className="hover:bg-gray-50">
                   {/* 주문번호 */}
-<<<<<<< HEAD
                   <td className="px-6 py-4 whitespace-nowrap">#{order.orderId}</td>
-=======
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    #{order.orderId}
-                  </td>
->>>>>>> origin/developer
 
                   {/* 상품정보 */}
                   <td className="px-6 py-4">
                     {order.orderDetails?.map((detail, index) => (
-<<<<<<< HEAD
                       <div key={index} className="flex items-center mb-4 last:mb-0">
                         <img src={`${backendURL}${detail.Image}`} alt={detail.ProductName} className="w-20 h-20 object-cover rounded-lg mr-4" />
-=======
-                      <div
-                        key={index}
-                        className="flex items-center mb-4 last:mb-0"
-                      >
-                        <img
-                          src={`${backendURL}${detail.Image}`}
-                          alt={detail.ProductName}
-                          className="w-20 h-20 object-cover rounded-lg mr-4"
-                        />
->>>>>>> origin/developer
                         <div>
                           <p className="font-semibold">{detail.ProductName}</p>
                           <p className="text-sm text-gray-500">
@@ -129,28 +92,13 @@ const OrderHistory = () => {
 
                   {/* 배송상태 */}
                   <td className="px-6 py-4 whitespace-nowrap">
-<<<<<<< HEAD
                     <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-800">{statusMap[order.status] || order.status}</span>
-=======
-                    <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-800">
-                      {statusMap[order.status] || order.status}
-                    </span>
->>>>>>> origin/developer
                   </td>
 
                   {/* 리뷰 버튼 */}
                   <td className="px-6 py-4 whitespace-nowrap">
                     {order.status === "SHIPPED" ? (
-<<<<<<< HEAD
                       <button onClick={() => navigate(`/review/${order.orderDetails[0].productId}`)} className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
-=======
-                      <button
-                        onClick={() =>
-                          navigate(`/review/${order.orderDetails[0].productId}`)
-                        }
-                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors"
-                      >
->>>>>>> origin/developer
                         리뷰 작성
                       </button>
                     ) : (
