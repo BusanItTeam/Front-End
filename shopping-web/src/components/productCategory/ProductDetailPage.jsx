@@ -7,17 +7,12 @@ import { formatCurrency } from "../utils/Formatting";
 import api from "../../services/Api";
 import CustomerFAQ from "../adminPage/CustomerFAQ";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faHeart,
-  faHeartBroken,
-  faShoppingCart,
-} from "@fortawesome/free-solid-svg-icons";
+import { faHeart, faHeartBroken, faShoppingCart } from "@fortawesome/free-solid-svg-icons";
 import { ShoppingBagIcon } from "lucide-react";
 
 const ProductDetailPage = () => {
   const { productId } = useParams();
-  const { products, token, error, backendURL, currentUser, isAdmin } =
-    useMyContext();
+  const { products, token, error, backendURL, currentUser, isAdmin } = useMyContext();
   const [product, setProduct] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [quantity, setQuantity] = useState(1);
@@ -31,29 +26,16 @@ const ProductDetailPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const selectedProduct = products.find(
-      (p) => p.productId === Number(productId)
-    );
+    const selectedProduct = products.find((p) => p.productId === Number(productId));
     setProduct(selectedProduct);
-    if (
-      selectedProduct &&
-      selectedProduct.images &&
-      selectedProduct.images.length > 0
-    ) {
+    if (selectedProduct && selectedProduct.images && selectedProduct.images.length > 0) {
       setSelectedImage(selectedProduct.images[0].imageUrl);
     }
   }, [productId, products]);
 
   useEffect(() => {
     if (products && products.length > 0) {
-      const uniqueCategories = [
-        ...new Map(
-          products.map((product) => [
-            product.category.categoryId,
-            product.category,
-          ])
-        ).values(),
-      ];
+      const uniqueCategories = [...new Map(products.map((product) => [product.category.categoryId, product.category])).values()];
       setCategories(uniqueCategories);
     }
   }, [products]);
@@ -70,19 +52,13 @@ const ProductDetailPage = () => {
           return;
         }
 
-        const response = await axios.get(
-          `${backendURL}/api/wishlist/product/${productId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const response = await axios.get(`${backendURL}/api/wishlist/product/${productId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
         if (typeof response.data === "boolean") {
           setIsWishlisted(response.data);
-        } else if (
-          response.data &&
-          typeof response.data.isWishlisted === "boolean"
-        ) {
+        } else if (response.data && typeof response.data.isWishlisted === "boolean") {
           setIsWishlisted(response.data.isWishlisted);
         } else {
           setIsWishlisted(false);
@@ -115,10 +91,7 @@ const ProductDetailPage = () => {
       const headers = { Authorization: `Bearer ${token}` };
 
       if (isWishlisted) {
-        const response = await axios.delete(
-          `${backendURL}/api/wishlist/product/${productId}`,
-          { headers }
-        );
+        const response = await axios.delete(`${backendURL}/api/wishlist/product/${productId}`, { headers });
         if (response.status === 200) {
           toast.success("찜 목록에서 삭제되었습니다.");
           setIsWishlisted(false);
@@ -128,11 +101,7 @@ const ProductDetailPage = () => {
           productId: Number(productId),
           optionId: selectedOption ? selectedOption.optionId : null, // 선택된 옵션이 있을 때 optionId 추가
         };
-        const response = await axios.post(
-          `${backendURL}/api/wishlist`,
-          wishListDTO,
-          { headers }
-        );
+        const response = await axios.post(`${backendURL}/api/wishlist`, wishListDTO, { headers });
         if (response.status === 200) {
           toast.success("찜 목록에 추가되었습니다.");
           setIsWishlisted(true);
@@ -361,10 +330,7 @@ const ProductDetailPage = () => {
           </li>
           {categories.map((category) => (
             <li key={category.categoryId}>
-              <Link
-                to={`/category/${category.name?.toLowerCase()}`}
-                className="block p-2 hover:bg-gray-200"
-              >
+              <Link to={`/category/${category.name?.toLowerCase()}`} className="block p-2 hover:bg-gray-200">
                 {category.name}
               </Link>
             </li>
@@ -377,19 +343,9 @@ const ProductDetailPage = () => {
         {/* 메인 이미지 */}
         <div className="w-full md:w-1/2 mx-auto mb-4">
           {selectedImage ? (
-            <img
-              src={`${backendURL}${selectedImage}`}
-              alt={product.name}
-              className="object-contain rounded-lg shadow-md"
-              style={{ width: "400px", height: "400px" }}
-            />
+            <img src={`${backendURL}${selectedImage}`} alt={product.name} className="object-contain rounded-lg shadow-md" style={{ width: "400px", height: "400px" }} />
           ) : (
-            <img
-              src="https://via.placeholder.com/400x300"
-              alt="No Image"
-              className="object-contain rounded-lg shadow-md"
-              style={{ width: "400px", height: "400px" }}
-            />
+            <img src="https://via.placeholder.com/400x300" alt="No Image" className="object-contain rounded-lg shadow-md" style={{ width: "400px", height: "400px" }} />
           )}
         </div>
 
@@ -397,16 +353,8 @@ const ProductDetailPage = () => {
         {product.images && product.images.length > 0 && (
           <div className="flex overflow-x-auto space-x-2 py-2">
             {product.images.map((image, index) => (
-              <div
-                key={index}
-                className="w-24 h-24 rounded-md shadow-md cursor-pointer flex-shrink-0"
-                onClick={() => handleThumbnailClick(image.imageUrl)}
-              >
-                <img
-                  src={`${backendURL}${image.imageUrl}`}
-                  alt={`Thumbnail ${index + 1}`}
-                  className="w-full h-full object-cover rounded-md"
-                />
+              <div key={index} className="w-24 h-24 rounded-md shadow-md cursor-pointer flex-shrink-0" onClick={() => handleThumbnailClick(image.imageUrl)}>
+                <img src={`${backendURL}${image.imageUrl}`} alt={`Thumbnail ${index + 1}`} className="w-full h-full object-cover rounded-md" />
               </div>
             ))}
           </div>
@@ -433,26 +381,18 @@ const ProductDetailPage = () => {
                 >
                   {formatCurrency(product.price)}
                 </span>
-                {formatCurrency(
-                  calculateDiscountedPrice(product.price, product.discountRate)
-                )}
+                {formatCurrency(calculateDiscountedPrice(product.price, product.discountRate))}
               </p>
-              <span className="bg-red-500 text-white px-2 py-1 rounded-full text-sm font-semibold">
-                {product.discountRate}% OFF
-              </span>
+              <span className="bg-red-500 text-white px-2 py-1 rounded-full text-sm font-semibold">{product.discountRate}% OFF</span>
             </div>
           ) : (
-            <p className="text-xl font-semibold mt-4 text-gray-800">
-              {formatCurrency(product.price)}
-            </p>
+            <p className="text-xl font-semibold mt-4 text-gray-800">{formatCurrency(product.price)}</p>
           )}
 
           {/* 할인율 */}
 
           {/* 상품 사양 */}
-          <h3 className="text-lg font-semibold mt-4 text-gray-800">
-            상품 사양
-          </h3>
+          <h3 className="text-lg font-semibold mt-4 text-gray-800">상품 사양</h3>
           <ul className="list-disc ml-5 text-gray-700">
             {productSpecifications.map((spec, index) => (
               <li key={index} className="mt-1">
@@ -462,15 +402,11 @@ const ProductDetailPage = () => {
           </ul>
 
           {/* 배송 정보 */}
-          <h3 className="text-lg font-semibold mt-4 text-gray-800">
-            배송 정보
-          </h3>
+          <h3 className="text-lg font-semibold mt-4 text-gray-800">배송 정보</h3>
           <p className="text-gray-700">{deliveryInfo}</p>
 
           {/* 반품 및 교환 정책 */}
-          <h3 className="text-lg font-semibold mt-4 text-gray-800">
-            반품 및 교환 정책
-          </h3>
+          <h3 className="text-lg font-semibold mt-4 text-gray-800">반품 및 교환 정책</h3>
           <p className="text-gray-700">{refundPolicy}</p>
 
           {/* 옵션 선택 */}
@@ -479,12 +415,7 @@ const ProductDetailPage = () => {
               <label htmlFor="option" className="font-semibold text-gray-700">
                 옵션 선택:
               </label>
-              <select
-                id="option"
-                onChange={handleOptionChange}
-                className="mt-2 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-1/2"
-                value={selectedOption ? selectedOption.optionId : ""}
-              >
+              <select id="option" onChange={handleOptionChange} className="mt-2 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-1/2" value={selectedOption ? selectedOption.optionId : ""}>
                 {product.options.map((option) => (
                   <option key={option.optionId} value={option.optionId}>
                     {option.color ? `[ 색상: ${option.color} ] , ` : ""}
@@ -497,51 +428,20 @@ const ProductDetailPage = () => {
 
           {/* 재고 상태 */}
           <div className="mt-4">
-            <p
-              className={`font-semibold ${
-                selectedOption && selectedOption.inventory.stock > 0
-                  ? "text-green-500"
-                  : "text-red-500"
-              }`}
-            >
-              {" "}
-              {selectedOption
-                ? selectedOption.inventory.stock > 0
-                  ? "재고 있음"
-                  : "재고 없음"
-                : "옵션을 선택하세요"}
-            </p>
+            <p className={`font-semibold ${selectedOption && selectedOption.inventory.stock > 0 ? "text-green-500" : "text-red-500"}`}> {selectedOption ? (selectedOption.inventory.stock > 0 ? "재고 있음" : "재고 없음") : "옵션을 선택하세요"}</p>
           </div>
 
           {/* 수량 선택 */}
           <div className="mt-6 flex items-center space-x-4">
-            <label
-              htmlFor="quantity"
-              className="mr-4 text-lg font-semibold text-gray-700"
-            >
+            <label htmlFor="quantity" className="mr-4 text-lg font-semibold text-gray-700">
               수량:
             </label>
             <div className="flex items-center border border-gray-300 rounded-md">
-              <button
-                onClick={decreaseQuantity}
-                className="px-4 py-2 bg-gray-200 text-gray-600 rounded-l-md hover:bg-gray-300 transition"
-              >
+              <button onClick={decreaseQuantity} className="px-4 py-2 bg-gray-200 text-gray-600 rounded-l-md hover:bg-gray-300 transition">
                 -
               </button>
-              <input
-                type="number"
-                id="quantity"
-                value={quantity}
-                onChange={handleQuantityChange}
-                min="1"
-                max={selectedOption ? selectedOption.inventory.stock : 0}
-                className="w-12 text-center border-0 focus:ring-0"
-                disabled={!selectedOption}
-              />
-              <button
-                onClick={increaseQuantity}
-                className="px-4 py-2 bg-red-500 text-white rounded-r-md hover:bg-red-700 transition"
-              >
+              <input type="number" id="quantity" value={quantity} onChange={handleQuantityChange} min="1" max={selectedOption ? selectedOption.inventory.stock : 0} className="w-12 text-center border-0 focus:ring-0" disabled={!selectedOption} />
+              <button onClick={increaseQuantity} className="px-4 py-2 bg-red-500 text-white rounded-r-md hover:bg-red-700 transition">
                 +
               </button>
             </div>
@@ -550,11 +450,7 @@ const ProductDetailPage = () => {
           {/* 구매 버튼 */}
           <div className="mt-8 flex items-center space-x-4">
             {/* 장바구니 버튼 */}
-            <button
-              onClick={handleAddToCart}
-              className="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-colors"
-              disabled={!selectedOption || selectedOption.inventory.stock <= 0}
-            >
+            <button onClick={handleAddToCart} className="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-colors" disabled={!selectedOption || selectedOption.inventory.stock <= 0}>
               {/* 장바구니 아이콘 */}
               <FontAwesomeIcon icon={faShoppingCart} className="w-5 h-5 mr-2" />
               장바구니
@@ -563,36 +459,15 @@ const ProductDetailPage = () => {
             {/* 찜하기 버튼 */}
             <button
               onClick={handleAddToWishlist}
-              className={`text-white font-bold py-3 px-6 rounded-lg transition-colors ${
-                loading
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : isWishlisted === null
-                  ? "bg-gray-500 hover:bg-gray-700"
-                  : isWishlisted
-                  ? "bg-red-500 hover:bg-red-700"
-                  : "bg-gray-500 hover:bg-gray-700"
-              }`}
+              className={`text-white font-bold py-3 px-6 rounded-lg transition-colors ${loading ? "bg-gray-400 cursor-not-allowed" : isWishlisted === null ? "bg-gray-500 hover:bg-gray-700" : isWishlisted ? "bg-red-500 hover:bg-red-700" : "bg-gray-500 hover:bg-gray-700"}`}
               disabled={loading}
             >
-              <FontAwesomeIcon
-                icon={isWishlisted ? faHeart : faHeartBroken}
-                className="mr-2 w-5 h-5"
-              />
-              {loading
-                ? "로딩..."
-                : isWishlisted === null
-                ? "찜하기"
-                : isWishlisted
-                ? "찜 취소"
-                : "찜하기"}
+              <FontAwesomeIcon icon={isWishlisted ? faHeart : faHeartBroken} className="mr-2 w-5 h-5" />
+              {loading ? "로딩..." : isWishlisted === null ? "찜하기" : isWishlisted ? "찜 취소" : "찜하기"}
             </button>
 
             {/* 바로 구매 버튼 */}
-            <button
-              onClick={handleDirectBuy}
-              className="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-9 rounded-lg shadow-md transition-colors flex items-center"
-              disabled={!selectedOption || selectedOption.inventory.stock <= 0}
-            >
+            <button onClick={handleDirectBuy} className="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-9 rounded-lg shadow-md transition-colors flex items-center" disabled={!selectedOption || selectedOption.inventory.stock <= 0}>
               <ShoppingBagIcon className="mr-2 w-5 h-5" />
               바로 구매
             </button>
@@ -618,10 +493,7 @@ const ProductDetailPage = () => {
                   </div>
                   {/* 리뷰 삭제 버튼 (작성자 또는 관리자만) */}
                   {(review.user.userId === currentUser?.userId || isAdmin) && (
-                    <button
-                      onClick={() => handleDeleteReview(review.reviewId)}
-                      className="text-red-500 hover:text-red-700"
-                    >
+                    <button onClick={() => handleDeleteReview(review.reviewId)} className="text-red-500 hover:text-red-700">
                       삭제
                     </button>
                   )}
@@ -637,10 +509,7 @@ const ProductDetailPage = () => {
           <h2 className="text-xl font-semibold">자주 묻는 질문</h2>
           <div>
             {faqs.map((faq) => (
-              <div
-                key={faq.faqId}
-                className="border rounded p-4 mt-2 shadow-sm"
-              >
+              <div key={faq.faqId} className="border rounded p-4 mt-2 shadow-sm">
                 <p className="font-semibold">{faq.question}</p>
                 <p className="mt-2">{faq.answer}</p>
               </div>

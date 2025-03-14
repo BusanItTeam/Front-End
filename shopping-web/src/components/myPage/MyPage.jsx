@@ -17,7 +17,7 @@ const MyPage = () => {
         return;
       }
 
-      const response = await Api.get("/orders", {
+      const response = await Api.get("/orders/history", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
