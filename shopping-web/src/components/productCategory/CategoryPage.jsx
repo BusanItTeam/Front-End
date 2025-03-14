@@ -3,17 +3,21 @@ import { useParams, Link } from "react-router-dom";
 import { useMyContext } from "../../store/ContextApi";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { formatCurrency } from "../utils/Formatting"; // Helper function
+import { formatCurrency } from "../utils/Formatting";
 
 const CategoryPage = () => {
+  // 상태 변수 선언
   const { products } = useMyContext();
   const [currentPage, setCurrentPage] = useState(1);
   const [wishlist, setWishlist] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState({});
-  const productsPerPage = 16; // 16개씩 페이징
+  const [categories, setCategories] = useState([]);
+  const [bestSellingProducts, setBestSellingProducts] = useState([]); // 베스트상품 상태 추가
+
+  // 상수 선언
+  const productsPerPage = 16;
   const backendURL = "http://localhost:8080";
   const { categoryName } = useParams();
-  const [categories, setCategories] = useState([]);
 
   // 카테고리 설정
   useEffect(() => {
@@ -36,7 +40,6 @@ const CategoryPage = () => {
       try {
         const token = localStorage.getItem("JWT_TOKEN");
         if (!token) return;
-
         const response = await axios.get(`${backendURL}/api/wishlist`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -65,25 +68,36 @@ const CategoryPage = () => {
         return newIndexes;
       });
     }, 1000);
-
     return () => clearInterval(interval);
   }, [products]);
+
+  // 베스트상품 불러오기
+  useEffect(() => {
+    const fetchBestSellingProducts = async () => {
+      try {
+        const response = await axios.get(
+          `${backendURL}/api/products/best-selling?limit=8`
+        );
+        setBestSellingProducts(response.data);
+      } catch (error) {
+        console.error("베스트상품 불러오기 오류:", error);
+      }
+    };
+    fetchBestSellingProducts();
+  }, []);
 
   // 위시리스트 추가/삭제 함수
   const toggleWishlist = async (productId) => {
     try {
       const token = localStorage.getItem("JWT_TOKEN");
       if (!token) return;
-
       if (wishlist.includes(productId)) {
-        // 이미 위시리스트에 있으면 삭제
         await axios.delete(`${backendURL}/api/wishlist/product/${productId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setWishlist(wishlist.filter((id) => id !== productId));
         toast.success("위시리스트에서 제거되었습니다.");
       } else {
-        // 위시리스트에 없으면 추가 (옵션 ID는 null로 추가)
         await axios.post(
           `${backendURL}/api/wishlist`,
           { productId, optionId: null },
@@ -104,16 +118,12 @@ const CategoryPage = () => {
       ? true
       : product.category?.name?.toLowerCase() === categoryName
   );
-
   const sortedProducts = [...filteredProducts].sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
   );
-
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const currentProducts = sortedProducts.slice(
-    indexOfFirstProduct,
-    indexOfLastProduct
+    (currentPage - 1) * productsPerPage,
+    currentPage * productsPerPage
   );
 
   // 할인 가격 계산
@@ -125,6 +135,7 @@ const CategoryPage = () => {
     return price;
   };
 
+  // 렌더링
   return (
     <div className="flex">
       {/* 사이드바 */}
@@ -151,6 +162,35 @@ const CategoryPage = () => {
 
       {/* 상품 목록 */}
       <div className="flex-1 max-w-6xl mx-auto px-4 py-8">
+        {/* 베스트상품 섹션 */}
+        <div className="mb-8">
+          <h3 className="text-2xl font-bold mb-4">베스트</h3>
+          {bestSellingProducts.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {bestSellingProducts.map((product) => (
+                <div
+                  key={product.productId}
+                  className="bg-white shadow-md rounded-lg overflow-hidden relative"
+                >
+                  <Link to={`/product/${product.productId}`}>
+                    <img
+                      src={`${backendURL}${product.images[0]?.imageUrl}`}
+                      alt={product.name}
+                      className="object-cover w-full h-64"
+                    />
+                    <div className="p-4">
+                      <h3 className="text-lg font-semibold">{product.name}</h3>
+                      <p>{formatCurrency(product.price)}</p>
+                    </div>
+                  </Link>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p>현재 베스트상품이 없습니다.</p>
+          )}
+        </div>
+        h
         <h2 className="text-3xl font-bold mb-6 capitalize">
           {categoryName === "all" ? "전체 상품" : categoryName}
         </h2>
@@ -161,7 +201,6 @@ const CategoryPage = () => {
               className="bg-white shadow-md rounded-lg overflow-hidden relative"
             >
               <Link to={`/product/${product.productId}`}>
-                {/* 이미지 */}
                 <img
                   src={`${backendURL}${
                     product.images[currentImageIndex[product.productId] || 0]
@@ -171,7 +210,6 @@ const CategoryPage = () => {
                   className="object-cover w-full h-64"
                 />
                 <div className="p-4">
-                  {/* 상품명과 하트 버튼 */}
                   <div className="flex justify-between items-center">
                     <h3 className="text-lg font-semibold">{product.name}</h3>
                     <button
@@ -189,7 +227,6 @@ const CategoryPage = () => {
                       ♥
                     </button>
                   </div>
-                  {/* 가격 */}
                   {product.discountRate && product.discountRate > 0 ? (
                     <>
                       <span className="text-gray-500 line-through mr-2">
@@ -212,7 +249,6 @@ const CategoryPage = () => {
             </div>
           ))}
         </div>
-
         {/* 페이지네이션 */}
         <div className="flex justify-center mt-8">
           {Array.from({
