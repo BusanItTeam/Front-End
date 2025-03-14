@@ -40,7 +40,7 @@ const Homepage = () => {
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <div className="relative w-full max-w-[2100px] h-[700px] overflow-hidden rounded-lg shadow-lg mt-2">
+      <div className="relative w-full max-w-[2100px] h-[700px] overflow-hidden rounded-lg mt-2">
         <button onClick={goToPrevious} className="absolute top-1/2 transform -translate-y-1/2 left-0 bg-black text-white border-none p-2 text-xl cursor-pointer z-10 opacity-70 hover:opacity-100">
           &lt;
         </button>
