@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "./Header.css";
 import Search from "../search/Search";
-import "../signup/SignUp";
 import { useLocation } from "react-router-dom";
 import { useMyContext } from "../../store/ContextApi";
 
@@ -11,8 +9,7 @@ export const Header = () => {
   const location = useLocation();
   const isMyPageActive = location.pathname.startsWith("/myPage");
   const navigate = useNavigate();
-  const { token, setToken, setCurrentUser, isAdmin, setIsAdmin, products } =
-    useMyContext();
+  const { token, setToken, setCurrentUser, isAdmin, setIsAdmin, products } = useMyContext();
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
@@ -29,82 +26,64 @@ export const Header = () => {
     setToken(null);
     setCurrentUser(null);
     setIsAdmin(false);
-    //navigate("/login");
   };
 
-  // products 상태가 변경될 때마다 categories를 업데이트합니다.
   useEffect(() => {
-    // products가 존재하고 비어있지 않은지 확인
     if (products && products.length > 0) {
-      // products에서 category 정보만 추출하여 중복을 제거합니다.
-      const uniqueCategories = [
-        ...new Map(
-          products.map((product) => [
-            product.category.categoryId,
-            product.category,
-          ])
-        ).values(),
-      ];
+      const uniqueCategories = [...new Map(products.map((product) => [product.category.categoryId, product.category])).values()];
       setCategories(uniqueCategories);
     }
   }, [products]);
 
   return (
-    <header className="header-wrapper">
-      <div className="frame-2">
+    <header className="flex items-center justify-between p-4 bg-white shadow-md">
+      <div className="flex items-center gap-40">
         <Link to="/">
-          <img src="/Logo.png" alt="Logo" className="logo" />
+          <img src="/Logo.png" alt="Logo" className="h-10" />
         </Link>
-
-        <nav className="frame-3">
-          <Link to="/" className="nav-link">
+        <nav className="flex gap-12">
+          <Link to="/" className="text-gray-800 font-bold hover:text-orange-500">
             홈
           </Link>
-          <div
-            className="category-dropdown"
-            onMouseEnter={() => setShowDropdown(true)}
-            onMouseLeave={() => setShowDropdown(false)}
-          >
-            <Link to="/category/all" className="nav-link">
+          <div className="relative" onMouseEnter={() => setShowDropdown(true)} onMouseLeave={() => setShowDropdown(false)}>
+            <Link to="/category/all" className="text-gray-800 font-bold hover:text-orange-500">
               카테고리
             </Link>
             {showDropdown && (
-              <ul className="dropdown-menu">
-                <li>
-                  <Link to={`/category/all`}>전체</Link> {/* 전체 상품 링크 */}
+              <ul className="absolute bg-gray-100 w-40 shadow-lg mt-2 z-50">
+                <li className="p-2 hover:bg-gray-200">
+                  <Link to={`/category/all`}>전체</Link>
                 </li>
                 {categories.map((category) => (
-                  <li key={category.categoryId}>
-                    <Link to={`/category/${category.name?.toLowerCase()}`}>
-                      {category.name}
-                    </Link>
+                  <li key={category.categoryId} className="p-2 hover:bg-gray-200">
+                    <Link to={`/category/${category.name?.toLowerCase()}`}>{category.name}</Link>
                   </li>
                 ))}
               </ul>
             )}
           </div>
-          <a href="/contact" className="nav-link">
+          <Link to="/contact" className="text-gray-800 font-bold hover:text-orange-500">
             Contact
-          </a>
-          <a href="/about" className="nav-link">
+          </Link>
+          <Link to="/about" className="text-gray-800 font-bold hover:text-orange-500">
             About
-          </a>
+          </Link>
           {!token ? (
             <>
-              <Link to="/signup" className="nav-link">
+              <Link to="/signup" className="text-gray-800 font-bold hover:text-orange-500">
                 Sign Up
               </Link>
-              <Link to="/login" className="nav-link">
+              <Link to="/login" className="text-gray-800 font-bold hover:text-orange-500">
                 LogIn
               </Link>
             </>
           ) : (
             <>
-              <button onClick={handleLogout} className="nav-link">
+              <button onClick={handleLogout} className="text-gray-800 font-bold hover:text-orange-500">
                 LogOut
               </button>
               {isAdmin && (
-                <Link to="/admin" className="nav-link">
+                <Link to="/admin" className="text-gray-800 font-bold hover:text-orange-500">
                   관리자
                 </Link>
               )}
@@ -112,24 +91,11 @@ export const Header = () => {
           )}
         </nav>
       </div>
-
       <Search />
-      <div className="frame-5">
-        <a href="/wishlist" className="icon wishlist"></a>
-        <a href="/cart" className="icon cart"></a>
-        <a
-          href="/myPage"
-          className={`icon ${isMyPageActive ? "user-active" : "user"}`}
-        ></a>
-        <Link to="/home" className="nav-link">
-          Home
-        </Link>
-        <Link to="/contact" className="nav-link">
-          Contact
-        </Link>
-        <Link to="/about" className="nav-link">
-          About
-        </Link>
+      <div className="flex items-center gap-6">
+        <Link to="/wishlist" className="w-8 h-8 bg-contain bg-no-repeat" style={{ backgroundImage: "url('/Wishlist.png')" }}></Link>
+        <Link to="/cart" className="w-8 h-8 bg-contain bg-no-repeat" style={{ backgroundImage: "url('/Cart=Off.png')" }}></Link>
+        <Link to="/myPage" className={`w-8 h-8 bg-contain bg-no-repeat ${isMyPageActive ? "bg-[url('/user2.png')]" : "bg-[url('/user.png')]"}`}></Link>
       </div>
     </header>
   );
