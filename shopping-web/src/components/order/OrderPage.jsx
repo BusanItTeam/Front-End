@@ -40,7 +40,7 @@ const OrderPage = () => {
     }
   }, []);
 
-  //✅ 유저 정보 가져오기
+  // 유저 정보 가져오기
   const [formData, setFormData] = useState({
     name: currentUser?.name || "",
     email: currentUser?.email || "",
@@ -77,6 +77,7 @@ const OrderPage = () => {
         address: userAddress.address || "",
         detailAddress: userAddress.detailAddress || "",
         extraAddress: userAddress.extraAddress || "",
+    
       });
     }
   }, [currentUser]);
@@ -168,14 +169,14 @@ const OrderPage = () => {
     }
   };
 
-  // ✅ 주문자 정보와 배송지 정보 동기화
+  //  주문자 정보와 배송지 정보 동기화
   useEffect(() => {
     if (sameAsOrderer) {
       setFormData2({ ...formData });
     }
   }, [sameAsOrderer, formData]);
 
-  // ✅ 최대 사용 가능 포인트 계산 함수
+  //  최대 사용 가능 포인트 계산 함수
   const getMaxUsablePoint = () => {
     const totalPrice = getTotalPrice();
     const userPoints = currentUser?.points || 0;

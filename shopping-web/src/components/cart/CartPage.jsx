@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMyContext } from "../../store/ContextApi";
 import api from "../../services/Api";
 import { formatCurrency } from "../utils/Formatting";
+import toast from "react-hot-toast";
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]); // 장바구니 아이템 상태
@@ -26,6 +27,14 @@ const CartPage = () => {
 
   // 장바구니 데이터 불러오기
   const updateCart = async () => {
+
+    if (!token) {
+      console.warn("JWT 토큰이 없습니다. 로그인 페이지로 이동합니다.");
+      toast.error("로그인이 필요합니다");
+      navigate("/login");
+      return;
+    }
+    
     try {
       const response = await api.get("/cart/show", {
         headers: { Authorization: `Bearer ${token}` },
@@ -39,6 +48,16 @@ const CartPage = () => {
   //  수량 변경 기능
   const updateQuantity = async (cartId, newQuantity) => {
     if (newQuantity < 1) return; // 최소 수량 1 유지
+
+    
+    const cartItem = cartItems.find((item) => item.cartId === cartId);
+    if (!cartItem) return;
+  
+    // 재고가 부족한 경우
+    if (cartItem.stock < newQuantity) {
+      toast.error("재고가 부족합니다.");
+      return;
+    }
 
     try {
       const response = await api.put(`/cart/update/${cartId}`, { quantity: newQuantity }, { headers: { Authorization: `Bearer ${token}` } });
@@ -75,6 +94,7 @@ const CartPage = () => {
       alert("선택된 상품이 없습니다.");
       return;
     }
+        
     // 선택된 상품의 전체 정보를 가져오기
     const selectedProducts = cartItems.filter((item) => selectedItems.includes(item.cartId));
     // localStorage에 선택된 상품 정보 저장

@@ -5,6 +5,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { formatCurrency } from "../utils/Formatting";
 import { handleAddToCart } from "../utils/cartUtils";
+import Api from "../../services/Api";
 
 const Wishlist = ({updateCart}) => {
   const [selectedItems, setSelectedItems] = useState([]);
@@ -25,7 +26,7 @@ const Wishlist = ({updateCart}) => {
 
         if (!token) {
           console.warn("JWT 토큰이 없습니다. 로그인 페이지로 이동합니다.");
-          alert("로그인이 필요합니다.");
+          toast.error("로그인이 필요합니다");
           navigate("/login");
           return;
         }
@@ -58,6 +59,39 @@ const Wishlist = ({updateCart}) => {
       setSelectedItems([]);
     }
   };
+
+
+
+
+  const handleOptionChange = (e, item) => {
+    const selectedOptionId = e.target.value;
+    
+    // 선택된 optionId를 item에 반영
+    const updatedItem = { ...item, optionId: selectedOptionId };
+  
+    // 서버에 업데이트된 옵션을 보냄
+    Api.put("/wishlist/update-option", updatedItem)
+      .then((response) => {
+        toast.success("옵션이 변경되었습니다!");
+  
+        // 응답 받은 데이터로 상태 업데이트 (새로고침 없이 즉시 반영)
+        setWishlist((prevWishlist) =>
+          prevWishlist.map((i) =>
+            i.wishListId === updatedItem.wishListId
+              ? { ...i, optionId: selectedOptionId, option: response.data.option }
+              : i
+          )
+        );
+      })
+      .catch((error) => {
+        toast.error("옵션 변경 중 오류가 발생했습니다.");
+        console.error("옵션 변경 오류:", error);
+      });
+  };
+  
+  
+  
+  
 
   // { 한개상품 선택 }
   const handleSelectItem = (wishListId) => {
@@ -185,7 +219,27 @@ const Wishlist = ({updateCart}) => {
                     {item.productName}
                   </Link>
                 </td>
-                <td className="py-2">{item.option || "옵션 없음"}</td>
+                <td className="py-2">
+                    {/* 옵션이 있는 경우 */}
+                    {item.optionId ? (
+                      <span>{item.option}</span> // 기존 옵션 표시
+                    ) : (
+                      <select
+                        value={item.optionId || ""}
+                        onChange={(e) => handleOptionChange(e, item)} // 옵션 변경 시 처리 함수
+                        className="border px-2 py-1 rounded"
+                      >
+                        <option value="" disabled>옵션 선택</option>
+                        {/* 옵션이 없을 때 기본값 또는 다른 옵션들을 제공 */}
+                        {item.productOptions && item.productOptions.map(option => (
+                          <option key={option.optionId} value={option.optionId}>
+                            {option.color} / {option.size}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </td>
+
                 <td className="py-2">
                   {/* 가격 정보 */}
                   {item.discountRate && item.discountRate > 0 ? (
