@@ -100,7 +100,6 @@ const ProductDetailPage = () => {
         const wishListDTO = {
           productId: Number(productId),
           optionId: selectedOption ? selectedOption.optionId : null, // 선택된 옵션이 있을 때 optionId 추가
-          
         };
         const response = await axios.post(`${backendURL}/api/wishlist`, wishListDTO, { headers });
         if (response.status === 200) {
@@ -125,7 +124,6 @@ const ProductDetailPage = () => {
       toast.error("재고가 부족합니다.");
       return;
     }
-
 
     const directBuyInfo = {
       productId: productId,
@@ -191,13 +189,13 @@ const ProductDetailPage = () => {
     setSelectedImage(imageUrl);
   };
 
-   // 수량 변경 핸들러
-   const handleQuantityChange = (e) => {
+  // 수량 변경 핸들러
+  const handleQuantityChange = (e) => {
     let newQuantity = parseInt(e.target.value, 10);
     if (newQuantity > selectedOption.inventory.stock) {
-      newQuantity = selectedOption.inventory.stock;  // 재고보다 많을 수 없도록 설정
+      newQuantity = selectedOption.inventory.stock; // 재고보다 많을 수 없도록 설정
     } else if (newQuantity < 1) {
-      newQuantity = 1;  // 최소 수량은 1로 설정
+      newQuantity = 1; // 최소 수량은 1로 설정
     }
     setQuantity(newQuantity);
   };
@@ -363,165 +361,119 @@ const ProductDetailPage = () => {
         )}
 
         {/* 상품 정보 (기존 코드 유지) */}
-  <div className="mt-6">
-  {/* 상품 이름 */}
-  <h1 className="text-2xl font-bold text-gray-800">{product.name}</h1>
+        <div className="mt-6">
+          {/* 상품 이름 */}
+          <h1 className="text-2xl font-bold text-gray-800">{product.name}</h1>
 
-  {/* 상품 설명 */}
-  <p className="text-gray-700 mt-2">{product.description}</p>
+          {/* 상품 설명 */}
+          <p className="text-gray-700 mt-2">{product.description}</p>
 
-  {/* 할인된 가격 */}
-  {product.discountRate && product.discountRate > 0 ? (
-    <div className="mt-4 flex items-center space-x-4">
-      <p className="text-xl font-semibold text-gray-800">
-        <span
-          style={{
-            textDecoration: "line-through",
-            color: "red",
-            marginRight: "10px",
-          }}
-        >
-          {formatCurrency(product.price)}
-        </span>
-        {formatCurrency(calculateDiscountedPrice(product.price, product.discountRate))}
-      </p>
-      <span className="bg-red-500 text-white px-2 py-1 rounded-full text-sm font-semibold">
-        {product.discountRate}% OFF
-      </span>
-    </div>
-  ) : (
-    <p className="text-xl font-semibold mt-4 text-gray-800">{formatCurrency(product.price)}</p>
-  )}
+          {/* 할인된 가격 */}
+          {product.discountRate && product.discountRate > 0 ? (
+            <div className="mt-4 flex items-center space-x-4">
+              <p className="text-xl font-semibold text-gray-800">
+                <span
+                  style={{
+                    textDecoration: "line-through",
+                    color: "red",
+                    marginRight: "10px",
+                  }}
+                >
+                  {formatCurrency(product.price)}
+                </span>
+                {formatCurrency(calculateDiscountedPrice(product.price, product.discountRate))}
+              </p>
+              <span className="bg-red-500 text-white px-2 py-1 rounded-full text-sm font-semibold">{product.discountRate}% OFF</span>
+            </div>
+          ) : (
+            <p className="text-xl font-semibold mt-4 text-gray-800">{formatCurrency(product.price)}</p>
+          )}
 
-  {/* 할인율 */}
-  {product.discountRate && product.discountRate > 0 && (
-    <p className="text-red-500 mt-2 font-semibold">할인율: {product.discountRate}%</p>
-  )}
+          {/* 할인율 */}
 
-  {/* 상품 사양 */}
-  <h3 className="text-lg font-semibold mt-4 text-gray-800">상품 사양</h3>
-  <ul className="list-disc ml-5 text-gray-700">
-    {productSpecifications.map((spec, index) => (
-      <li key={index} className="mt-1">{spec.name}: {spec.value}</li>
-    ))}
-  </ul>
+          {/* 상품 사양 */}
+          <h3 className="text-lg font-semibold mt-4 text-gray-800">상품 사양</h3>
+          <ul className="list-disc ml-5 text-gray-700">
+            {productSpecifications.map((spec, index) => (
+              <li key={index} className="mt-1">
+                {spec.name}: {spec.value}
+              </li>
+            ))}
+          </ul>
 
-  {/* 배송 정보 */}
-  <h3 className="text-lg font-semibold mt-4 text-gray-800">배송 정보</h3>
-  <p className="text-gray-700">{deliveryInfo}</p>
+          {/* 배송 정보 */}
+          <h3 className="text-lg font-semibold mt-4 text-gray-800">배송 정보</h3>
+          <p className="text-gray-700">{deliveryInfo}</p>
 
-  {/* 반품 및 교환 정책 */}
-  <h3 className="text-lg font-semibold mt-4 text-gray-800">반품 및 교환 정책</h3>
-  <p className="text-gray-700">{refundPolicy}</p>
+          {/* 반품 및 교환 정책 */}
+          <h3 className="text-lg font-semibold mt-4 text-gray-800">반품 및 교환 정책</h3>
+          <p className="text-gray-700">{refundPolicy}</p>
 
-  {/* 옵션 선택 */}
-  {product.options && product.options.length > 0 && (
-    <div className="mt-6">
-      <label htmlFor="option" className="font-semibold text-gray-700">옵션 선택:</label>
-      <select
-        id="option"
-        onChange={handleOptionChange}
-        className="mt-2 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-1/2"
-        value={selectedOption ? selectedOption.optionId : ""}
-      >
-        {product.options.map((option) => (
-          <option key={option.optionId} value={option.optionId}>
-            {option.color ? `[ 색상: ${option.color} ] , ` : ""}
-            {option.size ? `[ 사이즈: ${option.size} ] ` : ""}
-          </option>
-        ))}
-      </select>
-    </div>
-  )}
+          {/* 옵션 선택 */}
+          {product.options && product.options.length > 0 && (
+            <div className="mt-6">
+              <label htmlFor="option" className="font-semibold text-gray-700">
+                옵션 선택:
+              </label>
+              <select id="option" onChange={handleOptionChange} className="mt-2 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-1/2" value={selectedOption ? selectedOption.optionId : ""}>
+                {product.options.map((option) => (
+                  <option key={option.optionId} value={option.optionId}>
+                    {option.color ? `[ 색상: ${option.color} ] , ` : ""}
+                    {option.size ? `[ 사이즈: ${option.size} ] ` : ""}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
-  {/* 재고 상태 */}
-  <div className="mt-4">
-    <p className={`font-semibold ${selectedOption && selectedOption.inventory.stock > 0 ? "text-green-500" : "text-red-500"}`}>
-      재고 상태: {selectedOption ? (selectedOption.inventory.stock > 0 ? "재고 있음" : "재고 없음") : "옵션을 선택하세요"}
-    </p>
-    <p className={`font-semibold mt-2 ${selectedOption && selectedOption.inventory.stock <= 0 ? "text-red-500" : "text-green-500"}`}>
-      남은 재고: {selectedOption ? selectedOption.inventory.stock : "옵션을 선택하세요"}
-    </p>
-  </div>
+          {/* 재고 상태 */}
+          <div className="mt-4">
+            <p className={`font-semibold ${selectedOption && selectedOption.inventory.stock > 0 ? "text-green-500" : "text-red-500"}`}>재고 상태: {selectedOption ? (selectedOption.inventory.stock > 0 ? "재고 있음" : "재고 없음") : "옵션을 선택하세요"}</p>
+            <p className={`font-semibold mt-2 ${selectedOption && selectedOption.inventory.stock <= 0 ? "text-red-500" : "text-green-500"}`}>남은 재고: {selectedOption ? selectedOption.inventory.stock : "옵션을 선택하세요"}</p>
+          </div>
 
+          {/* 수량 선택 */}
+          <div className="mt-6 flex items-center space-x-4">
+            <label htmlFor="quantity" className="mr-4 text-lg font-semibold text-gray-700">
+              수량:
+            </label>
+            <div className="flex items-center border border-gray-300 rounded-md">
+              <button onClick={decreaseQuantity} className="px-4 py-2 bg-gray-200 text-gray-600 rounded-l-md hover:bg-gray-300 transition">
+                -
+              </button>
+              <input type="number" id="quantity" value={quantity} onChange={handleQuantityChange} min="1" max={selectedOption ? selectedOption.inventory.stock : 0} className="w-12 text-center border-0 focus:ring-0" disabled={!selectedOption} />
+              <button onClick={increaseQuantity} className="px-4 py-2 bg-red-500 text-white rounded-r-md hover:bg-red-700 transition">
+                +
+              </button>
+            </div>
+          </div>
 
-{/* 수량 선택 */}
-<div className="mt-6 flex items-center space-x-4">
-  <label htmlFor="quantity" className="mr-4 text-lg font-semibold text-gray-700">수량:</label>
-  <div className="flex items-center border border-gray-300 rounded-md">
-    <button
-      onClick={decreaseQuantity}
-      className="px-4 py-2 bg-gray-200 text-gray-600 rounded-l-md hover:bg-gray-300 transition"
-    >
-      -
-    </button>
-    <input
-      type="number"
-      id="quantity"
-      value={quantity}
-      onChange={handleQuantityChange}
-      min="1"
-      max={selectedOption ? selectedOption.inventory.stock : 0}
-      className="w-12 text-center border-0 focus:ring-0"
-      disabled={!selectedOption}
-    />
-    <button
-      onClick={increaseQuantity}
-      className="px-4 py-2 bg-red-500 text-white rounded-r-md hover:bg-red-700 transition"
-    >
-      +
-    </button>
-  </div>
-</div>
+          {/* 구매 버튼 */}
+          <div className="mt-8 flex items-center space-x-4">
+            {/* 장바구니 버튼 */}
+            <button onClick={handleAddToCart} className="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-colors" disabled={!selectedOption || selectedOption.inventory.stock <= 0}>
+              {/* 장바구니 아이콘 */}
+              <FontAwesomeIcon icon={faShoppingCart} className="w-5 h-5 mr-2" />
+              장바구니
+            </button>
 
-{/* 구매 버튼 */}
-<div className="mt-8 flex items-center space-x-4">
-  {/* 장바구니 버튼 */}
-  <button
-    onClick={handleAddToCart}
-    className="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-colors"
-    disabled={!selectedOption || selectedOption.inventory.stock <= 0}
-  >
-    {/* 장바구니 아이콘 */}
-    <FontAwesomeIcon icon={faShoppingCart} className="w-5 h-5 mr-2" />
-    장바구니
-  </button>
+            {/* 찜하기 버튼 */}
+            <button
+              onClick={handleAddToWishlist}
+              className={`text-white font-bold py-3 px-6 rounded-lg transition-colors ${loading ? "bg-gray-400 cursor-not-allowed" : isWishlisted === null ? "bg-gray-500 hover:bg-gray-700" : isWishlisted ? "bg-red-500 hover:bg-red-700" : "bg-gray-500 hover:bg-gray-700"}`}
+              disabled={loading}
+            >
+              <FontAwesomeIcon icon={isWishlisted ? faHeart : faHeartBroken} className="mr-2 w-5 h-5" />
+              {loading ? "로딩..." : isWishlisted === null ? "찜하기" : isWishlisted ? "찜 취소" : "찜하기"}
+            </button>
 
-  {/* 찜하기 버튼 */}
-  <button
-    onClick={handleAddToWishlist}
-    className={`text-white font-bold py-3 px-6 rounded-lg transition-colors ${
-      loading
-        ? "bg-gray-400 cursor-not-allowed"
-        : isWishlisted === null
-        ? "bg-gray-500 hover:bg-gray-700"
-        : isWishlisted
-        ? "bg-red-500 hover:bg-red-700"
-        : "bg-gray-500 hover:bg-gray-700"
-    }`}
-    disabled={loading}
-  >
-     <FontAwesomeIcon
-        icon={isWishlisted ? faHeart : faHeartBroken}
-        className="mr-2 w-5 h-5"
-      />
-    {loading ? "로딩..." : isWishlisted === null ? "찜하기" : isWishlisted ? "찜 취소" : "찜하기"}
-  </button>
-
-  {/* 바로 구매 버튼 */}
-      <button
-        onClick={handleDirectBuy}
-        className="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-9 rounded-lg shadow-md transition-colors flex items-center"
-        disabled={!selectedOption || selectedOption.inventory.stock <= 0}
-      >
-        <ShoppingBagIcon className="mr-2 w-5 h-5" />
-        바로 구매
-      </button>
-    </div>
-
-    </div>
-
-
+            {/* 바로 구매 버튼 */}
+            <button onClick={handleDirectBuy} className="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-9 rounded-lg shadow-md transition-colors flex items-center" disabled={!selectedOption || selectedOption.inventory.stock <= 0}>
+              <ShoppingBagIcon className="mr-2 w-5 h-5" />
+              바로 구매
+            </button>
+          </div>
+        </div>
 
         {/* 리뷰 및 평점 */}
         <div className="mt-8">

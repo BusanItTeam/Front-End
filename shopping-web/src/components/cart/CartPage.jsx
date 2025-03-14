@@ -27,14 +27,13 @@ const CartPage = () => {
 
   // 장바구니 데이터 불러오기
   const updateCart = async () => {
-
     if (!token) {
       console.warn("JWT 토큰이 없습니다. 로그인 페이지로 이동합니다.");
       toast.error("로그인이 필요합니다");
       navigate("/login");
       return;
     }
-    
+
     try {
       const response = await api.get("/cart/show", {
         headers: { Authorization: `Bearer ${token}` },
@@ -49,10 +48,9 @@ const CartPage = () => {
   const updateQuantity = async (cartId, newQuantity) => {
     if (newQuantity < 1) return; // 최소 수량 1 유지
 
-    
     const cartItem = cartItems.find((item) => item.cartId === cartId);
     if (!cartItem) return;
-  
+
     // 재고가 부족한 경우
     if (cartItem.stock < newQuantity) {
       toast.error("재고가 부족합니다.");
@@ -94,7 +92,7 @@ const CartPage = () => {
       alert("선택된 상품이 없습니다.");
       return;
     }
-        
+
     // 선택된 상품의 전체 정보를 가져오기
     const selectedProducts = cartItems.filter((item) => selectedItems.includes(item.cartId));
     // localStorage에 선택된 상품 정보 저장
@@ -160,8 +158,8 @@ const CartPage = () => {
   if (loading) return <p>Loading cart...</p>;
 
   return (
-    <div className="p-6 max-w-4xl mx-auto mt-6">
-      <h1 className="text-2xl font-semibold mb-6 text-center text-gray-800">CART</h1>
+    <div className="max-w-7xl mx-auto p-6 min-h-screen pt-9">
+      <h1 className="text-3xl font-bold mb-6 text-center pb-7">CART</h1>
       {cartItems.length === 0 ? (
         <div className="text-center text-gray-600 text-lg py-10">
           <hr className="border-b" />
@@ -171,9 +169,9 @@ const CartPage = () => {
       ) : (
         <>
           <div className="overflow-x-auto">
-            <table className="w-full border-t text-sm text-center">
+            <table className="w-full border-t border-gray-400 text-sm text-center">
               <thead>
-                <tr className="border-b">
+                <tr className="border-b border-gray-400">
                   <th className="py-2">선택</th>
                   <th className="py-2">이미지</th>
                   <th className="py-2">카테고리</th>
@@ -188,7 +186,7 @@ const CartPage = () => {
               </thead>
               <tbody>
                 {cartItems.map((item) => (
-                  <tr key={item.cartId ?? item.productId} className="border-b text-center text-gray-800">
+                  <tr key={item.cartId ?? item.productId} className="border-b border-gray-400 text-center text-gray-800">
                     <td className="p-4">
                       <input type="checkbox" checked={selectedItems.includes(item.cartId)} onChange={() => toggleSelectItem(item.cartId)} />
                     </td>
@@ -248,7 +246,7 @@ const CartPage = () => {
             <h2 className="text-gray-500 font-medium text-lg mt-1">
               {getSelectedTotalPrice().toLocaleString("ko-KR")}원 + 배송비 {SHIPPING_COST.toLocaleString("ko-KR")}원
             </h2>
-            <h5 className="text-xl font-bold text-gray-800 border-t pt-2 mt-4">총 결제 예상금액 {(getSelectedTotalPrice() + SHIPPING_COST).toLocaleString("ko-KR")}원</h5>
+            <h5 className="text-xl font-bold text-gray-800 border-t border-gray-400 pt-2 mt-4">총 결제 예상금액 {(getSelectedTotalPrice() + SHIPPING_COST).toLocaleString("ko-KR")}원</h5>
             <div className="flex justify-center gap-3 mt-4">
               <Link to="/orderpage" onClick={handleSelectedOrder} className="border border-gray-400 text-gray-700 font-medium py-2 px-4 rounded-lg shadow-md text-sm bg-white">
                 선택상품 주문하기
