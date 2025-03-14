@@ -11,7 +11,7 @@ import {
   LogOut,
 } from "lucide-react";
 
-const AdminLayout = () => {
+const AdminLayout = ({ children }) => {
   return (
     <div className="flex h-screen bg-white">
       {/* 사이드바 */}
@@ -24,14 +24,32 @@ const AdminLayout = () => {
 
         {/* 네비게이션 메뉴 */}
         <nav className="flex flex-col gap-4">
-          <SidebarLink to="/admin/products" icon={<Package />} label="상품 관리" />
-          <SidebarLink to="/admin/orders" icon={<ShoppingCart />} label="주문 및 배송 관리" />
+          <SidebarLink
+            to="/admin/products"
+            icon={<Package />}
+            label="상품 관리"
+          />
+          <SidebarLink
+            to="/admin/orders"
+            icon={<ShoppingCart />}
+            label="주문 및 배송 관리"
+          />
           <SidebarLink to="/admin/members" icon={<Users />} label="회원 관리" />
-          <SidebarLink to="/admin/support" icon={<Headset />} label="고객 지원" />
-          <SidebarLink to="/admin/inquiries" icon={<MessageSquare />} label="1:1 문의 답변" />
+          <SidebarLink
+            to="/admin/support"
+            icon={<Headset />}
+            label="고객 지원"
+          />
+          <SidebarLink
+            to="/admin/inquiries"
+            icon={<MessageSquare />}
+            label="1:1 문의 답변"
+          />
         </nav>
       </aside>
-      
+
+      {/* 메인 콘텐츠 */}
+      <main className="flex-1 overflow-y-auto p-5">{children}</main>
     </div>
   );
 };

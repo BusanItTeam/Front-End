@@ -428,8 +428,7 @@ const ProductDetailPage = () => {
 
           {/* 재고 상태 */}
           <div className="mt-4">
-            <p className={`font-semibold ${selectedOption && selectedOption.inventory.stock > 0 ? "text-green-500" : "text-red-500"}`}>재고 상태: {selectedOption ? (selectedOption.inventory.stock > 0 ? "재고 있음" : "재고 없음") : "옵션을 선택하세요"}</p>
-            <p className={`font-semibold mt-2 ${selectedOption && selectedOption.inventory.stock <= 0 ? "text-red-500" : "text-green-500"}`}>남은 재고: {selectedOption ? selectedOption.inventory.stock : "옵션을 선택하세요"}</p>
+            <p className={`font-semibold ${selectedOption && selectedOption.inventory.stock > 0 ? "text-green-500" : "text-red-500"}`}> {selectedOption ? (selectedOption.inventory.stock > 0 ? "재고 있음" : "재고 없음") : "옵션을 선택하세요"}</p>
           </div>
 
           {/* 수량 선택 */}

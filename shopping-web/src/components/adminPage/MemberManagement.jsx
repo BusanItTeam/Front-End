@@ -7,6 +7,7 @@ import { Blocks } from "react-loader-spinner";
 import { FaUser } from "react-icons/fa";
 import Search from "../search/Search.jsx";
 import { useMyContext } from "../../store/ContextApi.jsx";
+import AdminLayout from "./AdminLayout.jsx";
 
 // 컬럼 정의 (DataGrid용)
 const userListsColumns = [
@@ -188,7 +189,6 @@ const MemberManagement = () => {
     created: moment(item.createdDate).format("YYYY/MM/DD hh:mm:ss a"),
     status: item?.enabled ? "Active" : "Inactive",
   }));
-  
 
   useEffect(() => {
     console.log("🔍 검색어:", searchTerm);
@@ -196,43 +196,45 @@ const MemberManagement = () => {
   }, [searchTerm, users]);
 
   return (
-    <div className="p-4">
-      <div className="relative flex items-center justify-center mb-6">
-        <h1 className="text-3xl font-bold flex items-center gap-2">
-          <FaUser className="text-primary" />
-          전체 사용자
-        </h1>
-        <div className="absolute right-0">
-          <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+    <AdminLayout>
+      <div className="p-4">
+        <div className="relative flex items-center justify-center mb-6">
+          <h1 className="text-3xl font-bold flex items-center gap-2">
+            <FaUser className="text-primary" />
+            전체 사용자
+          </h1>
+          <div className="absolute right-0">
+            <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+          </div>
+        </div>
+
+        <div className="overflow-x-auto w-full mx-auto mt-4">
+          {loading ? (
+            <div className="flex justify-center items-center h-72">
+              <Blocks height="70" width="70" color="#4fa94d" visible />
+              <span>Loading...</span>
+            </div>
+          ) : (
+            <DataGrid
+              className="w-fit mx-auto"
+              rows={rows}
+              columns={userListsColumns}
+              initialState={{
+                pagination: {
+                  paginationModel: {
+                    pageSize: 10, // 기본 사이즈 페이지 10개씩
+                  },
+                },
+              }}
+              disableRowSelectionOnClick
+              pageSizeOptions={[10, 25, 50, 100]}
+              disableColumnResize
+              onRowClick={handleRowClick}
+            />
+          )}
         </div>
       </div>
-
-      <div className="overflow-x-auto w-full mx-auto mt-4">
-        {loading ? (
-          <div className="flex justify-center items-center h-72">
-            <Blocks height="70" width="70" color="#4fa94d" visible />
-            <span>Loading...</span>
-          </div>
-        ) : (
-          <DataGrid
-            className="w-fit mx-auto"
-            rows={rows}
-            columns={userListsColumns}
-            initialState={{
-              pagination: {
-                paginationModel: {
-                  pageSize: 10, // 기본 사이즈 페이지 10개씩
-                },
-              },
-            }}
-            disableRowSelectionOnClick
-            pageSizeOptions={[10, 25, 50, 100]}
-            disableColumnResize
-            onRowClick={handleRowClick}
-          />
-        )}
-      </div>
-    </div>
+    </AdminLayout>
   );
 };
 

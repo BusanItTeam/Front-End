@@ -22,7 +22,7 @@ const Homepage = () => {
         const response = await axios.get(`${backendURL}/api/products/best-selling?limit=8`);
         setBestProducts(response.data);
       } catch (error) {
-        console.error("베스트상품 불러오기 오류:", error);
+        console.error("베스트 상품 불러오기 오류:", error);
       }
     };
     fetchBestSellingProducts();

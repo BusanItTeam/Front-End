@@ -91,8 +91,6 @@ const MemberManagementDetails = () => {
     if (!window.confirm("정말로 이 사용자를 삭제하시겠습니까?")) return;
 
     try {
-   
-
       if (!token) {
         toast.error("로그인이 필요합니다.");
         return;
