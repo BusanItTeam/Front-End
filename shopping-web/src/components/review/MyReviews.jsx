@@ -15,9 +15,6 @@ const MyReviews = () => {
   const [loading, setLoading] = useState(true);
   const [orderProducts, setOrderProducts] = useState([]);
 
-  
- 
-  
   useEffect(() => {
     const fetchMyReviews = async () => {
       if (!token) {
@@ -67,9 +64,9 @@ const MyReviews = () => {
           <table className="min-w-full border-collapse border border-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="border px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">상품 정보</th>
-                <th className="border px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">리뷰</th>
-                <th className="border px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">수정</th>
+                <th className="border px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">상품 정보</th>
+                <th className="border px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">리뷰</th>
+                <th className="border px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">수정</th>
               </tr>
             </thead>
             <tbody>
@@ -81,15 +78,16 @@ const MyReviews = () => {
 
                 return (
                   <tr key={review.reviewId || `review-${review.productId}-${index}`} className="hover:bg-gray-50">
-                    <td className="border px-6 py-4">
-                      <div className="flex items-center">
+                    {/* 상품 정보 */}
+                    <td className="border px-6 py-4 text-center">
+                      <div className="flex flex-col items-center">
                         <img
                           src={`${backendURL}${matchingProduct?.image || review.productImage}`}
                           alt={matchingProduct?.productName || review.productName}
-                          className="w-20 h-20 object-cover rounded mr-4"
+                          className="w-20 h-20 object-cover rounded mb-2"
                         />
                         <div>
-                          <h3 className="font-semibold">
+                          <h3 className="font-semibold text-center">
                             {matchingProduct?.productName || review.productName}
                           </h3>
                           <p className="text-sm">
@@ -99,17 +97,21 @@ const MyReviews = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="border px-6 py-4">
+
+                    {/* 리뷰 */}
+                    <td className="border px-6 py-4 text-center">
                       <p className="text-sm">별점: {"★".repeat(review.rating + 1)}</p>
                       <p className="mt-2">{review.content}</p>
                     </td>
-                    <td className="border px-6 py-4">
+
+                    {/* 수정 버튼 */}
+                    <td className="border px-6 py-4 text-center">
                       <button
                         onClick={() => {
                           console.log("이동할 URL:", `/edit-review/${review.productId}/${review.optionId}`);
                           navigate(`/edit-review/${review.productId}/${review.optionId}`);
                         }}
-                        className="flex gap-2 items-center justify-center flex-1 border p-3 shadow-sm shadow-gray-200 rounded-md hover:bg-gray-300 transition-all duration-300"
+                        className="w-full border p-3 shadow-sm shadow-gray-200 rounded-md hover:bg-gray-300 transition-all duration-300"
                       >
                         리뷰 수정
                       </button>
