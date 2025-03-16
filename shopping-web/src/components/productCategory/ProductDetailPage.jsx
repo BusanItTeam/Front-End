@@ -147,16 +147,16 @@ const ProductDetailPage = () => {
     const fetchReviews = async () => {
       try {
         const response = await api.get(`/reviews/product/${productId}`);
+        console.log("✅ 리뷰 데이터 확인:", response.data); // ✅ 데이터 확인 로그 추가
         setReviews(response.data);
       } catch (error) {
-        console.error("Error fetching reviews:", error);
+        console.error("❌ 리뷰 가져오기 실패:", error);
         toast.error("리뷰를 가져오는데 실패했습니다.");
       }
     };
 
     fetchReviews();
-  }, [productId]);
-
+}, [productId]);
   // FAQ 로딩
   useEffect(() => {
     const fetchFAQs = async () => {
@@ -474,35 +474,48 @@ const ProductDetailPage = () => {
           </div>
         </div>
 
-        {/* 리뷰 및 평점 */}
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold">리뷰</h2>
-          <ul>
-            {reviews.map((review) => (
-              <div key={review.reviewId} className="border rounded p-4 mt-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <p className="font-semibold">{review.user.userName}</p>
-                    <div className="ml-2">
-                      {Array.from({ length: review.rating }).map((_, i) => (
-                        <span key={i} className="text-yellow-500">
-                          ★
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  {/* 리뷰 삭제 버튼 (작성자 또는 관리자만) */}
-                  {(review.user.userId === currentUser?.userId || isAdmin) && (
-                    <button onClick={() => handleDeleteReview(review.reviewId)} className="text-red-500 hover:text-red-700">
-                      삭제
-                    </button>
-                  )}
-                </div>
-                <p className="mt-2">{review.content}</p>
+     
+{/* 리뷰 및 평점 */}
+{/* 리뷰 및 평점 */}
+<div className="mt-8">
+  <h2 className="text-xl font-semibold">리뷰</h2>
+  <ul>
+    {reviews.map((review, index) => {
+      const uniqueKey = review.reviewId ?? `temp-key-${index}`; // ✅ reviewId가 없으면 임시 키 사용
+
+      return (
+        <div key={uniqueKey} className="border rounded p-4 mt-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              {/* ✅ user 정보가 있는지 확인 후 출력 */}
+              <p className="font-semibold">
+                {review.userName ?? "익명 사용자"}
+              </p>
+
+              <div className="ml-2">
+                {Array.from({ length: review.rating }).map((_, i) => (
+                  <span key={i} className="text-yellow-500">
+                    ★
+                  </span>
+                ))}
               </div>
-            ))}
-          </ul>
+            </div>
+
+            {/* 리뷰 삭제 버튼 (작성자 또는 관리자만) */}
+            {(review.userId === currentUser?.userId || isAdmin) && (
+              <button onClick={() => handleDeleteReview(review.reviewId)} className="text-red-500 hover:text-red-700">
+                삭제
+              </button>
+            )}
+          </div>
+          <p className="mt-2">{review.content}</p>
         </div>
+      );
+    })}
+  </ul>
+</div>
+
+
 
         {/* FAQ */}
         <div className="mt-8">

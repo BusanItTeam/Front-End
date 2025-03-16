@@ -38,11 +38,12 @@ import ForgotPassword from "./components/Auth/ForgotPassword";
 import ResetPassword from "./components/Auth/ResetPassword";
 import MyPoint from "./components/myPage/MyPoint";
 import PointHistory from "./components/myPage/PointHistory";
-
+import MyReviews from "./components/review/MyReviews";
 import ReviewForm from "./components/review/ReviewForm";
 import OrderHistory from "./components/order/OrderHistory";
 import AdminLayout from "./components/adminPage/AdminLayout";
 import NotFound from "./components/Auth/NotFound";
+import EditReview from "./components/review/EditReview";
 
 const AdminRoute = ({ children }) => {
   const { isAdmin } = useMyContext();
@@ -76,8 +77,10 @@ function App() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/myPage/PointHistory" element={<MyPoint />} />
           <Route path="/points-history" element={<PointHistory />} />
-          <Route path="/review/:orderItemId" element={<ReviewForm />} />
+          <Route path="/reviews/:productId/:optionId" element={<ReviewForm />} />
           <Route path="/orders/history" element={<OrderHistory />} />
+          <Route path="/my-reviews/:productId/:optionId" element={<MyReviews />} />
+          <Route path="/edit-review/:productId/:optionId" element={<EditReview />} />
           <Route path="*" element={<NotFound />} />
           <Route
             path="/admin"
