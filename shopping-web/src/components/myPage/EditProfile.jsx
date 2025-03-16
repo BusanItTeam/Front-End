@@ -64,7 +64,7 @@ const EditProfile = () => {
       }
 
       const response = await api.put(
-        "/auths/user",
+        "/auths/edit/user",
         {
           name: name || null,
           phoneNumber: phoneNumber || null,
@@ -151,7 +151,7 @@ const EditProfile = () => {
           <input
             type="name"
             placeholder="홍길동"
-            defaultValue={currentUser?.username}
+            value={currentUser?.username}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500"
           />
         </div>
@@ -162,7 +162,7 @@ const EditProfile = () => {
           <input
             type="name"
             placeholder="홍길동"
-            defaultValue={name}
+            value={name}
             onChange={(e) => setName(e.target.value)}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500"
           />
@@ -174,7 +174,7 @@ const EditProfile = () => {
           <input
             type="email"
             placeholder="rimel111@gmail.com"
-            defaultValue={currentUser?.email}
+            value={currentUser?.email}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500"
           />
         </div>
@@ -185,7 +185,7 @@ const EditProfile = () => {
           <input
             type="phoneNumber"
             placeholder="010-0000-0000"
-            defaultValue={currentUser?.phoneNumber}
+            value={currentUser?.phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500"
           />
@@ -197,7 +197,7 @@ const EditProfile = () => {
           <input
             type="text"
             placeholder="00000"
-            defaultValue={postcode}
+            value={postcode}
             onChange={(e) => setPostcode(e.target.value)}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500"
           />
@@ -209,7 +209,7 @@ const EditProfile = () => {
           <input
             type="text"
             placeholder="양주로152"
-            defaultValue={address}
+            value={address}
             onChange={(e) => setAddress(e.target.value)}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500"
           />
@@ -221,7 +221,7 @@ const EditProfile = () => {
           <input
             type="text"
             placeholder="대동아파트"
-            defaultValue={extraAddress}
+            value={extraAddress}
             onChange={(e) => setExtraAddress(e.target.value)}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500"
           />
@@ -233,7 +233,7 @@ const EditProfile = () => {
           <input
             type="text"
             placeholder="001동 1112호"
-            defaultValue={detailAddress}
+            value={detailAddress}
             onChange={(e) => setDetailAddress(e.target.value)}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500"
           />
@@ -245,7 +245,7 @@ const EditProfile = () => {
           <input
             type="text"
             placeholder="2024-02-01"
-            defaultValue={
+            value={
               currentUser?.createdDate
                 ? formatDate(currentUser.createdDate)
                 : ""

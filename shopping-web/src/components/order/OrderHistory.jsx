@@ -18,6 +18,9 @@ const OrderHistory = () => {
     SHIPPING: "배송중",
     SHIPPED: "배송완료",
   };
+ 
+
+  
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -51,29 +54,32 @@ const OrderHistory = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">주문번호</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">상품정보</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">가격</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">배송상태</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">리뷰</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">주문번호</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">상품정보</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">총 결제 금액</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">배송상태</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">리뷰</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {orders.map((order) => (
                 <tr key={order.orderId} className="hover:bg-gray-50">
                   {/* 주문번호 */}
-                  <td className="px-6 py-4 whitespace-nowrap">#{order.orderId}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center">#{order.orderId}</td>
 
                   {/* 상품정보 */}
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 text-center">
                     {order.orderDetails?.map((detail, index) => (
-                      <div key={`${detail.productId}-${detail.optionId}`} className="flex items-center mb-4 last:mb-0">
+                      <div
+                        key={`${detail.productId}-${detail.optionId}`}
+                        className="flex items-center justify-center mb-4 last:mb-0"
+                      >
                         <img
                           src={`${backendURL}${detail.Image}`}
                           alt={detail.ProductName}
                           className="w-20 h-20 object-cover rounded-lg mr-4"
                         />
-                        <div>
+                        <div className="text-center">
                           <p className="font-semibold">{detail.ProductName}</p>
                           <p className="text-sm text-gray-500">
                             {detail.OptionColor} / {detail.OptionSize}
@@ -84,24 +90,26 @@ const OrderHistory = () => {
                     ))}
                   </td>
 
+
                   {/* 가격 */}
                   <td className="px-6 py-4 whitespace-nowrap">
                     {order.orderDetails?.map((detail, index) => (
-                      <div key={`${detail.productId}-${detail.optionId}-price`} className="mb-2">
-                        {formatCurrency(detail.price * detail.quantity)}
+                      <div key={`${detail.productId}-${detail.optionId}-price`} className="mb-2 text-center">
+                        {/* totalPrice 계산 후 출력 */}
+                        {formatCurrency(order.totalPrice)}
                       </div>
                     ))}
                   </td>
-
                   {/* 배송상태 */}
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap text-center">
                     <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-800">
                       {statusMap[order.status] || order.status}
                     </span>
                   </td>
 
-                  {/* 리뷰 버튼 */}
-                  <td className="px-6 py-4 whitespace-nowrap">
+
+                    {/* 리뷰 버튼 */}
+                                    <td className="px-6 py-4 whitespace-nowrap text-center">
                     {order.status === "SHIPPED" && order.orderDetails.length > 0 ? (
                       order.orderDetails[0].reviewExists ? (
                         <button
