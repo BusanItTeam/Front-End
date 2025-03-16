@@ -19,7 +19,7 @@ const OrderPage = () => {
   const [Item, setItem] = useState(null); // 로컬 스토리지에서 가져온 상품 정보를 저장할 상태
   const [selectedItems, setSelectedItems] = useState([]);
 
-  // ✅ 바로 구매 상품 정보 가져오기
+  //  바로 구매 상품 정보 가져오기
   useEffect(() => {
     const storedDirectBuyInfo = localStorage.getItem("directBuyInfo");
     if (storedDirectBuyInfo) {
@@ -30,7 +30,7 @@ const OrderPage = () => {
     }
   }, []);
 
-  // ✅ 페이지 마운트 시 장바구니에서 선택된 상품 정보 가져오기
+  // 페이지 마운트 시 장바구니에서 선택된 상품 정보 가져오기
   useEffect(() => {
     const storedItems = localStorage.getItem("selectedItems");
     if (storedItems) {
@@ -82,7 +82,7 @@ const OrderPage = () => {
     }
   }, [currentUser]);
 
-  // ✅ 결제하기 버튼 클릭 시 주문저장
+  //  결제하기 버튼 클릭 시 주문저장
   const handleOrderSubmit = async () => {
     // 사용자 정보와 상품 정보가 모두 필요한 경우
     if (!currentUser?.id || (selectedItems.length === 0 && !Item)) {
@@ -128,6 +128,7 @@ const OrderPage = () => {
       const token = localStorage.getItem("JWT_TOKEN");
       console.log("🔑 JWT 토큰 확인:", token);
 
+      
       if (!token) {
         alert("로그인이 필요합니다.");
         return;
@@ -223,6 +224,7 @@ const OrderPage = () => {
     }));
   };
 
+  
   // ✅ "주문자 정보와 동일" 체크박스 핸들러
   const handleSameOrderer = (event) => {
     const checked = event.target.checked;
@@ -254,22 +256,30 @@ const OrderPage = () => {
     { id: "smilepay", name: "스마일PAY" },
   ];
 
+  // 할인된 가격 계산
+  const calculateDiscountedPrice = (price, discountRate) => {
+    if (!discountRate || discountRate === 0) return price; // 할인율이 없으면 원래 가격 반환
+    return price - (price * (discountRate / 100)); // 할인율을 적용한 가격 계산
+  };
+
   // ✅ 전체 상품 가격 계산
   const getTotalPrice = () => {
     let totalPrice = 0;
-
+  
     // 바로 구매 상품이 있을 경우 가격 계산
     if (Item && Item.product) {
-      totalPrice += Item.product.price * Item.quantity;
+      const discountedPrice = calculateDiscountedPrice(Item.product.price, Item.product.discountRate); 
+      totalPrice += discountedPrice * Item.quantity;
     }
-
+  
     // 장바구니 상품이 있을 경우 가격 계산
     if (selectedItems.length > 0) {
       selectedItems.forEach((item) => {
-        totalPrice += item.price * item.quantity; // 장바구니 상품의 가격을 사용
+        const discountedPrice = calculateDiscountedPrice(item.price, item.discountRate); 
+        totalPrice += discountedPrice * item.quantity;
       });
     }
-
+  
     return totalPrice;
   };
 
@@ -385,7 +395,11 @@ const OrderPage = () => {
                         ) : null
                       )}
                     </td>
-                    <td className="py-2">{(item.product.price * item.quantity).toLocaleString("ko-KR")}원</td>
+                   
+                    <td className="py-2">
+                    {calculateDiscountedPrice(item.product.price, item.product.discountRate) * item.quantity
+                      .toLocaleString("ko-KR")}원
+                    </td>
                     <td className="py-2">{item.quantity}</td>
                     <td className="py-2">{calculateEstimatedPoints().toLocaleString("ko-KR")}원</td>
                     <td className="py-2">일반 배송</td>
@@ -633,7 +647,7 @@ const OrderPage = () => {
           </div>
           <div className="flex justify-between py-3 font-bold text-lg text-gray-900">
             <span>총 결제금액</span>
-            <span>{(getTotalPrice() + SHIPPING_COST - point).toLocaleString("ko-KR")}원</span>
+              <span>{(getTotalPrice() + SHIPPING_COST - point).toLocaleString("ko-KR")}원</span>
           </div>
         </div>
         <div className="mt-6 flex space-x-2">
