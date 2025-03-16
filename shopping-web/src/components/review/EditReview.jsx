@@ -145,7 +145,7 @@ const EditReview = () => {
         </div>
 
         {/* 제출 버튼 */}
-        <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
+        <button type="submit" className="w-full border p-3 shadow-sm shadow-gray-200 rounded-md hover:bg-gray-300 transition-all duration-300">
           리뷰 수정 완료
         </button>
       </form>

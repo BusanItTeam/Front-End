@@ -109,14 +109,15 @@ const OrderHistory = () => {
 
 
                     {/* 리뷰 버튼 */}
-                                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                    {/* 리뷰 버튼 */}
+                  <td className="px-6 py-4 whitespace-nowrap text-center">
                     {order.status === "SHIPPED" && order.orderDetails.length > 0 ? (
                       order.orderDetails[0].reviewExists ? (
                         <button
                           onClick={() =>
                             navigate(`/my-reviews/${order.orderDetails[0].productId}/${order.orderDetails[0].optionId}`)
                           }
-                          className="flex gap-2 items-center justify-center flex-1 border p-3 shadow-sm shadow-gray-200 rounded-md hover:bg-gray-300 transition-all duration-300"
+                          className="flex justify-center items-center mx-auto border p-3 shadow-sm shadow-gray-200 rounded-md hover:bg-gray-300 transition-all duration-300"
                         >
                           내가 작성한 리뷰 보기
                         </button>
@@ -134,6 +135,7 @@ const OrderHistory = () => {
                       <span className="text-gray-400">배송 완료 후 가능</span>
                     )}
                   </td>
+
                 </tr>
               ))}
             </tbody>
