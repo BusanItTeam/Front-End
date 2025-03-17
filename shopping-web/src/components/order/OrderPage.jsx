@@ -77,7 +77,6 @@ const OrderPage = () => {
         address: userAddress.address || "",
         detailAddress: userAddress.detailAddress || "",
         extraAddress: userAddress.extraAddress || "",
-    
       });
     }
   }, [currentUser]);
@@ -128,7 +127,6 @@ const OrderPage = () => {
       const token = localStorage.getItem("JWT_TOKEN");
       console.log("🔑 JWT 토큰 확인:", token);
 
-      
       if (!token) {
         alert("로그인이 필요합니다.");
         return;
@@ -224,7 +222,6 @@ const OrderPage = () => {
     }));
   };
 
-  
   // ✅ "주문자 정보와 동일" 체크박스 핸들러
   const handleSameOrderer = (event) => {
     const checked = event.target.checked;
@@ -259,27 +256,27 @@ const OrderPage = () => {
   // 할인된 가격 계산
   const calculateDiscountedPrice = (price, discountRate) => {
     if (!discountRate || discountRate === 0) return price; // 할인율이 없으면 원래 가격 반환
-    return price - (price * (discountRate / 100)); // 할인율을 적용한 가격 계산
+    return price - price * (discountRate / 100); // 할인율을 적용한 가격 계산
   };
 
   // ✅ 전체 상품 가격 계산
   const getTotalPrice = () => {
     let totalPrice = 0;
-  
+
     // 바로 구매 상품이 있을 경우 가격 계산
     if (Item && Item.product) {
-      const discountedPrice = calculateDiscountedPrice(Item.product.price, Item.product.discountRate); 
+      const discountedPrice = calculateDiscountedPrice(Item.product.price, Item.product.discountRate);
       totalPrice += discountedPrice * Item.quantity;
     }
-  
+
     // 장바구니 상품이 있을 경우 가격 계산
     if (selectedItems.length > 0) {
       selectedItems.forEach((item) => {
-        const discountedPrice = calculateDiscountedPrice(item.price, item.discountRate); 
+        const discountedPrice = calculateDiscountedPrice(item.price, item.discountRate);
         totalPrice += discountedPrice * item.quantity;
       });
     }
-  
+
     return totalPrice;
   };
 
@@ -395,11 +392,8 @@ const OrderPage = () => {
                         ) : null
                       )}
                     </td>
-                   
-                    <td className="py-2">
-                    {calculateDiscountedPrice(item.product.price, item.product.discountRate) * item.quantity
-                      .toLocaleString("ko-KR")}원
-                    </td>
+
+                    <td className="py-2">{calculateDiscountedPrice(item.product.price, item.product.discountRate) * item.quantity.toLocaleString("ko-KR")}원</td>
                     <td className="py-2">{item.quantity}</td>
                     <td className="py-2">{calculateEstimatedPoints().toLocaleString("ko-KR")}원</td>
                     <td className="py-2">일반 배송</td>
@@ -432,7 +426,7 @@ const OrderPage = () => {
                     </td>
                     <td className=" py-2">{item.productName}</td>
                     <td className=" py-2">{item.color && item.size ? `color: ${item.color}, size: ${item.size}` : "옵션 없음"}</td>
-                    <td className=" py-2">{(item.price * item.quantity).toLocaleString("ko-KR")}원</td>
+                    <td className=" py-2">{calculateDiscountedPrice(item.price, item.discountRate) * item.quantity.toLocaleString("ko-KR")}원</td>
                     <td className=" py-2">{item.quantity}</td>
                     <td className=" py-2">{((item.price / 100) * item.quantity).toLocaleString("ko-KR")}원</td>
                     <td className=" py-2">일반 배송</td>
@@ -647,7 +641,7 @@ const OrderPage = () => {
           </div>
           <div className="flex justify-between py-3 font-bold text-lg text-gray-900">
             <span>총 결제금액</span>
-              <span>{(getTotalPrice() + SHIPPING_COST - point).toLocaleString("ko-KR")}원</span>
+            <span>{(getTotalPrice() + SHIPPING_COST - point).toLocaleString("ko-KR")}원</span>
           </div>
         </div>
         <div className="mt-6 flex space-x-2">
