@@ -184,12 +184,12 @@ const OrderPage = () => {
     return Math.min(totalPrice, userPoints);
   };
 
-  // ✅ 포인트 전액 사용 함수
+  // 포인트 전액 사용 함수
   const handleFullUse = () => {
     setPoint(getMaxUsablePoint()); // 최대 사용 가능 포인트로 설정
   };
 
-  // ✅ 포인트 입력 값 제한 함수
+  // 포인트 입력 값 제한 함수
   const handlePointChange = (event) => {
     let value = Number(event.target.value);
     const maxUsablePoint = getMaxUsablePoint();
@@ -206,7 +206,7 @@ const OrderPage = () => {
 
     setPoint(value);
   };
-  // ✅ 주문자 정보 변경 핸들러
+  //  주문자 정보 변경 핸들러
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -215,7 +215,7 @@ const OrderPage = () => {
     }));
   };
 
-  // ✅ 배송지 정보 변경 핸들러
+  //  배송지 정보 변경 핸들러
   const handleChange2 = (e) => {
     const { name, value } = e.target;
     setFormData2((prev) => ({
@@ -225,13 +225,13 @@ const OrderPage = () => {
   };
 
   
-  // ✅ "주문자 정보와 동일" 체크박스 핸들러
+  //  "주문자 정보와 동일" 체크박스 핸들러
   const handleSameOrderer = (event) => {
     const checked = event.target.checked;
     setSameAsOrderer(checked);
 
     if (checked) {
-      setFormData2({ ...formData }); // ✅ Immediately copy orderer info
+      setFormData2({ ...formData }); //  Immediately copy orderer info
     } else {
       setFormData2({
         name: "",
@@ -244,7 +244,7 @@ const OrderPage = () => {
       });
     }
   };
-  // ✅ 결제 방법 리스트
+  //  결제 방법 리스트
   const paymentMethods = [
     { id: "bank", name: "무통장입금" },
     { id: "credit", name: "신용카드" },
@@ -262,7 +262,7 @@ const OrderPage = () => {
     return price - (price * (discountRate / 100)); // 할인율을 적용한 가격 계산
   };
 
-  // ✅ 전체 상품 가격 계산
+  // 전체 상품 가격 계산
   const getTotalPrice = () => {
     let totalPrice = 0;
   
