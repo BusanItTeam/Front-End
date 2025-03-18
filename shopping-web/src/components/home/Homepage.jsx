@@ -74,6 +74,7 @@ const Homepage = () => {
               <div className="bg-white shadow-md rounded-lg overflow-hidden">
                 <img src={`${backendURL}${product.images[0]?.imageUrl}`} alt={product.name} className="w-full h-64 object-cover" />
                 <div className="p-4">
+                  
                   <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
                   
                  <span className="text-gray-500 line-through mr-2">

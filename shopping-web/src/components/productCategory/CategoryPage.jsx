@@ -178,10 +178,26 @@ const CategoryPage = () => {
                       alt={product.name}
                       className="object-cover w-full h-64"
                     />
-                    <div className="p-4">
+                     <div className="p-4">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-semibold">{product.name}</h3>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleWishlist(product.productId);
+                      }}
+                      className={`text-xl ${
+                        wishlist.includes(product.productId)
+                          ? "text-red-500"
+                          : "text-gray-400"
+                      }`}
+                    >
+                      ♥
+                    </button>
+                  </div>
                       
-                      <h3 className="text-lg font-semibold">{product.name}</h3>
-                      
+                    
                       <span className="text-gray-500 line-through mr-2">
                         {formatCurrency(product.price)}
                       </span>
@@ -193,7 +209,9 @@ const CategoryPage = () => {
                           )
                         )}
                       </span>
+                      
                     </div>
+                        
                   </Link>
                 </div>
               ))}
