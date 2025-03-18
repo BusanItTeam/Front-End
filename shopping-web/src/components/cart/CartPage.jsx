@@ -137,11 +137,13 @@ const CartPage = () => {
 
       if (response.status === 200) {
         setCartItems((prevItems) => prevItems.filter((item) => item.cartId !== cartId));
-        alert(" 장바구니에서 삭제되었습니다.");
+        if(response.status === 200){
+        toast.success(" 장바구니에서 삭제되었습니다.");
+        }
       }
     } catch (error) {
       console.error("🚨 장바구니 아이템 삭제 실패:", error);
-      alert(" 장바구니 아이템 삭제에 실패했습니다. 다시 시도해주세요.");
+      toast.error(" 장바구니 아이템 삭제에 실패했습니다. 다시 시도해주세요.");
     }
   };
 
