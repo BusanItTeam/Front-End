@@ -65,7 +65,7 @@ export const Header = () => {
             </ul>
           )}
         </div>
-        <Link to="/contact" className="hover:text-pink-500">
+        <Link to="/contat" className="hover:text-pink-500">
           Contact
         </Link>
         <Link to="/about" className="hover:text-pink-500">
@@ -123,7 +123,7 @@ export const Header = () => {
               ))}
             </ul>
           </div>
-          <Link to="/contact" className="block py-2 hover:text-pink-500">
+          <Link to="/contat" className="block py-2 hover:text-pink-500">
             Contact
           </Link>
           <Link to="/about" className="block py-2 hover:text-pink-500">
