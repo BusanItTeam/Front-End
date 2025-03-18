@@ -112,7 +112,7 @@ function ProductManagement() {
         imageInput.value = null; // 파일 input의 값을 null로 설정하여 리셋
       }
 
-      alert("상품 추가 완료!");
+      toast.success("상품 추가 완료!");
     } catch (error) {
       toast.error("Error adding product:", error);
       alert("상품 추가 실패!");

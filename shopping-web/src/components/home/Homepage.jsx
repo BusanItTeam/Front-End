@@ -67,32 +67,37 @@ const Homepage = () => {
       </div> */}
 
       <section className="w-full max-w-[2100px] mt-12 mb-20 px-20">
-        <h2 className="text-2xl font-bold mb-6 text-center">베스트상품</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {bestProducts.map((product) => (
-            <Link to={`/product/${product.productId}`} key={product.productId} className="block">
-              <div className="bg-white shadow-md rounded-lg overflow-hidden">
-                <img src={`${backendURL}${product.images[0]?.imageUrl}`} alt={product.name} className="w-full h-64 object-cover" />
-                <div className="p-4">
-                  
-                  <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
-                  
-                 <span className="text-gray-500 line-through mr-2">
-                    {formatCurrency(product.price)}
-                 </span>
-                  <span className="text-red-500 font-semibold">
-                    {formatCurrency(
-                      calculateDiscountedPrice(
-                        product.price,
-                        product.discountRate
-                      )
-                      )}
-                  </span>
-                </div>
-              </div>
-            </Link>
-          ))}
+      <h2 className="text-2xl font-bold mb-6 text-center">베스트상품</h2>
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {bestProducts.map((product) => (
+        <Link to={`/product/${product.productId}`} key={product.productId} className="block">
+          <div className="bg-white shadow-md rounded-lg overflow-hidden">
+            <div className="w-full h-64 flex justify-center items-center bg-gray-100">
+              <img 
+                src={`${backendURL}${product.images[0]?.imageUrl}`} 
+                alt={product.name} 
+                className="object-cover w-full h-64"
+              />
+             </div>
+            <div className="p-4">
+              <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
+              <span className="text-gray-500 line-through mr-2">
+                {formatCurrency(product.price)}
+              </span>
+              <span className="text-red-500 font-semibold">
+                {formatCurrency(
+                  calculateDiscountedPrice(
+                    product.price,
+                    product.discountRate
+                  )
+                )}
+          </span>
         </div>
+      </div>
+    </Link>
+  ))}
+</div>
+
       </section>
     </div>
   );
