@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { formatCurrency } from "../utils/Formatting";
 
 const Homepage = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -28,6 +29,15 @@ const Homepage = () => {
     fetchBestSellingProducts();
   }, []);
 
+  const calculateDiscountedPrice = (price, discountRate) => {
+    if (discountRate && discountRate > 0) {
+      const discountAmount = (price * discountRate) / 100;
+      return price - discountAmount;
+    }
+    return price;
+  };
+
+  
   const getImageSrc = (index) => images[index] || defaultImage;
 
   const goToPrevious = () => {
@@ -65,7 +75,18 @@ const Homepage = () => {
                 <img src={`${backendURL}${product.images[0]?.imageUrl}`} alt={product.name} className="w-full h-64 object-cover" />
                 <div className="p-4">
                   <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
-                  <p className="text-gray-600">{product.price.toLocaleString()} 원</p>
+                  
+                 <span className="text-gray-500 line-through mr-2">
+                    {formatCurrency(product.price)}
+                 </span>
+                  <span className="text-red-500 font-semibold">
+                    {formatCurrency(
+                      calculateDiscountedPrice(
+                        product.price,
+                        product.discountRate
+                      )
+                      )}
+                  </span>
                 </div>
               </div>
             </Link>

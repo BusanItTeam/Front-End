@@ -179,8 +179,20 @@ const CategoryPage = () => {
                       className="object-cover w-full h-64"
                     />
                     <div className="p-4">
+                      
                       <h3 className="text-lg font-semibold">{product.name}</h3>
-                      <p>{formatCurrency(product.price)}</p>
+                      
+                      <span className="text-gray-500 line-through mr-2">
+                        {formatCurrency(product.price)}
+                      </span>
+                      <span className="text-red-500 font-semibold">
+                        {formatCurrency(
+                          calculateDiscountedPrice(
+                            product.price,
+                            product.discountRate
+                          )
+                        )}
+                      </span>
                     </div>
                   </Link>
                 </div>

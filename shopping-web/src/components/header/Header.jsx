@@ -46,11 +46,11 @@ export const Header = () => {
       {/* 메뉴 부분: 반응형 네브바 메뉴 */}
       <div className="xl:flex hidden gap-12 items-center text-lg font-semibold text-gray-800 ml-70 mx-auto">
         <Link to="/" className="hover:text-pink-500">
-          홈
+          Home
         </Link>
         <div className="relative" onMouseEnter={() => setShowDropdown(true)} onMouseLeave={() => setShowDropdown(false)}>
           <Link to="/category/all" className="hover:text-pink-500">
-            카테고리
+          Category
           </Link>
           {showDropdown && (
             <ul className="absolute bg-gray-100 w-40 shadow-lg mt-2 z-50 rounded-md text-base">
@@ -83,11 +83,11 @@ export const Header = () => {
         ) : (
           <>
             <button onClick={handleLogout} className="hover:text-pink-500">
-              LogOut
+              Logout
             </button>
             {isAdmin && (
               <Link to="/admin" className="hover:text-pink-500">
-                관리자
+                manager
               </Link>
             )}
           </>
