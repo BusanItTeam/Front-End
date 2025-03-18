@@ -9,6 +9,7 @@ import CustomerFAQ from "../adminPage/CustomerFAQ";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart, faHeartBroken, faShoppingCart } from "@fortawesome/free-solid-svg-icons";
 import { ShoppingBagIcon } from "lucide-react";
+import SizeChart from "./SizeChart";
 
 const ProductDetailPage = () => {
   const { productId } = useParams();
@@ -528,6 +529,7 @@ const ProductDetailPage = () => {
             ))}
           </div>
         </div>
+        <SizeChart />
       </div>
 
       {/* 장바구니 팝업 */}
