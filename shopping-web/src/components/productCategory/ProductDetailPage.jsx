@@ -215,6 +215,8 @@ const ProductDetailPage = () => {
       return;
     }
 
+   
+
     console.log("🔑 현재 JWT 토큰:", token);
 
     // 요청 데이터 생성
@@ -343,13 +345,22 @@ const ProductDetailPage = () => {
       {/* 메인 컨텐츠 */}
       <div className="flex-grow container mx-auto px-4 py-8 ml-64">
         {/* 메인 이미지 */}
-        <div className="w-full md:w-1/2 mx-auto mb-4">
-          {selectedImage ? (
-            <img src={`${backendURL}${selectedImage}`} alt={product.name} className="object-contain rounded-lg shadow-md" style={{ width: "400px", height: "400px" }} />
-          ) : (
-            <img src="https://via.placeholder.com/400x300" alt="No Image" className="object-contain rounded-lg shadow-md" style={{ width: "400px", height: "400px" }} />
-          )}
-        </div>
+        <div className="w-full md:w-1/2 mx-auto mb-4 leading-none">
+  {selectedImage ? (
+    <img 
+      src={`${backendURL}${selectedImage}`} 
+      alt={product.name} 
+      className="w-[400px] h-[400px] object-cover rounded-lg shadow-md block" 
+    />
+  ) : (
+    <img 
+      src="https://via.placeholder.com/400x300" 
+      alt="No Image" 
+      className="w-[400px] h-[400px] object-cover rounded-lg shadow-md block" 
+    />
+  )}
+</div>
+
 
         {/* 썸네일 목록 */}
         {product.images && product.images.length > 0 && (
